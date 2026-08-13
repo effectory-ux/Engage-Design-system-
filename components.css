@@ -125,14 +125,14 @@
 .btn-upgrade:hover,
 .btn-upgrade.is-hover {
   border-color: var(--border-highlight-hover);
-  color: var(--content-secondary-hover);
+  color: var(--content-base);
   box-shadow: var(--sh-action-hover);
 }
 .btn-upgrade:active,
 .btn-upgrade.is-pressed {
   background: var(--bg-highlight-subtle);
   border-color: var(--border-highlight-hover);
-  color: var(--content-secondary-hover);
+  color: var(--content-base);
   box-shadow: var(--sh-action-hover);
 }
 .btn-upgrade:focus-visible {
@@ -347,7 +347,7 @@ input.tf.is-readonly.is-hover { border-color: var(--border-base); }
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-inverse);
-  color: var(--content-on-inverse);
+  color: var(--content-inverse);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
@@ -682,7 +682,7 @@ textarea.ta.is-disabled::placeholder { color: var(--content-disabled); }
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-inverse);
-  color: var(--content-on-inverse);
+  color: var(--content-inverse);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.4;

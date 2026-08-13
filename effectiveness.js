@@ -2160,9 +2160,9 @@ function shell(d) {
   const fxMarker = (m) => `<div class="fx-marker ${m.variant} ${m.chip}" style="left:${m.x}%;top:${100 - m.y}%"><div class="fx-dot"></div><div class="fx-chip"><i data-icon="${m.icon}"></i>${m.label}</div></div>`;
   const quad = (m) => {
     const eng = m.x >= 50, perf = m.y >= 50;
-    if (eng && perf) return { q: 'var(--border-positive-base)', s: 'var(--bg-accent-green-subtle)' };   // Effective
+    if (eng && perf) return { q: 'var(--border-positive)', s: 'var(--bg-accent-green-subtle)' };   // Effective
     if (!eng && perf) return { q: 'var(--border-action-hover)', s: 'var(--bg-tertiary)' };              // Detached
-    if (!eng && !perf) return { q: 'var(--bg-negative-base)', s: 'var(--bg-accent-red-subtle)' };       // Ineffective
+    if (!eng && !perf) return { q: 'var(--bg-negative)', s: 'var(--bg-accent-red-subtle)' };       // Ineffective
     return { q: 'var(--bg-highlight-base)', s: 'var(--bg-accent-yellow-subtle)' };                      // Not fully utilized
   };
   /* Icon + label-type per marker variant (Figma label logic) */
@@ -2986,7 +2986,7 @@ function trendSeries(current, previous, max = 100) {
   return { labels, data };
 }
 const makeLineChart = (cv, labels, data, { max = 100, unit = '%' } = {}) => {
-  const info = css('--bg-info-base');
+  const info = css('--bg-info');
   const gridBlue = css('--border-info-subtle');
   const tickFont = { family: 'Poppins', size: 12, weight: 600 };
   const areaFill = (context) => {
@@ -3135,7 +3135,7 @@ function wireFeedback() {
     const problem = wrap.querySelector('#fb-problem');
     problem.addEventListener('input', () => { problem.style.borderColor = ''; });
     wrap.querySelector('#fb-send').addEventListener('click', () => {
-      if (!problem.value.trim()) { problem.style.borderColor = 'var(--border-negative-base)'; problem.focus(); return; }
+      if (!problem.value.trim()) { problem.style.borderColor = 'var(--border-negative)'; problem.focus(); return; }
       const entry = {
         ts: new Date().toISOString(), page: currentPageLabel(), url: location.href, lang: window.LANG || 'en',
         problem: problem.value.trim(), solution: wrap.querySelector('#fb-solution').value.trim(),
@@ -3157,10 +3157,10 @@ function renderOverview(variant, initialView) {
 
   /* Charts — wait for Poppins so radar labels are not clipped */
   document.fonts.ready.then(() => {
-    gauge('rr-chart', d.rrValue, '--bg-info-base', { cutout: '82%', dotRadius: 7, dotStroke: 2.5 });
-    gauge('kpi-workload', d.kpiWorkload, '--bg-positive-base', { cutout: '80%', dotRadius: 4.5, dotStroke: 2 });
-    gauge('kpi-retention', d.kpiRetention, '--bg-positive-base', { cutout: '80%', dotRadius: 4.5, dotStroke: 2 });
-    gauge('kpi-wellbeing', d.kpiWellbeing, '--bg-info-base', { cutout: '80%', dotRadius: 4.5, dotStroke: 2 });
+    gauge('rr-chart', d.rrValue, '--bg-info', { cutout: '82%', dotRadius: 7, dotStroke: 2.5 });
+    gauge('kpi-workload', d.kpiWorkload, '--bg-positive', { cutout: '80%', dotRadius: 4.5, dotStroke: 2 });
+    gauge('kpi-retention', d.kpiRetention, '--bg-positive', { cutout: '80%', dotRadius: 4.5, dotStroke: 2 });
+    gauge('kpi-wellbeing', d.kpiWellbeing, '--bg-info', { cutout: '80%', dotRadius: 4.5, dotStroke: 2 });
 
     /* eNPS donut */
     new Chart(document.getElementById('nps-chart'), {
@@ -3169,7 +3169,7 @@ function renderOverview(variant, initialView) {
         labels: ['Promoters', 'Passives', 'Detractors'],
         datasets: [{
           data: [d.npsPromoters, d.npsPassives, d.npsDetractors],
-          backgroundColor: [css('--bg-distribution-agree'), css('--bg-distribution-neither-agree-disagree'), css('--bg-distribution-disagree')],
+          backgroundColor: [css('--bg-distribution-agree'), css('--bg-distribution-neither'), css('--bg-distribution-disagree')],
           borderWidth: 0
         }]
       },
@@ -3184,8 +3184,8 @@ function renderOverview(variant, initialView) {
       data: {
         labels: ['Engagement', 'Managing systems', 'Facilitating employees', 'Leadership in change', 'Giving direction', 'Employer-ship'].map(s => window.tr ? tr(s) : s),
         datasets: [
-          { label: 'Previous', data: d.swPrevious, backgroundColor: rgba(swPrev, 0.54), borderColor: swPrev, borderWidth: 1, pointBackgroundColor: css('--bg-base'), pointBorderColor: css('--border-highlight-base'), pointBorderWidth: 2, pointRadius: 5 },
-          { label: 'Current', data: d.swCurrent, backgroundColor: rgba(swCur, 0.47), borderColor: swCur, borderWidth: 1, pointBackgroundColor: css('--bg-base'), pointBorderColor: css('--border-info-base'), pointBorderWidth: 2, pointRadius: 5 }
+          { label: 'Previous', data: d.swPrevious, backgroundColor: rgba(swPrev, 0.54), borderColor: swPrev, borderWidth: 1, pointBackgroundColor: css('--bg-base'), pointBorderColor: css('--border-highlight'), pointBorderWidth: 2, pointRadius: 5 },
+          { label: 'Current', data: d.swCurrent, backgroundColor: rgba(swCur, 0.47), borderColor: swCur, borderWidth: 1, pointBackgroundColor: css('--bg-base'), pointBorderColor: css('--border-info'), pointBorderWidth: 2, pointRadius: 5 }
         ]
       },
       options: {
@@ -3195,7 +3195,7 @@ function renderOverview(variant, initialView) {
         plugins: {
           legend: { display: false },
           tooltip: {
-            enabled: true, backgroundColor: css('--bg-inverse-base'), padding: 8, cornerRadius: 8, displayColors: false,
+            enabled: true, backgroundColor: css('--bg-inverse'), padding: 8, cornerRadius: 8, displayColors: false,
             titleFont: { family: 'Poppins', size: 12, weight: 600 }, bodyFont: { family: 'Poppins', size: 12, weight: 500 },
             callbacks: { title: (items) => items[0].label, label: (item) => `${item.dataset.label}: ${item.formattedValue}%` }
           }
