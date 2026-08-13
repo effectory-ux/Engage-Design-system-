@@ -28,7 +28,7 @@ If you genuinely need a decorative inline SVG, annotate it:
 The skill is distributed as a single rolling GitHub release, **`skill-latest`**, whose download URL never changes and always serves the newest build:
 
 ```
-https://github.com/effectory-design/effectory-design-documentation/releases/download/skill-latest/effectory-design-system.zip
+https://github.com/effectory-ux/Engage-Design-system-/releases/download/skill-latest/effectory-design-system.zip
 ```
 
 **Versioning.** The version lives in the root `VERSION` file (single source of truth). Bump it when you ship changes (e.g. `1.0.0` → `1.0.1`). The number is stamped into the bundle (`VERSION` + the `**Version:**` line in `SKILL.md`), shown in the build output, and used as the GitHub release title — so you always know which version you're uploading/using.
