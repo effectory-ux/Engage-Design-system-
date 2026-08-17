@@ -1,3 +1,8 @@
+/* Resolve assets next to this script, not next to the page, so a prototype can load
+   this file straight from the design-system site. Falls back to page-relative. */
+const ASSET_BASE = (document.currentScript && document.currentScript.src)
+  ? new URL('.', document.currentScript.src).href
+  : '';
 
 /* ============================================================
    Effectiveness group comparison — shared overview renderer
@@ -970,7 +975,7 @@ function focusView(d) {
 function reportsView(d) {
   const row = (icon, key, name, desc) => `
     <div class="report-row" data-report="${key}">
-      <img class="file-icon" src="assets/icons/${icon}.svg" alt="" />
+      <img class="file-icon" src="${ASSET_BASE}assets/icons/${icon}.svg" alt="" />
       <div class="report-meta">
         <div class="report-name">${name}</div>
         <div class="report-desc">${desc}</div>
@@ -1044,7 +1049,7 @@ function reportsDialogs() {
       <div class="gen-panel" id="gen-panel">
         <div class="gen-card gen-loading">
           <div class="gen-icon">
-            <img class="gen-file" src="assets/icons/file-loading.svg" alt="" />
+            <img class="gen-file" src="${ASSET_BASE}assets/icons/file-loading.svg" alt="" />
             <span class="gen-spinner"></span>
           </div>
           <div class="gen-text">
@@ -1054,7 +1059,7 @@ function reportsDialogs() {
         </div>
         <div class="gen-done">
           <div class="gen-card">
-            <img class="gen-file" src="assets/icons/file-ready.svg" alt="" />
+            <img class="gen-file" src="${ASSET_BASE}assets/icons/file-ready.svg" alt="" />
             <div class="gen-text">
               <span class="gen-title">Done!</span>
               <span class="gen-sub">The report will download automatically</span>
@@ -2575,7 +2580,7 @@ function shell(d) {
 
   <div class="card qs-card is-high">
     <div class="qs-header">
-      <img class="qs-illu" src="assets/illustrations/win-small.svg" alt="" />
+      <img class="qs-illu" src="${ASSET_BASE}assets/illustrations/win-small.svg" alt="" />
       <p class="qs-title text-l5">Highest scores</p>
       <div class="qs-icons">
         ${pinListControl(pinQItems(d.highScores), 'ib-36 ib-tertiary')}
@@ -2587,7 +2592,7 @@ function shell(d) {
 
   <div class="card qs-card is-low">
     <div class="qs-header">
-      <img class="qs-illu" src="assets/illustrations/improve-small.svg" alt="" />
+      <img class="qs-illu" src="${ASSET_BASE}assets/illustrations/improve-small.svg" alt="" />
       <p class="qs-title text-l5">Lowest scores</p>
       <div class="qs-icons">
         ${pinListControl(pinQItems(d.lowScores), 'ib-36 ib-tertiary')}
