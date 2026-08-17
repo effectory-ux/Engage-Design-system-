@@ -225,6 +225,25 @@ Token-gebaseerd: 64 = `--spacing-extra-loose × 2`, 48 = `--spacing-loose × 2`,
 
 ---
 
+### 12. Vraag in welke track het prototype hoort
+Bouw je een nieuw prototype, vraag dan **voordat je begint** bij welke track het hoort. Product & Tech
+werkt in drie tracks, en de prototype-galerij is daarop ingedeeld:
+
+| Track | Waar het over gaat |
+|---|---|
+| **Surveying** | een survey opzetten, uitzetten en koppelen |
+| **Leadership enablement** | van resultaat naar gesprek en actie |
+| **Reporting** | resultaten teruggeven en duiden |
+| **Platform** | alles wat geen track raakt: homepage, instellingen, integraties |
+
+Het gaat om het onderwerp, niet om wie het maakt: group linking is van Jente maar hoort bij Surveying.
+
+Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat het bevestigen. Noteer
+het antwoord in de oplevering, zodat het prototype met de juiste `group` in
+[`prototypes.json`](https://github.com/effectory-ux/prototypes) van de galerij kan.
+
+---
+
 ## Workflow
 
 1. **Lees de reference** — laad `design-system-reference.md` volledig

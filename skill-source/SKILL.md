@@ -245,17 +245,37 @@ Token-gebaseerd: 64 = `--spacing-extra-loose × 2`, 48 = `--spacing-loose × 2`,
 
 ---
 
+### 12. Vraag in welke track het prototype hoort
+Bouw je een nieuw prototype, vraag dan **voordat je begint** bij welke track het hoort. Product & Tech
+werkt in drie tracks, en de prototype-galerij is daarop ingedeeld:
+
+| Track | Waar het over gaat |
+|---|---|
+| **Surveying** | een survey opzetten, uitzetten en koppelen |
+| **Leadership enablement** | van resultaat naar gesprek en actie |
+| **Reporting** | resultaten teruggeven en duiden |
+| **Platform** | alles wat geen track raakt: homepage, instellingen, integraties |
+
+Het gaat om het onderwerp, niet om wie het maakt: group linking is van Jente maar hoort bij Surveying.
+
+Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat het bevestigen. Noteer
+het antwoord in de oplevering, zodat het prototype met de juiste `group` in
+[`prototypes.json`](https://github.com/effectory-ux/prototypes) van de galerij kan.
+
+---
+
 ## Workflow
 
 1. **Lees de reference** — laad `design-system-reference.md` volledig
 2. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
 3. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
-4. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
+4. **Vraag naar de track** — Surveying, Leadership enablement, Reporting of Platform (zie regel 12)
+5. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
-5. **Bouw incrementeel** — begin met de HTML-structuur, voeg components toe, stel layout in met tokens
-6. **Geen eigen stijlen** — custom CSS alleen voor layout-specifieke zaken (positionering, grid, flex), altijd met tokens voor waarden
-7. **Review** — check de output op doc-classes en hardcoded waarden vóór oplevering
-8. **Lokale server vereist** — meld na het bouwen altijd:
+6. **Bouw incrementeel** — begin met de HTML-structuur, voeg components toe, stel layout in met tokens
+7. **Geen eigen stijlen** — custom CSS alleen voor layout-specifieke zaken (positionering, grid, flex), altijd met tokens voor waarden
+8. **Review** — check de output op doc-classes en hardcoded waarden vóór oplevering
+9. **Lokale server vereist** — meld na het bouwen altijd:
    > ⚠️ Open dit prototype via de lokale server, **niet** via dubbelklik (file://).
    > SVG-maskers (o.a. Toggle-vinkje) en icoonfuncties werken niet zonder HTTP.
    > Start de server met `python3 serve.py` en open daarna:
