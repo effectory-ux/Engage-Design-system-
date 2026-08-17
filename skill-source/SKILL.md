@@ -169,24 +169,38 @@ Een prototype ziet eruit als een echte pagina in de app — niet als een docs-pa
 - Gebruik `--content-base` als standaard tekstkleur
 - Geen docs-chrome (sidebar, tabs, TOC, etc.)
 
-### 8. Altijd via lokale server openen — en `<base href="/">` verplicht
-Prototypes in een submap (zoals `prototypes/`) hebben dit nodig. `icons.js` fetcht SVGs relatief aan het HTML-document. Zonder `<base href="/">` wordt `assets/icons/` omgezet naar `prototypes/assets/icons/` — die map bestaat niet.
+### 8. Assets relatief laden — nooit `<base href="/">`
+`icons.js` haalt SVG's op naast **zichzelf** (via `document.currentScript`), dus relatieve paden werken
+gewoon. Gebruik ze:
 
-Altijd in de `<head>` van elk prototype:
 ```html
-<base href="/" />
-```
-En gebruik root-relatieve paden voor alle assets:
-```html
-<link rel="stylesheet" href="/tokens.css" />
-<link rel="stylesheet" href="/foundation.css" />
-<link rel="stylesheet" href="/components.css" />
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="foundation.css" />
+<link rel="stylesheet" href="components.css" />
 ...
-<script src="/icons.js"></script>
+<script src="icons.js"></script>
 ```
 
-Bovendien: open prototypes altijd via `python3 serve.py` → `http://localhost:<poort>/...`.
-Nooit via dubbelklik (`file://`) — CSS-masks voor het Toggle-vinkje werken dan ook niet.
+Staat het prototype in een submap zoals `prototypes/`, zet er dan een base bij die één niveau omhoog wijst:
+
+```html
+<base href="../" />
+```
+
+**Nooit `<base href="/">`.** Dat werkt alleen zolang je lokaal serveert vanaf de repo-root. Zodra het
+prototype op GitHub Pages staat, wijst `/` naar de root van het domein en niet naar de repo, en laadt
+geen enkele stylesheet of icoon meer. Dat is precies wat er op 17-08-2026 met vijftien prototypes gebeurde:
+de pagina's bleven werken op de lokale server en waren live compleet ongestyled.
+
+Wil je het prototype los van deze bestanden publiceren, verwijs dan naar het design system zelf:
+
+```html
+<link rel="stylesheet" href="https://effectory-ux.github.io/Engage-Design-system-/components.css" />
+<script src="https://effectory-ux.github.io/Engage-Design-system-/icons.js"></script>
+```
+
+Open prototypes altijd via `python3 serve.py` → `http://localhost:<poort>/...`, nooit via dubbelklik
+(`file://`) — CSS-masks voor het Toggle-vinkje werken dan niet.
 
 ### 9. Animaties via motion-tokens en `.overlay`
 Verzin geen eigen duraties of easings — gebruik de motion-tokens (`--motion-fast/base/slow`, `--ease-out/in/standard`; zie reference sectie 2 → Motion).

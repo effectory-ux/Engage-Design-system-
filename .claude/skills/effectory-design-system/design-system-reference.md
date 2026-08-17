@@ -14,7 +14,7 @@ Do NOT invent names. If something isn't listed here, it does not exist.
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prototype</title>
-  <base href="/" />
+  <base href="../" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/tokens.css" />
@@ -34,8 +34,11 @@ Do NOT invent names. If something isn't listed here, it does not exist.
 </html>
 ```
 
-**Waarom `<base href="/">` en root-relatieve paden:**
-`icons.js` fetcht SVGs via `fetch('assets/icons/...')`. Browsers resolven `fetch`-paden relatief aan het HTML-document, niet het script. Vanuit `prototypes/` zou dat naar `prototypes/assets/icons/` wijzen — die map bestaat niet. `<base href="/">` forceert resolutie vanaf de server-root, zodat iconen, CSS én de toggle-mask altijd correct laden. Altijd `<base href="/">` gebruiken voor prototypes in een submap.
+**Waarom relatieve paden en nooit `<base href="/">`:**
+`icons.js` haalt SVG's op naast zichzelf (`document.currentScript`), dus `href="tokens.css"` en
+`src="icons.js"` werken zoals ze staan. Ligt het prototype in een submap zoals `prototypes/`, zet er dan
+`<base href="../" />` bij. Gebruik nooit `<base href="/">`: dat klopt alleen zolang je lokaal vanaf de
+repo-root serveert, en breekt op GitHub Pages, waar `/` de root van het domein is en niet van de repo.
 
 **Nooit meenemen:** `nav.html`, `nav.js`, `.shell`, `.topnav`, `.sidebar`, `.content-wrap`, `.page-header`, `.page-tabs`, `.tab-panel`, `.states-row`, `.state-col`, `.dd-grid`, `.token-table`, `.pg-card`, `.dev-preview`, `.dev-code-wrap`, `.toc-col`, `.section`, `.pagination`
 
