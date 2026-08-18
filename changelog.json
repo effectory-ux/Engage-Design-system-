@@ -1,6 +1,20 @@
 {
-  "count": 1009,
+  "count": 1011,
   "entries": [
+    {
+      "hash": "831d222",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Skill: propose the gallery entry after building, and wait for approval",
+      "pages": []
+    },
+    {
+      "hash": "82c8ee9",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Stamp v1.10.2 in the bundle and rebuild changelog.json",
+      "pages": []
+    },
     {
       "hash": "967e35e",
       "author": "Jente Insing",
