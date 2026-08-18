@@ -125,14 +125,14 @@
 .btn-upgrade:hover,
 .btn-upgrade.is-hover {
   border-color: var(--border-highlight-hover);
-  color: var(--content-secondary-hover);
+  color: var(--content-base);
   box-shadow: var(--sh-action-hover);
 }
 .btn-upgrade:active,
 .btn-upgrade.is-pressed {
   background: var(--bg-highlight-subtle);
   border-color: var(--border-highlight-hover);
-  color: var(--content-secondary-hover);
+  color: var(--content-base);
   box-shadow: var(--sh-action-hover);
 }
 .btn-upgrade:focus-visible {
@@ -347,7 +347,7 @@ input.tf.is-readonly.is-hover { border-color: var(--border-base); }
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-inverse);
-  color: var(--content-on-inverse);
+  color: var(--content-inverse);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
@@ -532,6 +532,16 @@ input[type="search"].srch::-webkit-search-decoration,
 input[type="search"].srch::-webkit-search-cancel-button { -webkit-appearance: none; }
 
 /* Hover */
+/* Large search — for a page where search is the main action, not a filter in a
+   toolbar. Same field, one step up in height and type. */
+input[type="search"].srch-lg {
+  height: 44px;
+  padding: 0 var(--spacing-base) 0 40px;
+  font-size: 16px;
+  border-radius: var(--radius-md);
+}
+.search-wrap.is-lg .search-icon { left: 14px; width: 18px; height: 18px; }
+
 input[type="search"].srch:hover,
 input[type="search"].srch.is-hover { border-color: var(--border-action-hover); }
 
@@ -682,7 +692,7 @@ textarea.ta.is-disabled::placeholder { color: var(--content-disabled); }
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-inverse);
-  color: var(--content-on-inverse);
+  color: var(--content-inverse);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
@@ -766,6 +776,9 @@ textarea.ta.is-disabled::placeholder { color: var(--content-disabled); }
   display:inline-flex; align-items:center; gap:4px;
   background:var(--bg-tertiary); color:var(--content-base);
 }
+/* Small chip — for a label inside a card, where the 14px chip is too loud. */
+.chip-sm { padding: 2px 6px; font-size: 12px; font-weight: 600; line-height: 18px; border-radius: var(--radius-md); }
+
 .chip svg { width:10px; height:10px; flex-shrink:0; opacity:.8; }
 .chip-info    { background:var(--bg-info); color:#fff; }
 .chip-error   { background:var(--bg-negative); color:#fff; }
