@@ -2455,6 +2455,12 @@ span.inline-notif-icon.is-subtle i[data-icon] { width: 24px; height: 24px; displ
 .tag-negative  { background: var(--bg-negative);  color: #fff; }
 .tag-highlight { background: var(--bg-highlight-base); color: var(--content-base); }
 .tag-positive  { background: var(--bg-positive);  color: #fff; }
+/* Survey-status fills. Eff Tag has no neutral or dark background, but survey status
+   needs both — in production these come from the dedicated Survey Status component.
+   Kept here (not redefined per prototype) so every screen shows the same Draft and
+   Planned pill. Reconcile with Survey Status when that lands in the design system. */
+.tag.is-draft   { background: var(--bg-tertiary);      color: var(--content-base); }
+.tag.is-planned { background: var(--bg-inverse);       color: var(--content-inverse); }
 
 /* ── List — vertical stack of rows separated by hairline dividers ── */
 /* .list-item is the generic row: a leading content block (title + sub) that

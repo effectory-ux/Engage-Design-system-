@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create survey - My Effectory</title>
+  <base href="../" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="foundation.css" />
+  <link rel="stylesheet" href="components.css" />
+  <style>
+    body { background: var(--bg-interface-body); }
+
+    /* Responsive page padding (design-system §2) */
+    :root { --page-y: var(--spacing-super-extra-loose); --page-x: 80px; }
+    @media (max-width: 1199px) { :root { --page-y: var(--spacing-extra-loose); --page-x: var(--spacing-loose); } }
+    @media (max-width: 575px)  { :root { --page-y: var(--spacing-loose); --page-x: var(--spacing-base); } }
+
+    /* App shell: sidebar (full height) + scrolling content */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+    .app .mainnav { height: 100%; }
+    .app-main { flex: 1; min-width: 0; height: 100vh; overflow-y: auto; }
+    .app-main-inner { max-width: calc(1200px + 2 * var(--page-x)); margin-inline: auto; padding: var(--page-y) var(--page-x) var(--spacing-super-extra-loose); display: flex; flex-direction: column; gap: var(--spacing-loose); }
+    .ph { margin-bottom: calc(-1 * var(--spacing-loose)); }
+    .ph-divider { border: none; border-top: 1px solid var(--border-base); margin: 0; }
+
+    /* ── Section header (Latest projects) ── */
+    .sec-head { display: flex; align-items: center; gap: var(--spacing-base-tight); margin-bottom: var(--spacing-loose); }
+    .sec-head h2 { margin: 0; flex: 1; min-width: 0; }
+    .sec-head .btn { flex-shrink: 0; }
+
+    /* ── Project cards (carousel) ── */
+    .proj-viewport { overflow: hidden; padding: 6px 0 12px; margin: -6px 0 -12px; }
+    .proj-track { display: flex; gap: var(--spacing-base); transition: transform .32s cubic-bezier(.4,0,.2,1); }
+    .proj-card { flex: 0 0 calc((100% - var(--spacing-base) * 2) / 3); height: 172px; padding: var(--spacing-extra-loose); display: flex; flex-direction: column; text-decoration: none; }
+    .proj-card:hover { border-color: var(--border-action-hover); }
+    .proj-title { flex: 1; font-size: 16px; font-weight: 600; line-height: 1.5; color: var(--content-base); }
+    .proj-meta { display: flex; align-items: center; gap: var(--spacing-tight); font-size: 14px; font-weight: 500; color: var(--content-secondary); }
+    .proj-meta i { width: 16px; height: 16px; display: flex; flex-shrink: 0; color: var(--content-secondary); }
+
+    /* ── All surveys list ── */
+    .surveys-list { padding: 0; }
+    .flt-bar { display: flex; align-items: center; gap: var(--spacing-base-tight); padding: var(--spacing-base-tight) var(--spacing-base); border-bottom: 1px solid var(--border-base); }
+    .flt-bar .search-wrap { flex: 1; min-width: 120px; }
+    .flt-bar input[type="search"].srch { border-color: transparent; background: transparent; box-shadow: none; }
+    .flt-bar input[type="search"].srch:hover { border-color: var(--border-action-hover); background: var(--bg-input-hover); }
+    .flt-bar input[type="search"].srch:focus { border-color: var(--border-brand); background: var(--bg-input); }
+    .flt-cb { display: inline-flex; align-items: center; gap: var(--spacing-tight); font-size: 14px; font-weight: 500; color: var(--content-secondary); white-space: nowrap; cursor: pointer; height: 36px; padding: 0 var(--spacing-base-tight); }
+    .flt-bar .sel-btn-inline { white-space: nowrap; }
+    .flt-bar .sel-btn-inline,
+    .flt-bar .sel-btn-inline .sel-btn-name,
+    .flt-bar .sel-btn-inline .sel-btn-value { font-size: 14px; }
+    .flt-bar .sel-btn-inline i { width: 16px; height: 16px; display: flex; flex-shrink: 0; color: var(--content-secondary); }
+    .flt-ctl { display: inline-flex; }
+    .flt-ctl .menu { position: fixed; margin: 0; z-index: 1100; width: max-content; min-width: 180px; }
+    .flt-ctl .menu .menu-item { cursor: pointer; }
+    .flt-ctl .menu .tag { width: auto; align-self: flex-start; }
+    #sortMenu .menu-item-check { visibility: hidden; }
+    #sortMenu .menu-item.is-selected .menu-item-check { visibility: visible; }
+
+    .surveys-list .list-item > .tag { flex-shrink: 0; width: 212px; text-align: center; }
+    .surveys-list .tag.is-draft   { background: var(--bg-tertiary);    color: var(--content-base); }
+    .surveys-list .tag.is-planned { background: var(--bg-inverse); color: var(--content-on-brand-base); }
+
+    .srv-rr { flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; width: 56px; }
+    .srv-rr-top { display: flex; align-items: center; justify-content: center; gap: var(--spacing-extra-tight); font-size: 14px; font-weight: 500; color: var(--content-base); }
+    .srv-rr-top i { width: 14px; height: 14px; display: flex; flex-shrink: 0; color: var(--content-secondary); }
+    .srv-bar { height: 6px; border-radius: var(--radius-sm); background: var(--bg-tertiary); overflow: hidden; }
+    .srv-bar-fill { height: 100%; border-radius: var(--radius-full); background: var(--bg-info); }
+    .surveys-list .list-item .ib { flex-shrink: 0; }
+
+    /* ══════════════════════════════════════════════════════════════
+       Create survey → "Choose a survey template" dialog
+       Layout-only CSS; every value is a token. The surfaces themselves
+       are the DS components: .overlay > .dialog.dialog-l, .card,
+       .search-wrap/.srch, .btn, .dialog-close, .tooltip.
+       ══════════════════════════════════════════════════════════════ */
+
+    /* The dialog fills the available height; only the card grid scrolls,
+       so the title, the "Start from scratch" action and the search box stay put. */
+    .tpl-dialog,
+    .prev-dialog { max-height: 100%; }
+    /* an overlay covered by another one keeps its state but is not painted */
+    .overlay.is-behind { visibility: hidden; }
+
+    /* Header: title block only. Right padding keeps a long title clear of the
+       absolute close button. */
+    .tpl-head { display: flex; align-items: flex-start; gap: var(--spacing-base); padding-right: var(--spacing-super-loose); }
+    .tpl-head .dialog-header { flex: 1; min-width: 0; }
+
+    /* Search takes the row, "Start from scratch" sits beside it */
+    .tpl-search-row { display: flex; align-items: center; gap: var(--spacing-base); }
+    .tpl-search-row .search-wrap { flex: 1; min-width: 0; }
+    .tpl-search-row .btn { flex-shrink: 0; }
+
+    /* .dialog-close is absolutely positioned by the DS — move that positioning
+       onto the tooltip wrapper so the bubble is anchored to the button. */
+    .dlg-close-tt { position: absolute; top: 15px; right: 15px; z-index: 2; }
+    .dlg-close-tt .dialog-close { position: static; }
+    /* .tt-demo shows the bubble permanently (it's the docs demo wrapper); on a real
+       screen it may only appear on hover/focus. */
+    /* position:fixed so the bubble is never clipped by .dialog's overflow:hidden —
+       coordinates are set on hover/focus by the auto-position script below
+       (design-system-reference → Tooltip → "Clipping vermijden"). */
+    .dlg-close-tt .tooltip { position: fixed; z-index: 1200; opacity: 0; visibility: hidden; transition: opacity var(--motion-fast) var(--ease-out); }
+    .dlg-close-tt:hover .tooltip,
+    .dlg-close-tt:focus-within .tooltip { opacity: 1; visibility: visible; }
+
+    .tpl-body { display: flex; flex-direction: column; gap: var(--spacing-loose); min-height: 0; }
+    /* A class-level `display` beats the UA rule for [hidden], so restore it explicitly
+       for the nodes the search toggles — otherwise the grid and the no-results state
+       are both laid out at once and fight over the same space. */
+    .tpl-grid[hidden], .tpl-empty[hidden], .tpl-card[hidden] { display: none; }
+
+    /* Grid of template cards — 3 across, the rest scrolls.
+       Right padding keeps the card shadow clear of the scrollbar. */
+    /* grid-auto-rows:min-content is load-bearing. The grid has a definite
+       (flex-constrained) height, so plain `auto` rows divide that height between
+       them and the cards get clipped by .card's overflow:hidden. min-content sizes
+       each row to its card and lets the grid scroll instead. */
+    .tpl-grid { list-style: none; margin: 0; padding: var(--spacing-extra-tight) var(--spacing-extra-tight) var(--spacing-extra-tight) 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: min-content; align-content: start; gap: var(--spacing-loose); overflow-y: auto; min-height: 0; }
+    @media (max-width: 900px) { .tpl-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 620px) { .tpl-grid { grid-template-columns: 1fr; } }
+
+    .tpl-card { display: flex; flex-direction: column; padding: var(--spacing-loose); }
+    .tpl-card-img { width: 64px; height: 64px; display: block; flex-shrink: 0; }
+    /* flex-shrink:0 throughout — the card is a flex column, and without it the
+       clamped description is the flexible item and gets squashed to zero height. */
+    .tpl-name { margin: var(--spacing-base) 0 0; color: var(--content-base); flex-shrink: 0; }
+    .tpl-sub { margin: var(--spacing-extra-tight) 0 0; color: var(--content-secondary); flex-shrink: 0; }
+    /* 3-line clamp, matching the live card */
+    .tpl-desc { margin: var(--spacing-base) 0 0; color: var(--content-base); flex-shrink: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    /* margin-top:auto pins the actions to the bottom so they line up across a row;
+       both buttons share the width evenly with 16px between them */
+    .tpl-actions { margin-top: auto; padding-top: var(--spacing-base); display: flex; align-items: center; gap: var(--spacing-base); }
+    .tpl-actions .btn { flex: 1; min-width: 0; justify-content: center; }
+
+    /* No-results state — replaces the grid */
+    /* min-height keeps the dialog from collapsing to the height of the heading when
+       the grid is swapped out; flex-shrink:0 stops the illustration being squashed. */
+    .tpl-empty { flex: 1; min-height: 360px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--spacing-loose); padding-bottom: var(--spacing-extra-loose); }
+    .tpl-empty h2 { margin: 0; color: var(--content-base); flex-shrink: 0; }
+    .tpl-empty img { width: 380px; max-width: 100%; height: auto; flex-shrink: 0; }
+
+    /* ── Template preview dialog ── */
+    .prev-top { display: flex; align-items: center; padding-right: var(--spacing-super-loose); }
+    .prev-body { display: flex; flex-direction: column; gap: var(--spacing-loose); overflow-y: auto; min-height: 0; padding-right: var(--spacing-extra-tight); }
+    .prev-header { display: flex; align-items: center; gap: var(--spacing-base); }
+    .prev-header img { width: 64px; height: 64px; flex-shrink: 0; }
+    .prev-title { margin: 0; color: var(--content-base); }
+    .prev-meta { margin: var(--spacing-extra-tight) 0 0; color: var(--content-secondary); }
+    .prev-lead { margin: 0; color: var(--content-base); }
+    /* 24px between blocks; 12px between a block heading and its text (DS section spacing) */
+    .prev-block { margin-top: var(--spacing-loose); }
+    .prev-block h3 { margin: 0 0 var(--spacing-base-tight); color: var(--content-base); }
+    .prev-block p { margin: 0; color: var(--content-base); white-space: pre-line; }
+    /* "Show more" is the Link button: no padding, no fill — only the label colour
+       changes on hover/press. */
+    .prev-more { align-self: flex-start; padding-left: 0; padding-right: 0; }
+
+    /* ── Questionnaire (Figma "Questionnaire list", node 3912:51393) ── */
+    .q-title { margin: 0 0 var(--spacing-base-tight); color: var(--content-base); }
+    .q-panel { display: flex; flex-direction: column; gap: var(--spacing-extra-loose); padding: var(--spacing-loose); background: var(--bg-secondary); border-radius: var(--radius-md); }
+    .q-head { display: flex; align-items: center; gap: var(--spacing-base-tight); margin-bottom: var(--spacing-base-tight); }
+    .q-head h4 { margin: 0; color: var(--content-base); }
+    /* Count pill. Eff Tag has no neutral/grey background (documented Figma/dev gap),
+       so this is prototype-local, same as the draft/planned pills on all-surveys. */
+    .q-count { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 var(--spacing-tight); background: var(--bg-tertiary); color: var(--content-base); border-radius: var(--radius-full); font-size: 12px; font-weight: 600; }
+    .q-list { background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); overflow: hidden; }
+    .q-row { display: flex; align-items: center; gap: var(--spacing-base); padding: var(--spacing-base) var(--spacing-loose); border-bottom: 1px solid var(--border-base); }
+    .q-row:last-child { border-bottom: none; }
+    .q-text { flex: 1; min-width: 0; color: var(--content-base); }
+    .q-scale { flex-shrink: 0; display: flex; align-items: center; gap: var(--spacing-tight); width: 168px; color: var(--content-base); }
+    .q-scale-icon { flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); }
+    .q-scale-icon i { width: 16px; height: 16px; display: flex; }
+    .q-scale-icon.is-scale  { background: var(--bg-brand-subtle);         color: var(--content-accent-turquoise); }
+    .q-scale-icon.is-choice { background: var(--bg-accent-yellow-subtle); color: var(--content-accent-yellow); }
+    .q-scale-icon.is-open   { background: var(--bg-accent-orange-subtle); color: var(--content-accent-orange); }
+    .q-scale-icon.is-nps    { background: var(--bg-accent-blue-subtle);   color: var(--content-accent-blue); }
+    .q-scale-icon.is-yesno  { background: var(--bg-accent-green-subtle);  color: var(--content-accent-green); }
+    /* Same grey-tag gap: Eff Tag has no subtle brand fill, so this one is local. */
+    .q-list .tag.is-standard { flex-shrink: 0; background: var(--bg-brand-subtle); color: var(--content-accent-turquoise); }
+    @media (max-width: 860px) { .q-scale { width: auto; } .q-scale span:last-child { display: none; } }
+
+    /* ── "Let's get started" dialog ── */
+    .start-body { display: flex; flex-direction: column; gap: var(--spacing-loose); }
+    .start-body .tf-lbl,
+    .start-body .slt-lbl { font-size: 14px; font-weight: 500; color: var(--content-secondary); }
+    /* the select popover must break out of .dialog's overflow:hidden — same fixed-layer
+       rule as the filter menus on all-surveys */
+    .start-body .menu { position: fixed; margin: 0; z-index: 1200; }
+    .start-body .slt { width: 100%; }
+    /* single-select: reserve the check slot so rows don't shift, show it only on the
+       selected one (same as the Sort menu on all-surveys) */
+    .start-body .menu-item-check { visibility: hidden; }
+    .start-body .menu-item.is-selected .menu-item-check { visibility: visible; }
+    /* .tf-field-icon sets its own display, which beats the UA rule for [hidden] —
+       same trap as the grid/empty-state toggle above */
+    .start-body .tf-field-icon[hidden] { display: none; }
+    .start-body .tf-field-icon { color: var(--content-negative); }
+
+    /* Footer floats ON TOP of the scrolling body at the bottom edge of the dialog:
+       taken out of flow, full width, and faded in with a transparent → surface
+       gradient so the questionnaire scrolls away underneath it instead of stopping
+       at a hard bar. The gradient itself is click-through; only the button isn't. */
+    .prev-dialog .dialog-footer { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; justify-content: center; padding: var(--spacing-super-loose) var(--spacing-extra-loose) var(--spacing-loose); background: linear-gradient(180deg, transparent 0%, var(--bg-base) 45%); border-radius: 0 0 var(--radius-xl) var(--radius-xl); pointer-events: none; }
+    .prev-dialog .dialog-footer .btn-big { pointer-events: auto; width: 326px; max-width: 100%; justify-content: center; }
+    /* room so the last question row can scroll clear of the floating footer */
+    .prev-body { padding-bottom: var(--spacing-super-extra-loose); }
+
+    @media (max-width: 760px) {
+      .list-item-sub span { max-width: 160px; }
+      .surveys-list .list-item > .tag { width: auto; }
+      .tpl-search-row { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="mainnav">
+    <div class="mn-portal">
+      <span class="mn-logo"></span>
+      <button class="mn-portal-btn"><b>Coordinator</b> <i data-icon="chevron-down" class="mn-chev"></i></button>
+    </div>
+    <nav class="mn-nav" aria-label="Main">
+      <a class="mn-item"><i data-icon="home"></i> Home</a>
+      <a class="mn-item" data-group="1" aria-expanded="true"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-up" class="mn-chev"></i></a>
+      <div class="mn-sub">
+        <a class="mn-subitem is-active" aria-current="page">All surveys</a>
+        <a class="mn-subitem">Projects</a>
+      </div>
+      <a class="mn-item"><i data-icon="refresh"></i> 360&deg; Feedback</a>
+      <a class="mn-item"><i data-icon="structure"></i> Organization <i data-icon="chevron-down" class="mn-chev"></i></a>
+    </nav>
+    <div class="mn-foot">
+      <a class="mn-item"><i data-icon="help"></i> Help &amp; learn</a>
+      <div class="mn-foot-divider"></div>
+      <div class="mn-user">
+        <div class="av av-36 av-blue">JR</div>
+        <div class="mn-meta">
+          <div class="mn-name">Jamal van Rooijen</div>
+          <div class="mn-org">Effectory B.V.</div>
+        </div>
+        <i data-icon="chevron-up"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="app-main">
+    <div class="app-main-inner">
+
+      <!-- Page header -->
+      <div class="ph">
+        <div class="ph-row">
+          <div class="ph-left">
+            <h1 class="ph-title">Surveys</h1>
+            <div class="ph-meta">See your most recent surveys and projects</div>
+          </div>
+          <div class="ph-controls">
+            <button class="btn btn-primary" id="createBtn"><i data-icon="plus"></i> Create survey</button>
+          </div>
+        </div>
+      </div>
+
+      <hr class="ph-divider" />
+
+      <!-- Latest projects -->
+      <section>
+        <div class="sec-head">
+          <h2 class="text-l4">Latest projects</h2>
+          <button class="btn btn-tertiary">Go to projects</button>
+          <button class="ib ib-36 ib-secondary" id="projPrev" aria-label="Previous projects"><i data-icon="arrow-left"></i></button>
+          <button class="ib ib-36 ib-secondary" id="projNext" aria-label="Next projects"><i data-icon="arrow-right"></i></button>
+        </div>
+
+        <div class="proj-viewport">
+          <div class="proj-track" id="projTrack">
+            <a class="card card-elevated is-interactive proj-card">
+              <div class="proj-title">Central Employee Listening</div>
+              <div class="proj-meta"><i data-icon="clipboard"></i> 5 surveys</div>
+            </a>
+            <a class="card card-elevated is-interactive proj-card">
+              <div class="proj-title">Employee lifecycle</div>
+              <div class="proj-meta"><i data-icon="clipboard"></i> 1 survey</div>
+            </a>
+            <a class="card card-elevated is-interactive proj-card">
+              <div class="proj-title">Example projects</div>
+              <div class="proj-meta"><i data-icon="clipboard"></i> 3 surveys</div>
+            </a>
+            <a class="card card-elevated is-interactive proj-card">
+              <div class="proj-title">Example projects</div>
+              <div class="proj-meta"><i data-icon="clipboard"></i> 3 surveys</div>
+            </a>
+            <a class="card card-elevated is-interactive proj-card">
+              <div class="proj-title">Another project</div>
+              <div class="proj-meta"><i data-icon="clipboard"></i> 1 survey</div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- All surveys -->
+      <section>
+        <h2 class="text-l4" style="margin: 0 0 var(--spacing-loose);">All surveys</h2>
+
+        <div class="card card-elevated surveys-list">
+
+          <!-- Filter bar -->
+          <div class="flt-bar">
+            <div class="search-wrap">
+              <span class="search-icon"><i data-icon="search"></i></span>
+              <input type="search" class="srch" placeholder="Search" aria-label="Search surveys" />
+            </div>
+            <label class="flt-cb">
+              <span class="cb-wrap"><input type="checkbox" class="cb" id="myOnly" /></span>
+              Show only my surveys
+            </label>
+            <div class="flt-ctl">
+              <button class="sel-btn sel-btn-inline" id="sortBtn" aria-haspopup="listbox" aria-expanded="false">
+                <i data-icon="sort-descending"></i>
+                <span class="sel-btn-name">Sort by:</span>
+                <span class="sel-btn-value" id="sortVal">Created last</span>
+              </button>
+              <div class="menu" id="sortMenu" role="listbox" hidden>
+                <div class="menu-item is-selected" data-sort="Created last"><span class="menu-item-body"><span class="menu-item-title">Created last</span></span><i data-icon="check" class="menu-item-check"></i></div>
+                <div class="menu-item" data-sort="Created first"><span class="menu-item-body"><span class="menu-item-title">Created first</span></span><i data-icon="check" class="menu-item-check"></i></div>
+                <div class="menu-item" data-sort="A-Z"><span class="menu-item-body"><span class="menu-item-title">A-Z</span></span><i data-icon="check" class="menu-item-check"></i></div>
+                <div class="menu-item" data-sort="Z-A"><span class="menu-item-body"><span class="menu-item-title">Z-A</span></span><i data-icon="check" class="menu-item-check"></i></div>
+              </div>
+            </div>
+            <div class="flt-ctl">
+              <button class="sel-btn sel-btn-inline" id="statusBtn" aria-haspopup="listbox" aria-expanded="false">
+                <i data-icon="filter"></i>
+                <span class="sel-btn-name">Status:</span>
+                <span class="sel-btn-value" id="statusVal">All (5)</span>
+              </button>
+              <div class="menu" id="statusMenu" role="listbox" aria-multiselectable="true" hidden>
+                <div class="menu-item is-selected" data-status="Draft"><span class="menu-cb"><i data-icon="check"></i></span><span class="menu-item-body"><span class="tag is-draft">Draft</span></span></div>
+                <div class="menu-item is-selected" data-status="Planned"><span class="menu-cb"><i data-icon="check"></i></span><span class="menu-item-body"><span class="tag is-planned">Planned</span></span></div>
+                <div class="menu-item is-selected" data-status="In Progress"><span class="menu-cb"><i data-icon="check"></i></span><span class="menu-item-body"><span class="tag tag-highlight">In Progress</span></span></div>
+                <div class="menu-item is-selected" data-status="Completed"><span class="menu-cb"><i data-icon="check"></i></span><span class="menu-item-body"><span class="tag tag-positive">Completed</span></span></div>
+                <div class="menu-item is-selected" data-status="Merged"><span class="menu-cb"><i data-icon="check"></i></span><span class="menu-item-body"><span class="tag tag-info">Merged</span></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="list-item is-interactive" data-mine="true">
+            <div class="list-item-content">
+              <div class="list-item-title">Engagement 2025</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Central Employee Listening</span></div>
+            </div>
+            <span class="tag tag-info text-w400">5 surveys <b>merged</b></span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 100%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:100%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive">
+            <div class="list-item-content">
+              <div class="list-item-title">New office - Company wide survey</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Central Employee Listening</span></div>
+            </div>
+            <span class="tag tag-positive text-w400"><b>Completed</b> on 22 aug 2025</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 87%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:87%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive" data-mine="true">
+            <div class="list-item-content">
+              <div class="list-item-title">Onboarding experience 2026</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Employee lifecycle</span></div>
+            </div>
+            <span class="tag tag-positive text-w400"><b>Completed</b> on 14 mar 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 92%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:92%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive" data-mine="true">
+            <div class="list-item-content">
+              <div class="list-item-title">Pulse second quarter</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Central Employee Listening</span></div>
+            </div>
+            <span class="tag tag-highlight text-w400"><b>Running</b> until 17 jun 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 34%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:34%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive">
+            <div class="list-item-content">
+              <div class="list-item-title">Thriving Workplace Pulse July 2026</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Central Employee Listening</span></div>
+            </div>
+            <span class="tag tag-highlight text-w400"><b>Running</b> until 19 jul 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 32%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:32%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive">
+            <div class="list-item-content">
+              <div class="list-item-title">Customer Support team check-in</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Example projects</span></div>
+            </div>
+            <span class="tag tag-highlight text-w400"><b>Running</b> until 7 jul 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 79%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:79%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive" data-mine="true">
+            <div class="list-item-content">
+              <div class="list-item-title">Exit interviews 2026</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Employee lifecycle</span></div>
+            </div>
+            <span class="tag tag-highlight text-w400"><b>Running</b> until 30 sep 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 41%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:41%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive">
+            <div class="list-item-content">
+              <div class="list-item-title">Leadership 360 pilot</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Example projects</span></div>
+            </div>
+            <span class="tag is-planned text-w400"><b>Starts</b> on 3 aug 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 0%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:0%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive" data-mine="true">
+            <div class="list-item-content">
+              <div class="list-item-title">UX survey</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Example projects</span></div>
+            </div>
+            <span class="tag is-planned text-w400"><b>Starts</b> on 10 may 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 0%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:0%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive">
+            <div class="list-item-content">
+              <div class="list-item-title">Wellbeing check-in Q1</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Central Employee Listening</span></div>
+            </div>
+            <span class="tag tag-positive text-w400"><b>Completed</b> on 5 feb 2026</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 68%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:68%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive" data-mine="true">
+            <div class="list-item-content">
+              <div class="list-item-title">DE&amp;I baseline scan</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Central Employee Listening</span></div>
+            </div>
+            <span class="tag is-draft">Draft</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 0%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:0%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+          <div class="list-item is-interactive">
+            <div class="list-item-content">
+              <div class="list-item-title">Test survey</div>
+              <div class="list-item-sub"><i data-icon="folder"></i> <span>Example projects</span></div>
+            </div>
+            <span class="tag is-draft">Draft</span>
+            <div class="srv-rr">
+              <div class="srv-rr-top"><i data-icon="user"></i> 0%</div>
+              <div class="srv-bar"><div class="srv-bar-fill" style="width:0%;"></div></div>
+            </div>
+            <button class="ib ib-36 ib-tertiary" aria-label="More options"><i data-icon="more-vertical"></i></button>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     Dialog host. Both overlays are created by JS into this node so
+     they get the .overlay enter animation on open and the .is-closing
+     exit animation on close (SKILL rule 9).
+     ══════════════════════════════════════════════════════════════ -->
+<div id="dialogHost"></div>
+
+<script src="icons.js"></script>
+<script>
+  /* ── Template data ─────────────────────────────────────────────
+     Captured verbatim from my.effectory.com → Surveys → Create survey
+     (Coordinator portal). `img` points at the illustration downloaded
+     from the app's own asset folder. Copy is production copy — do not
+     rewrite it when reusing this screen; it is what the live app says. */
+  var TEMPLATES = [
+    {
+      img: 'sf-template',
+      name: 'Strategic Fitness Model',
+      sub: 'Available in 3 projects',
+      meta: 'Standard template · 22 questions · 4 minutes',
+      desc: 'The SF Model template is based on Effectory’s Strategic Fitness Model, which measures the key drivers of organizational success: employee engagement and the performance environment. It provides a holistic view of how well your organization enables employees to perform and stay motivated.',
+      blocks: [
+        ['Why is it valuable?', 'By using this template, you gather actionable data on the factors that influence both willingness to work and ability to perform. This helps you identify areas that need improvement to boost engagement and organizational effectiveness.'],
+        ['When to use it?', 'Use this template for annual engagement surveys or when aligning HR and organizational strategies. It’s ideal for organizations seeking a comprehensive view of performance conditions and engagement drivers.'],
+        ['What will you get?', '22 questions on engagement drivers and the performance environment\nA clear read on where your organization is strong and where it needs work\nData you can act on when setting strategic priorities']
+      ]
+    },
+    {
+      img: 'wcwp-template',
+      name: 'World-class workplace Scan',
+      sub: 'Available in 3 projects',
+      meta: 'Standard template · 15 questions · 3 minutes',
+      desc: 'WCWP template is a survey designed to measure how your organization compares to top employers worldwide. It uses Effectory’s benchmark to assess employee satisfaction and engagement against recognized standards of excellence. The WCWP label is awarded based on 2 criteria: The score on eNPS and Employer Excellence, and the response rate.',
+      blocks: [
+        ['Why is it valuable?', 'Conducting this survey provides reliable, comparative data that shows how your organization performs relative to the best workplaces. This helps you understand whether your employee experience meets world-class standards and where you can improve to attract and retain talent. It can help employer branding initiatives.'],
+        ['When to use it?', 'Use this template when you want to qualify for the World-Class Workplace label. It can be integrated in an annual surveyor conducted as a stand-alone survey.'],
+        ['What will you get?', '15 questions on employer excellence, enablement, engagement, and eNPS\nA comparison against the Effectory benchmark of top employers worldwide\nThe chance to qualify for the World-class Workplace label\nInsight you can use to strengthen your employer brand']
+      ]
+    },
+    {
+      img: 'dei-template',
+      name: 'Diversity, Equity & Inclusion (DEI)',
+      sub: 'Available in 2 projects',
+      meta: 'Standard template · 44 questions · 8 minutes',
+      desc: 'The DEI template is designed to help organizations assess their current state of diversity, equity, and inclusion. It provides a clear starting point for understanding where your DEI efforts stand and sets a baseline for measuring progress over time.',
+      blocks: [
+        ['Why is it valuable?', 'Using this template will help you gather reliable, practical data on your current DEI status. This data enables you to identify strengths and weaknesses, set priorities, and track progress over time. It ensures your DEI strategy is based on facts rather than assumptions.'],
+        ['When to use it?', 'Use this template when you want to evaluate inclusiveness, fairness, and diversity in your organization. It’s ideal before launching DEI initiatives or as part of annual reviews to track progress.'],
+        ['What will you get?', '44 questions on where your organization stands on diversity, equity, and inclusion\nA clear view of what\'s working well and what needs attention\nThe DEI Manager Toolkit, including the full DEI Index, to plan your next steps\nOptional expert advice and workshops to embed DEI in your culture']
+      ]
+    },
+    {
+      img: 'sos-template',
+      name: 'Smart Organization Scan - Pulse',
+      sub: 'Available in 2 projects',
+      meta: 'Standard template · 9 questions · 2 minutes',
+      desc: 'The Smart Organization Scan (SOS) is Effectory’s proven approach for organizations of all sizes and industries. The SOS Pulse template is a short, targeted follow-up survey designed to check whether previous survey results have been shared and acted upon.',
+      blocks: [
+        ['Why is it valuable?', 'The SOS Pulse helps you close the feedback loop by showing employees their voices matter. It enables you to measure progress on actions taken, identify areas where improvements are sticking—or where more attention is needed—and maintain trust and transparency. By listening regularly, you keep engagement high and ensure your strategy remains responsive to real-time needs.'],
+        ['When to use it?', 'Use this template for regular check-ins after your baseline survey. It’s perfect for quarterly or semi-annual follow-ups, monitoring whether actions are working, and keeping engagement and performance on the agenda throughout the year. Ideally, you have done a SOS Survey first and use the Pulse to check in after.'],
+        ['What will you get?', '9 questions on engagement, follow-up, eNPS, and retention\nA short check-in you can run quarterly or twice a year, for everyone or selected groups\nA view of trends over time, so you can see whether your actions are working']
+      ]
+    },
+    {
+      img: 'sos-template',
+      name: 'Smart Organization Scan - Survey',
+      sub: 'Available in 2 projects',
+      meta: 'Standard template · 34 questions · 6 minutes',
+      desc: 'The Smart Organization Scan (SOS) is Effectory’s tried and tested approach for organizations of all sizes and across industries. With the SOS Survey template, you get real-time, actionable insights into opportunities for employee engagement and the performance environment. It is a science-backed survey template designed to measure both employee engagement and the performance environment.',
+      blocks: [
+        ['Why is it valuable?', 'By using this template, you can gather reliable, actionable data on two critical dimensions: willingness to work (engagement) and ability to perform (performance environment). This data helps you identify silent signals like burnout or attrition risk, prioritize areas for improvement, and track progress over time. It ensures your organizational development strategy is based on facts, not assumptions.'],
+        ['When to use it?', 'Use this template when you need a comprehensive baseline measurement of engagement and performance across your organization. It’s ideal for annual or bi-annual surveys, before major organizational changes, or when setting strategic priorities for people and culture.\nWithin SOS we offer two templates: the SOS Survey and the SOS Pulse. If you haven\'t run a SOS Survey yet, use this template for your first baseline measurement. You can follow up with a Pulse later.'],
+        ['What will you get?', '34 questions, including 2 open-ended ones\nAll the key people indicators: eNPS, retention risk, and well-being\nThe Effectiveness Matrix, for an instant read on engagement and the performance environment\nAutomatic qualification for the World-class Workplace label']
+      ]
+    },
+    {
+      img: 'psa-template',
+      name: 'Psychological Risk Assessment',
+      sub: 'Available in 2 projects',
+      meta: 'Standard template · 10 questions · 2 minutes',
+      desc: 'PsyGB (from Psychische Gefährdungsbeurteilung) is a template that can be used for evaluating psychological stress factors in the workplace and identifying groups with elevated stress levels. It is designed to help organizations comply with German legislation and improve employee well-being.',
+      blocks: [
+        ['Why is it valuable?', 'PsyGB provides HR and management with practical, immediate insights into psychosocial risks. It enables organizations to identify hotspots of psychological strain, take targeted action, and foster a healthier work environment. Built on robust scientific research, PsyGB delivers accurate, trustworthy data for informed decision-making.'],
+        ['When to use it?', 'Use this template when conducting mandatory psychological risk assessments under German law or when monitoring mental stress factors to improve workplace conditions. It’s ideal for organizations seeking compliance and proactive well-being strategies.'],
+        ['What will you get?', '10 scientifically validated questions, each measuring a specific stress-related dimension\nThe hotspots where psychological strain is highest\nClear reporting you can use to plan targeted interventions\nBenchmark data to compare against']
+      ]
+    },
+    {
+      img: 'esg-template',
+      name: 'ESG Scan',
+      sub: 'in User Testing Surveys, March 2024 - March 2027',
+      meta: 'Standard template · 31 questions · 7 minutes',
+      desc: 'The ESG template measures employee perceptions of your organization’s sustainability, social responsibility, and governance practices.',
+      blocks: [
+        ['Why is it valuable?', 'It provides data to strengthen your ESG strategy, align organizational values with employee expectations, and demonstrate commitment to responsible business practices.'],
+        ['When to use it?', 'Use this template when launching or reviewing ESG initiatives, preparing sustainability reports, or seeking employee input on corporate responsibility.'],
+        ['What will you get?', '31 questions across 6 themes, from health and safety to governance and innovation\n1 open-ended question that collects employee stories about your real-world ESG impact\nInsight to improve your ESG initiatives and meet stakeholder expectations\nThe opportunity to earn ESG recognition badges']
+      ]
+    }
+  ];
+
+  /* Questionnaire per template — question sections from the IP-safe Effectory content
+     library (realistic-content skill, data.safe.json). Counts match the meta line on
+     each template. Shape: template name -> [[section, [[question, scaleKind], …]], …] */
+  var QUESTIONNAIRES = {
+    "Strategic Fitness Model": [
+      ["Direction setting", [
+        ["Where the organisation says it's going inspires me","scale"],
+        ["I'm behind where the organisation is heading","scale"],
+        ["Staff here are dealt with in an even-handed way","scale"]
+      ]],
+      ["Adaptive leadership", [
+        ["My team knows how it can help the wider organisation succeed","scale"],
+        ["My team is a constant source of good improvement ideas","scale"],
+        ["My manager steers us through change capably","scale"],
+        ["I trust my manager's judgement","scale"],
+        ["The way things are done here is a good fit for me","scale"]
+      ]],
+      ["Employee enablement", [
+        ["It's clear to me what I'm meant to deliver","scale"],
+        ["What I'm asked to do plays to what I'm good at","scale"],
+        ["Helpful feedback on my performance comes my way often","scale"],
+        ["Good work of mine gets noticed","scale"]
+      ]],
+      ["Systems & structure", [
+        ["Strong results tend to pay off here","scale"],
+        ["Across the organisation, work is structured in a well-organised way","scale"],
+        ["I'm kitted out with the tools and systems my job calls for","scale"],
+        ["Teamwork within my group works well","scale"],
+        ["There are plenty of ways to grow on offer here","scale"],
+        ["The information I rely on is easy to track down","scale"]
+      ]],
+      ["Engagement", [
+        ["Day to day, I find my work enjoyable","scale"],
+        ["My work leaves me energised","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["Being part of this organisation makes me proud","scale"]
+      ]]
+    ],
+    "World-class workplace Scan": [
+      ["Job satisfaction", [
+        ["Day to day, I find my work enjoyable","scale"],
+        ["My role lets me play to my strengths","scale"],
+        ["My work leaves me energised","scale"],
+        ["How would you rate the amount on your plate?","scale"]
+      ]],
+      ["Working conditions", [
+        ["Across the organisation, work is structured in a well-organised way","scale"],
+        ["I'm kitted out with the tools and systems my job calls for","scale"]
+      ]],
+      ["Company culture", [
+        ["As an employer, this place suits me well","scale"],
+        ["Being part of this organisation makes me proud","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["The organisation makes me feel my work matters","scale"],
+        ["Staff ideas actually feed improvements here","scale"],
+        ["Where the organisation says it's going inspires me","scale"]
+      ]],
+      ["eNPS", [
+        ["Would you point a friend towards us as a place to work?","nps"]
+      ]],
+      ["Improvement areas", [
+        ["Where do you think the organisation has room to do better?","open"],
+        ["Where could the organisation step up? Add a short note and one practical suggestion","open"]
+      ]]
+    ],
+    "Diversity, Equity & Inclusion (DEI)": [
+      ["Psychological safety", [
+        ["Owning up to a slip-up feels safe here","scale"],
+        ["I can speak my mind here without worrying about repercussions","scale"],
+        ["I'm comfortable raising behaviour issues directly with teammates","scale"],
+        ["I'm comfortable challenging my manager on how they act","scale"],
+        ["I know how to report unwanted behaviour here","yesno"],
+        ["Over the past year, colleagues have behaved towards me in unwanted ways (e.g. verbal aggression, physical abuse, sexual harassment, bullying, discrimination)","scale"],
+        ["What kind of unwanted behaviour did you run into?","choice"],
+        ["Who was the unwanted behaviour coming from?","choice"],
+        ["Did you flag this behaviour to a manager, confidential adviser or HR?","yesno"],
+        ["What stopped you reporting this to a manager, confidential adviser or HR?","open"],
+        ["The support I got after reporting this was satisfactory","yesno"],
+        ["What would have made it better?","open"]
+      ]],
+      ["Trust", [
+        ["Staff and management keep the lines of communication open here","scale"],
+        ["Leadership here is open and straight with us about big developments","scale"],
+        ["I know what our DEI goals and approach are","scale"],
+        ["Leadership is genuinely committed to advancing DEI here","scale"],
+        ["We're kept posted on how the DEI strategy and goals are progressing","scale"]
+      ]],
+      ["Belonging", [
+        ["I can be genuine with everyone I work alongside","scale"],
+        ["The people right around me take me as I am","scale"],
+        ["My teammates make my contribution feel it counts","scale"],
+        ["I sense my manager appreciates what I bring","scale"],
+        ["Do you feel you have to keep parts of who you are under wraps at work?","yesno"],
+        ["Which parts of your identity have you had to downplay or conceal?","choice"]
+      ]],
+      ["Valuing differences", [
+        ["My manager makes room for differing views in the team","scale"],
+        ["I'm treated respectfully by my manager","scale"],
+        ["Differing views are genuinely respected here","scale"],
+        ["Staff ideas actually feed improvements here","scale"]
+      ]],
+      ["Inclusive decision-making", [
+        ["Ideas and suggestions get a fair look in my team","scale"],
+        ["I get enough chances to weigh in on the things that matter here","scale"],
+        ["Teammates pass on everything I need to do my job properly","scale"],
+        ["My manager keeps me posted on what matters","scale"]
+      ]],
+      ["Fairness", [
+        ["Around me, people get equal respect whatever their background or personal characteristics","scale"],
+        ["Doing well here earns recognition and reward","scale"],
+        ["I get a fair deal here","scale"],
+        ["It's clear how hiring decisions are made here","scale"],
+        ["It's clear how pay and rewards are decided here","scale"],
+        ["It's clear how promotions are decided here","scale"],
+        ["I'm given fair chances to grow, both professionally and personally","scale"],
+        ["My manager actively pushes me to grow","scale"]
+      ]],
+      ["Diversity", [
+        ["Our managers are as diverse a group as the rest of the workforce","scale"],
+        ["My manager plays an active role in building and promoting diversity within my team","scale"],
+        ["Diversity is something this organisation actively celebrates","scale"]
+      ]],
+      ["Closing", [
+        ["Which DEI topics should our HR policy prioritise? (pick the two that matter most to you)","choice"],
+        ["Anything else you'd like to say on this?","open"]
+      ]]
+    ],
+    "Smart Organization Scan - Pulse": [
+      ["Engagement", [
+        ["Being part of this organisation makes me proud","scale"],
+        ["Day to day, I find my work enjoyable","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["My work leaves me energised","scale"]
+      ]],
+      ["Acting on feedback", [
+        ["Off the back of our feedback results, my team has actively made changes","scale"],
+        ["Speaking up here visibly leads to things getting better","scale"]
+      ]],
+      ["eNPS", [
+        ["Would you point a friend towards us as a place to work?","nps"]
+      ]],
+      ["Retention", [
+        ["Over the last quarter I've acted on finding a new job, or intend to shortly","scale"],
+        ["Staying on here for another year or two appeals to me","scale"]
+      ]]
+    ],
+    "Smart Organization Scan - Survey": [
+      ["Job satisfaction", [
+        ["Day to day, I find my work enjoyable","scale"]
+      ]],
+      ["Tools & resources", [
+        ["I'm kitted out with the tools and systems my job calls for","scale"],
+        ["The information I rely on is easy to track down","scale"]
+      ]],
+      ["Role & contribution", [
+        ["What I'm asked to do plays to what I'm good at","scale"],
+        ["It's clear to me what I'm meant to deliver","scale"]
+      ]],
+      ["Workload & wellbeing", [
+        ["My job and personal life sit in healthy balance","scale"],
+        ["My work leaves me energised","scale"]
+      ]],
+      ["Team effectiveness", [
+        ["My team knows how it can help the wider organisation succeed","scale"],
+        ["Teamwork within my group works well","scale"],
+        ["My team is a regular source of good improvement ideas","scale"]
+      ]],
+      ["Manager support", [
+        ["I trust my manager's judgement","scale"],
+        ["Helpful feedback on my performance comes my way often","scale"],
+        ["My manager steers us through change capably","scale"]
+      ]],
+      ["Strategy & goals", [
+        ["I'm behind where the organisation is heading","scale"],
+        ["Where the organisation says it's going inspires me","scale"]
+      ]],
+      ["Senior leadership", [
+        ["I have faith in the people running the organisation","scale"]
+      ]],
+      ["Cross-team communication", [
+        ["Across the organisation, work is structured in a well-organised way","scale"]
+      ]],
+      ["Company culture", [
+        ["As an employer, this place suits me well","scale"],
+        ["Being part of this organisation makes me proud","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["The organisation makes me feel my work matters","scale"],
+        ["The way things are done here is a good fit for me","scale"],
+        ["Staff here are dealt with in an even-handed way","scale"],
+        ["Strong results tend to pay off here","scale"],
+        ["Good work of mine gets noticed","scale"]
+      ]],
+      ["Acting on feedback", [
+        ["Staff ideas actually feed improvements here","scale"]
+      ]],
+      ["Learning & growth", [
+        ["There are plenty of ways to grow on offer here","scale"],
+        ["Over the last quarter I've acted on finding a new job, or intend to shortly","scale"],
+        ["Staying on here for another year or two appeals to me","scale"]
+      ]],
+      ["eNPS", [
+        ["Would you point a friend towards us as a place to work?","scale"]
+      ]],
+      ["Pride & highlights", [
+        ["What about the organisation gives you the most pride?","choice"],
+        ["What's behind that pride? A short description will do","open"]
+      ]],
+      ["Improvement areas", [
+        ["Where do you think the organisation has room to do better?","choice"],
+        ["Where could the organisation step up? Add a short note and one practical suggestion","open"]
+      ]]
+    ],
+    "Psychological Risk Assessment": [
+      ["Workload & wellbeing", [
+        ["The amount I'm asked to handle sits at a reasonable level","scale"],
+        ["My job and personal life sit in healthy balance","scale"]
+      ]],
+      ["Manager support", [
+        ["I trust my manager's judgement","scale"]
+      ]],
+      ["Job satisfaction", [
+        ["I'm given enough authority to make decisions","scale"],
+        ["Day to day, I find my work enjoyable","scale"]
+      ]],
+      ["Strategy & goals", [
+        ["I buy into the organisation's goals and strategy","scale"]
+      ]],
+      ["Cross-team communication", [
+        ["Across the organisation, work is structured in a well-organised way","scale"]
+      ]],
+      ["My workplace", [
+        ["My workspace ticks the boxes for a good environment (lighting, temperature, cleanliness, noise, and so on)","scale"],
+        ["Where I work, people trust, respect and back each other","scale"],
+        ["Where I work, the what and why of changes are explained clearly and early","scale"]
+      ]]
+    ],
+    "ESG Scan": [
+      ["Social pillar", [
+        ["My job and personal life sit in healthy balance","scale"],
+        ["My physical workspace meets my needs","scale"],
+        ["The safety rules for my workplace are spelled out clearly","scale"],
+        ["I can show up as my real self here","scale"],
+        ["Building an inclusive culture is something the organisation takes seriously","scale"],
+        ["Around me, people get equal respect whatever their background or personal characteristics","scale"],
+        ["The way my pay is decided feels fair","scale"],
+        ["There are plenty of ways to grow on offer here","scale"],
+        ["Staying on here for another year or two appeals to me","scale"],
+        ["Which of our ESG efforts are you proudest of?","open"]
+      ]],
+      ["Governance pillar", [
+        ["I'm behind where the organisation is heading","scale"],
+        ["Leadership keeps the whole organisation in the loop regularly, on things like goals and changes","scale"],
+        ["Those at the top are in touch with day-to-day realities","scale"],
+        ["How decisions get made here is well defined","scale"],
+        ["My team is a regular source of good improvement ideas","scale"],
+        ["Staff ideas actually feed improvements here","scale"],
+        ["My manager encourages me to put forward ideas and run with them","scale"],
+        ["I can speak my mind here without worrying about repercussions","scale"],
+        ["I have faith in the people running the organisation","scale"],
+        ["My manager trusts me to do my work in the best way I can","scale"],
+        ["Staff and management talk to each other openly here","scale"]
+      ]],
+      ["Environment & sustainability", [
+        ["I'm conscious of the mark the organisation leaves on the environment","scale"],
+        ["The organisation has written down its greener ways of working (processes, policies)","scale"],
+        ["My manager stresses the importance of sustainability in decisions and behaviour","scale"],
+        ["The organisation gets its message across well on sustainability topics","scale"],
+        ["My team actively hunts for ways to shrink our footprint and work more sustainably day to day","scale"],
+        ["We build our products and services with the environment in mind","scale"],
+        ["Sustainability shows up in the goals we're set","scale"],
+        ["Our benefits (e.g. commuting allowance) are set up to nudge us towards sustainable choices","scale"],
+        ["In my part of the business, we weigh up how sustainable our suppliers and providers are when we decide","scale"],
+        ["I'm nudged to put forward sustainability ideas","scale"]
+      ]]
+    ]
+  };
+
+  /* Projects on the account — the same list the Projects page shows
+     (reference-prototypes/projects.html). */
+  var PROJECTS = [
+    'Employee listening (Top 2 Box), February 2026 - March 2027',
+    'Central employee surveys, February 2025 - March 2027',
+    'Onboarding survey, May 2024 - March 2027',
+    'Exit survey, 2024-2026, May 2024 - March 2027',
+    'Team Development Scan, March 2024 - March 2027',
+    'World-class Workplace, March 2024 - March 2027',
+    'Leadership 360, January 2025 - March 2027',
+    'Pulse program 2026, January 2026 - December 2026',
+    'New hire check-ins, 2025 - 2027',
+    'Manager effectiveness, March 2025 - March 2027',
+    'Wellbeing monitor, 2025 - 2027'
+  ];
+
+  /* Where the create-survey flow was opened from. Opened from All surveys the new
+     survey has no home yet, so "Let's get started" asks which project it belongs to.
+     Opened from inside a project that answer is already known and the field is left
+     out entirely. Add ?context=project to the URL to see the in-project variant. */
+  var FLOW_CONTEXT = new URLSearchParams(location.search).get('context') === 'project'
+    ? 'project' : 'all-surveys';
+
+  /* ── Overlay open/close (SKILL rule 9) ─────────────────────────
+     Every dialog is mounted in an .overlay so the enter animation comes
+     for free. Closing adds .is-closing and only removes the node on
+     animationend, so the exit animation actually plays. */
+  var host = document.getElementById('dialogHost');
+
+  /* Preview opens on top of the template dialog. Two live .overlay nodes would mean
+     two stacked scrims, so only the topmost one is shown — the one underneath keeps
+     its state (search query, scroll position) and comes back on "Back to templates". */
+  function syncOverlays() {
+    var live = [].slice.call(host.querySelectorAll('.overlay:not(.is-closing)'));
+    [].forEach.call(host.querySelectorAll('.overlay'), function (o) {
+      o.classList.toggle('is-behind', live.indexOf(o) !== -1 && o !== live[live.length - 1]);
+    });
+  }
+
+  function openOverlay(buildSurface) {
+    var overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.appendChild(buildSurface(overlay));
+    host.appendChild(overlay);
+    syncOverlays();
+    if (window.Icons) window.Icons.render(overlay);
+    // clicking the scrim dismisses the flow, same as the close button
+    overlay.addEventListener('mousedown', function (e) {
+      if (e.target === overlay) closeAllOverlays();
+    });
+    return overlay;
+  }
+
+  /* instant:true swaps the surface without an exit animation — used by
+     "Back to templates", where the stack pops back to the dialog underneath and a
+     150ms crossfade of two full-size dialogs just reads as a jumble. */
+  function closeOverlay(overlay, instant) {
+    if (!overlay || overlay.classList.contains('is-closing')) return;
+    if (instant) { overlay.remove(); syncOverlays(); return; }
+    overlay.classList.add('is-closing');
+    var surface = overlay.querySelector('.dialog, .sidepanel');
+    var removed = false;
+    var done = function () {
+      if (removed) return;
+      removed = true;
+      overlay.remove();
+      syncOverlays();
+    };
+    // Listen on the surface, not the backdrop, so the longest movement finishes first.
+    if (surface) surface.addEventListener('animationend', done, { once: true });
+    // Safety net: prefers-reduced-motion kills the animation, and a throttled or
+    // background tab may never fire animationend — never leave a dialog wedged open.
+    setTimeout(done, 400);
+  }
+
+  // Dismiss the whole flow: the surface on top animates out, anything under it goes at once.
+  function closeAllOverlays() {
+    var live = [].slice.call(host.querySelectorAll('.overlay:not(.is-closing)'));
+    live.forEach(function (o, i) { closeOverlay(o, i !== live.length - 1); });
+  }
+
+  // Escape closes the topmost overlay
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var open = host.querySelectorAll('.overlay:not(.is-closing)');
+    if (open.length) closeOverlay(open[open.length - 1]);
+  });
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function illustration(name, alt) {
+    return '<img class="tpl-card-img" src="assets/illustrations/templates/' + name + '.svg" alt="' + esc(alt) + '" />';
+  }
+  /* Scale kind -> icon + label + accent (the .is-* class colours the chip). */
+  var SCALE_TYPES = {
+    scale:  ['point-scale', '5-point scale'],
+    choice: ['check-square', 'Multiple choice'],
+    open:   ['text-entry', 'Open-ended question'],
+    nps:    ['net-promoter-score', '0\u201310 scale'],
+    yesno:  ['single-answer', 'Yes / No']
+  };
+
+  // Questionnaire block: one card of question rows per section, headed by the
+  // section name + a count pill. Structure follows the Figma "Questionnaire list".
+  function questionnaireHTML(templateName) {
+    var sections = QUESTIONNAIRES[templateName];
+    if (!sections || !sections.length) return '';
+    return '<div>' +
+      '<h3 class="text-l4 q-title">Questionnaire</h3>' +
+      '<div class="q-panel">' +
+        sections.map(function (sec) {
+          return '<div>' +
+            '<div class="q-head">' +
+              '<h4 class="text-l5">' + esc(sec[0]) + '</h4>' +
+              '<span class="q-count">' + sec[1].length + '</span>' +
+            '</div>' +
+            '<div class="q-list">' +
+              sec[1].map(function (q) {
+                var t = SCALE_TYPES[q[1]] || SCALE_TYPES.scale;
+                return '<div class="q-row">' +
+                  '<div class="text-medium text-w500 q-text">' + esc(q[0]) + '</div>' +
+                  '<div class="text-medium q-scale">' +
+                    '<span class="q-scale-icon is-' + q[1] + '"><i data-icon="' + t[0] + '"></i></span>' +
+                    '<span>' + esc(t[1]) + '</span>' +
+                  '</div>' +
+                  '<span class="tag is-standard q-owner">Standard</span>' +
+                '</div>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }
+
+  // Icon-only buttons always get a tooltip + matching aria-label (SKILL rule 10)
+  function closeButton() {
+    return '<div class="tt-demo dlg-close-tt">' +
+             '<button class="dialog-close" data-close aria-label="Close"><i data-icon="cross"></i></button>' +
+             '<div class="tooltip is-below">Close</div>' +
+           '</div>';
+  }
+
+  /* ── Dialog 1: Choose a survey template ────────────────────── */
+  function openTemplateDialog() {
+    openOverlay(function (overlay) {
+      var dlg = el('div', 'dialog dialog-l tpl-dialog');
+      dlg.setAttribute('role', 'dialog');
+      dlg.setAttribute('aria-modal', 'true');
+      dlg.setAttribute('aria-labelledby', 'tplTitle');
+      dlg.innerHTML =
+        closeButton() +
+        '<div class="tpl-head">' +
+          '<div class="dialog-header">' +
+            '<h3 class="dialog-title" id="tplTitle">Choose a survey template</h3>' +
+            '<p class="dialog-subtitle">Save time with pre-made survey templates crafted by our experts</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dialog-body tpl-body">' +
+          '<div class="tpl-search-row">' +
+            '<div class="search-wrap">' +
+              '<span class="search-icon"><i data-icon="search"></i></span>' +
+              '<input type="search" class="srch" placeholder="Search templates" aria-label="Search templates" data-tplsearch />' +
+            '</div>' +
+            '<button class="btn btn-secondary" data-scratch><i data-icon="plus"></i> Start from scratch</button>' +
+          '</div>' +
+          '<ul class="tpl-grid" data-grid></ul>' +
+          '<div class="tpl-empty" data-empty hidden>' +
+            '<h2 class="text-l4">No results found</h2>' +
+            '<img src="assets/illustrations/templates/search-no-results-illustration.svg" alt="" />' +
+          '</div>' +
+        '</div>';
+
+      var grid = dlg.querySelector('[data-grid]');
+      var empty = dlg.querySelector('[data-empty]');
+      var search = dlg.querySelector('[data-tplsearch]');
+
+      TEMPLATES.forEach(function (t, i) {
+        var li = el('li', 'card card-elevated tpl-card');
+        li.dataset.index = i;
+        li.innerHTML =
+          illustration(t.img, '') +
+          '<h4 class="text-large text-w600 tpl-name">' + esc(t.name) + '</h4>' +
+          '<p class="text-small text-w500 tpl-sub">' + esc(t.sub) + '</p>' +
+          '<p class="text-medium text-w400 tpl-desc">' + esc(t.desc) + '</p>' +
+          '<div class="tpl-actions">' +
+            '<button class="btn btn-secondary" data-use>Use template</button>' +
+            '<button class="btn btn-tertiary" data-preview>Preview</button>' +
+          '</div>';
+        grid.appendChild(li);
+      });
+
+      /* Hovering the card promotes its "Use template" to the primary button — the card
+         itself signals which action is the main one. Done by swapping the real DS class
+         rather than restyling .btn-secondary, so the button is genuinely .btn-primary in
+         that state. focusin/focusout gives keyboard users the same cue. */
+      function promote(card, on) {
+        var b = card && card.querySelector('[data-use]');
+        if (!b) return;
+        b.classList.toggle('btn-primary', on);
+        b.classList.toggle('btn-secondary', !on);
+      }
+      ['mouseover', 'mouseout', 'focusin', 'focusout'].forEach(function (type) {
+        grid.addEventListener(type, function (e) {
+          var card = e.target.closest('.tpl-card');
+          if (!card) return;
+          // ignore moves between children of the same card
+          var to = e.relatedTarget;
+          if (to && card.contains(to)) return;
+          promote(card, type === 'mouseover' || type === 'focusin');
+        });
+      });
+
+      // Live search — matches on name AND description, like the live app
+      search.addEventListener('input', function () {
+        var q = search.value.trim().toLowerCase();
+        var visible = 0;
+        [].forEach.call(grid.children, function (li) {
+          var t = TEMPLATES[li.dataset.index];
+          var hit = !q || (t.name + ' ' + t.desc).toLowerCase().indexOf(q) !== -1;
+          li.hidden = !hit;
+          if (hit) visible++;
+        });
+        grid.hidden = visible === 0;
+        empty.hidden = visible > 0;
+      });
+
+      dlg.addEventListener('click', function (e) {
+        if (e.target.closest('[data-close]')) { closeOverlay(overlay); return; }
+        var prev = e.target.closest('[data-preview]');
+        if (prev) { openPreviewDialog(+prev.closest('.tpl-card').dataset.index); return; }
+        if (e.target.closest('[data-scratch]')) { openStartDialog(null); return; }
+        var use = e.target.closest('[data-use]');
+        if (use) { openStartDialog(TEMPLATES[+use.closest('.tpl-card').dataset.index]); return; }
+      });
+
+      return dlg;
+    });
+  }
+
+  /* ── Dialog 3: "Let's get started" ─────────────────────────────
+     Names the survey and — only when the flow started outside a project —
+     asks which project it belongs to. */
+  function openStartDialog(template) {
+    var needsProject = FLOW_CONTEXT !== 'project';
+    var chosen = null;
+
+    openOverlay(function (overlay) {
+      var dlg = el('div', 'dialog dialog-s start-dialog');
+      dlg.setAttribute('role', 'dialog');
+      dlg.setAttribute('aria-modal', 'true');
+      dlg.setAttribute('aria-labelledby', 'startTitle');
+
+      dlg.innerHTML =
+        closeButton() +
+        '<div class="dialog-header is-sm">' +
+          '<h3 class="dialog-title" id="startTitle">Let’s get started</h3>' +
+        '</div>' +
+        '<div class="dialog-body start-body">' +
+          '<div class="tf-wrap">' +
+            '<label class="tf-lbl" for="surveyName">Survey name</label>' +
+            '<div class="tf-field">' +
+              '<input class="tf" id="surveyName" type="text" placeholder="Enter a survey name" ' +
+                'maxlength="35" aria-describedby="surveyNameHelp" data-name />' +
+              '<span class="tf-field-icon tf-icon-right" data-nameicon hidden><i data-icon="alert-circle"></i></span>' +
+            '</div>' +
+            '<span class="tf-help" id="surveyNameHelp">At least 3 and at most 35 characters</span>' +
+          '</div>' +
+          (needsProject ?
+          '<div class="slt-wrap">' +
+            '<label class="slt-lbl" id="projectLbl">What project does it belong to?</label>' +
+            '<div class="slt" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" ' +
+              'aria-labelledby="projectLbl" data-project>' +
+              '<span class="slt-left"><span class="slt-ph" data-projectlabel>Select a project</span></span>' +
+              '<i data-icon="chevron-down"></i>' +
+            '</div>' +
+            '<div class="menu" role="listbox" data-projectmenu hidden>' +
+              PROJECTS.map(function (name) {
+                return '<div class="menu-item" role="option" data-projectopt>' +
+                  '<span class="menu-item-body"><span class="menu-item-title">' + esc(name) + '</span></span>' +
+                  '<i data-icon="check" class="menu-item-check"></i>' +
+                '</div>';
+              }).join('') +
+            '</div>' +
+            '<span class="tf-help">Your new survey will be added to this project and use its settings</span>' +
+          '</div>' : '') +
+        '</div>' +
+        '<div class="dialog-footer">' +
+          '<button class="btn btn-secondary" data-goback>Go back</button>' +
+          '<button class="btn btn-primary is-disabled" data-create disabled>Create survey</button>' +
+        '</div>';
+
+      var nameInput = dlg.querySelector('[data-name]');
+      var nameIcon = dlg.querySelector('[data-nameicon]');
+      var createBtn = dlg.querySelector('[data-create]');
+      var trigger = dlg.querySelector('[data-project]');
+      var menu = dlg.querySelector('[data-projectmenu]');
+      var menuLabel = dlg.querySelector('[data-projectlabel]');
+
+      function nameValid() {
+        var v = nameInput.value.trim();
+        return v.length >= 3 && v.length <= 35;
+      }
+      function refresh() {
+        var ok = nameValid() && (!needsProject || chosen !== null);
+        createBtn.disabled = !ok;
+        createBtn.classList.toggle('is-disabled', !ok);
+      }
+      // only flag the field once the user has left it — don't shout while typing
+      function showError(on) {
+        nameInput.classList.toggle('is-error', on);
+        nameIcon.hidden = !on;
+      }
+      nameInput.addEventListener('input', function () { showError(false); refresh(); });
+      nameInput.addEventListener('blur', function () { showError(!nameValid()); });
+
+      if (needsProject) {
+        // fixed-position popover so .dialog's overflow:hidden can't clip it
+        function positionMenu() {
+          var r = trigger.getBoundingClientRect();
+          menu.style.width = r.width + 'px';
+          var top = r.bottom + 4;
+          if (top + menu.offsetHeight > window.innerHeight - 8) {
+            top = Math.max(8, r.top - 4 - menu.offsetHeight);
+          }
+          menu.style.top = top + 'px';
+          menu.style.left = r.left + 'px';
+        }
+        function closeMenu() {
+          menu.hidden = true;
+          trigger.setAttribute('aria-expanded', 'false');
+          trigger.classList.remove('is-typing');
+        }
+        function toggleMenu() {
+          if (menu.hidden) {
+            menu.hidden = false;
+            trigger.setAttribute('aria-expanded', 'true');
+            trigger.classList.add('is-typing');
+            positionMenu();
+          } else closeMenu();
+        }
+        trigger.addEventListener('click', function (e) { e.stopPropagation(); toggleMenu(); });
+        trigger.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMenu(); }
+        });
+        menu.addEventListener('click', function (e) {
+          var opt = e.target.closest('[data-projectopt]');
+          if (!opt) return;
+          e.stopPropagation();
+          menu.querySelectorAll('.menu-item').forEach(function (m) {
+            m.classList.remove('is-selected');
+            m.setAttribute('aria-selected', 'false');
+          });
+          opt.classList.add('is-selected');
+          opt.setAttribute('aria-selected', 'true');
+          chosen = opt.querySelector('.menu-item-title').textContent;
+          menuLabel.textContent = chosen;
+          menuLabel.className = 'slt-val';
+          closeMenu();
+          refresh();
+        });
+        overlay.addEventListener('click', closeMenu);
+        window.addEventListener('resize', function () { if (!menu.hidden) positionMenu(); });
+      }
+
+      dlg.addEventListener('click', function (e) {
+        if (e.target.closest('[data-close]')) { closeAllOverlays(); return; }
+        // Go back pops to the template dialog underneath, same as "Back to templates"
+        if (e.target.closest('[data-goback]')) { closeOverlay(overlay, true); return; }
+        if (e.target.closest('[data-create]') && !createBtn.disabled) {
+          if (template) {
+            // Coming from a template you land on the survey's Questions step with that
+            // template applied and its questions listed.
+            // paths resolve against <base href="../">, i.e. the server root
+            location.href = 'prototypes/survey-settings-questionnaire.html' +
+              '?template=' + encodeURIComponent(template.name) +
+              '&name=' + encodeURIComponent(nameInput.value.trim()) +
+              // carried so "Save & Close" over there can return to the overview
+              // this flow was started from
+              '&context=' + encodeURIComponent(FLOW_CONTEXT);
+            return;
+          }
+          // Start-from-scratch goes somewhere else entirely — that screen is NOT captured,
+          // so the prototype stops here rather than inventing it.
+          closeAllOverlays();
+        }
+      });
+
+      setTimeout(function () { nameInput.focus(); }, 0);
+      return dlg;
+    });
+  }
+
+  /* ── Dialog 2: template preview ────────────────────────────── */
+  function openPreviewDialog(index) {
+    var t = TEMPLATES[index];
+    openOverlay(function (overlay) {
+      var dlg = el('div', 'dialog dialog-l prev-dialog');
+      dlg.setAttribute('role', 'dialog');
+      dlg.setAttribute('aria-modal', 'true');
+      dlg.setAttribute('aria-labelledby', 'prevTitle');
+
+      var lead = t.blocks[0];
+      var rest = t.blocks.slice(1);
+
+      dlg.innerHTML =
+        closeButton() +
+        '<div class="prev-top">' +
+          '<button class="btn btn-secondary" data-back><i data-icon="arrow-left"></i> Back to templates</button>' +
+        '</div>' +
+        '<div class="prev-body">' +
+          '<div class="prev-header">' +
+            illustration(t.img, '') +
+            '<div>' +
+              '<h3 class="text-l3 prev-title" id="prevTitle">' + esc(t.name) + '</h3>' +
+              '<p class="text-medium prev-meta">' + esc(t.meta) + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<div>' +
+            '<p class="text-medium prev-lead">' + esc(t.desc) + '</p>' +
+            '<div class="prev-block">' +
+              '<h3 class="text-l5">' + esc(lead[0]) + '</h3>' +
+              '<p class="text-medium">' + esc(lead[1]) + '</p>' +
+            '</div>' +
+            '<div data-rest hidden>' +
+              rest.map(function (b) {
+                return '<div class="prev-block">' +
+                         '<h3 class="text-l5">' + esc(b[0]) + '</h3>' +
+                         '<p class="text-medium">' + esc(b[1]) + '</p>' +
+                       '</div>';
+              }).join('') +
+            '</div>' +
+            '<button class="btn btn-link prev-more" data-more style="margin-top: var(--spacing-base-tight);">' +
+              '<span data-morelabel>Show more</span> <i data-icon="chevron-down"></i>' +
+            '</button>' +
+          '</div>' +
+          questionnaireHTML(t.name) +
+        '</div>' +
+        '<div class="dialog-footer">' +
+          '<button class="btn-big btn-big-primary" data-use>Use template <i data-icon="arrow-right"></i></button>' +
+        '</div>';
+
+      dlg.addEventListener('click', function (e) {
+        // X dismisses the whole flow; Back pops one step to the template list
+        if (e.target.closest('[data-close]')) { closeAllOverlays(); return; }
+        if (e.target.closest('[data-back]')) { closeOverlay(overlay, true); return; }
+        var more = e.target.closest('[data-more]');
+        if (more) {
+          var restEl = dlg.querySelector('[data-rest]');
+          var open = restEl.hidden;
+          restEl.hidden = !open;
+          more.querySelector('[data-morelabel]').textContent = open ? 'Show less' : 'Show more';
+          var chev = more.querySelector('i[data-icon]');
+          chev.setAttribute('data-icon', open ? 'chevron-up' : 'chevron-down');
+          // icons.js skips anything already rendered — clear the flag so it re-injects
+          delete chev.dataset.iconLoaded;
+          if (window.Icons) window.Icons.render(more);
+          return;
+        }
+        if (e.target.closest('[data-use]')) { openStartDialog(t); return; }
+      });
+
+      return dlg;
+    });
+  }
+
+  /* ── Tooltip auto-position ─────────────────────────────────────
+     .dialog has overflow:hidden (for its rounded corners), so an absolutely
+     positioned bubble is clipped at the dialog edge. Measure the trigger on
+     hover/focus and place the bubble with position:fixed, flipping and clamping
+     inside the viewport — then no ancestor can ever cut it off. Delegated on
+     document so it survives the dialogs being built and torn down.
+     (design-system-reference → Tooltip → "Clipping vermijden".) */
+  (function () {
+    var GAP = 10, EDGE = 8;
+    function place(wrap) {
+      var tip = wrap.querySelector('.tooltip');
+      if (!tip) return;
+      var r = wrap.getBoundingClientRect();
+      // reset so the bubble measures at its natural size before we position it
+      tip.style.left = '0px'; tip.style.top = '0px'; tip.style.transform = 'none';
+      var t = tip.getBoundingClientRect();
+      var below = tip.classList.contains('is-below');
+      var top = below ? r.bottom + GAP : r.top - GAP - t.height;
+      // flip to the other side if the preferred one doesn't fit
+      if (top < EDGE) top = r.bottom + GAP;
+      if (top + t.height > window.innerHeight - EDGE) top = r.top - GAP - t.height;
+      var left = r.left + r.width / 2 - t.width / 2;
+      tip.style.left = Math.max(EDGE, Math.min(left, window.innerWidth - t.width - EDGE)) + 'px';
+      tip.style.top = Math.max(EDGE, Math.min(top, window.innerHeight - t.height - EDGE)) + 'px';
+    }
+    function onEnter(e) {
+      var wrap = e.target.closest && e.target.closest('.tt-demo');
+      if (wrap) place(wrap);
+    }
+    document.addEventListener('mouseover', onEnter);
+    document.addEventListener('focusin', onEnter);
+  })();
+
+  document.getElementById('createBtn').addEventListener('click', openTemplateDialog);
+
+  /* ── Latest projects carousel ──────────────────────────────── */
+  (function () {
+    var track = document.getElementById('projTrack');
+    var prev = document.getElementById('projPrev');
+    var next = document.getElementById('projNext');
+    if (!track || !prev || !next) return;
+    var GAP = 16, PER = 3;
+    var count = track.children.length;
+    var pages = Math.max(1, Math.ceil(count / PER));
+    var page = 0;
+    function pageWidth() {
+      var w = track.children[0].getBoundingClientRect().width;
+      return PER * (w + GAP);
+    }
+    function render() {
+      track.style.transform = 'translateX(-' + (page * pageWidth()) + 'px)';
+      prev.disabled = page <= 0;
+      next.disabled = page >= pages - 1;
+      prev.classList.toggle('is-disabled', prev.disabled);
+      next.classList.toggle('is-disabled', next.disabled);
+    }
+    prev.addEventListener('click', function () { if (page > 0) { page--; render(); } });
+    next.addEventListener('click', function () { if (page < pages - 1) { page++; render(); } });
+    window.addEventListener('resize', render);
+    render();
+  })();
+
+  /* ── All-surveys list controls (unchanged from the all-surveys screen) ── */
+  (function () {
+    var sortBtn = document.getElementById('sortBtn');
+    var sortMenu = document.getElementById('sortMenu');
+    var sortVal = document.getElementById('sortVal');
+    var statusBtn = document.getElementById('statusBtn');
+    var statusMenu = document.getElementById('statusMenu');
+    var statusVal = document.getElementById('statusVal');
+    var myOnly = document.getElementById('myOnly');
+    if (!sortBtn || !statusBtn) return;
+
+    var list = document.querySelector('.surveys-list');
+    var rows = [].slice.call(list.querySelectorAll('.list-item'));
+    var searchInput = list.querySelector('input[type="search"]');
+
+    var empty = document.createElement('div');
+    empty.className = 'list-empty';
+    empty.textContent = 'No surveys match your filters.';
+    empty.hidden = true;
+    list.appendChild(empty);
+
+    function rowStatus(row) {
+      var p = row.querySelector('.tag');
+      if (p.classList.contains('tag-info')) return 'Merged';
+      if (p.classList.contains('tag-positive')) return 'Completed';
+      if (p.classList.contains('tag-highlight')) return 'In Progress';
+      if (p.classList.contains('is-planned')) return 'Planned';
+      return 'Draft';
+    }
+    function rowName(row) { return row.querySelector('.list-item-title').textContent.trim().toLowerCase(); }
+
+    function apply() {
+      var statuses = {};
+      statusMenu.querySelectorAll('[data-status].is-selected').forEach(function (mi) { statuses[mi.dataset.status] = true; });
+      var mine = myOnly && myOnly.checked;
+      var sel = sortMenu.querySelector('.menu-item.is-selected');
+      var sort = sel ? sel.dataset.sort : 'Created last';
+      var q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+      var ordered = rows.slice();
+      if (sort === 'Created first') ordered.reverse();
+      else if (sort === 'A-Z') ordered.sort(function (a, b) { return rowName(a).localeCompare(rowName(b)); });
+      else if (sort === 'Z-A') ordered.sort(function (a, b) { return rowName(b).localeCompare(rowName(a)); });
+
+      var lastVisible = null, visible = 0;
+      ordered.forEach(function (row) {
+        list.insertBefore(row, empty);
+        var show = statuses[rowStatus(row)]
+          && (!mine || row.dataset.mine === 'true')
+          && (!q || rowName(row).indexOf(q) !== -1);
+        row.hidden = !show;
+        row.style.borderBottom = '';
+        if (show) { visible++; lastVisible = row; }
+      });
+      if (lastVisible) lastVisible.style.borderBottom = 'none';
+      empty.hidden = visible > 0;
+    }
+
+    var openMenu = null, openBtn = null;
+    function positionMenu(btn, menu) {
+      var r = btn.getBoundingClientRect();
+      var mh = menu.offsetHeight;
+      var top = r.bottom + 4;
+      if (top + mh > window.innerHeight - 8) {
+        top = r.top - 4 - mh > 8 ? r.top - 4 - mh : Math.max(8, window.innerHeight - 8 - mh);
+      }
+      menu.style.top = top + 'px';
+      menu.style.left = Math.max(8, r.right - menu.offsetWidth) + 'px';
+    }
+    function closeMenus() {
+      sortMenu.hidden = true; statusMenu.hidden = true;
+      sortBtn.setAttribute('aria-expanded', 'false');
+      statusBtn.setAttribute('aria-expanded', 'false');
+      openMenu = null; openBtn = null;
+    }
+    function toggleMenu(btn, menu) {
+      var willOpen = menu.hidden;
+      closeMenus();
+      if (willOpen) {
+        menu.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+        openMenu = menu; openBtn = btn;
+        positionMenu(btn, menu);
+      }
+    }
+    sortBtn.addEventListener('click', function (e) { e.stopPropagation(); toggleMenu(sortBtn, sortMenu); });
+    statusBtn.addEventListener('click', function (e) { e.stopPropagation(); toggleMenu(statusBtn, statusMenu); });
+    window.addEventListener('resize', function () { if (openMenu) positionMenu(openBtn, openMenu); });
+    document.addEventListener('scroll', function () { if (openMenu) positionMenu(openBtn, openMenu); }, true);
+
+    sortMenu.querySelectorAll('[data-sort]').forEach(function (mi) {
+      mi.addEventListener('click', function (e) {
+        e.stopPropagation();
+        sortMenu.querySelectorAll('.menu-item').forEach(function (m) { m.classList.remove('is-selected'); });
+        mi.classList.add('is-selected');
+        sortVal.textContent = mi.dataset.sort;
+        closeMenus();
+        apply();
+      });
+    });
+
+    function updateStatusLabel() {
+      var all = statusMenu.querySelectorAll('[data-status]');
+      var sel = statusMenu.querySelectorAll('[data-status].is-selected');
+      statusVal.textContent = sel.length === all.length ? 'All (' + all.length + ')'
+        : sel.length === 0 ? 'None'
+        : sel.length + ' selected';
+    }
+    statusMenu.querySelectorAll('[data-status]').forEach(function (mi) {
+      mi.addEventListener('click', function (e) {
+        e.stopPropagation();
+        mi.classList.toggle('is-selected');
+        updateStatusLabel();
+        apply();
+      });
+    });
+
+    if (myOnly) myOnly.addEventListener('change', apply);
+    if (searchInput) searchInput.addEventListener('input', apply);
+
+    document.addEventListener('click', closeMenus);
+    apply();
+  })();
+</script>
+</body>
+</html>

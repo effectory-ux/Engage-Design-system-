@@ -932,11 +932,27 @@ Compact label; de **kleur draagt de betekenis** (status, categorie, marker). **E
 <span class="tag tag-positive">Completed</span>
 <span class="tag tag-info tag-full"><i data-icon="tag"></i> Engagement</span>
 ```
-- `.tag` (basis = `--bg-info-base` + wit, `--radius-base`, 12px/600) + background-variant: `.tag-info` (blauw, default), `.tag-brand` (teal), `.tag-warning` (oranje), `.tag-negative` (rood), `.tag-highlight` (geel, tekst `--content-base`), `.tag-positive` (groen). Radius: standaard medium; `.tag-full` maakt een pill.
+- `.tag` (basis = `--bg-info` + wit, `--radius-base`, **12px / SemiBold 600**) + background-variant: `.tag-info` (blauw, default), `.tag-brand` (teal), `.tag-warning` (oranje), `.tag-negative` (rood), `.tag-highlight` (geel, tekst `--content-base`), `.tag-positive` (groen). Radius: standaard medium; `.tag-full` maakt een pill.
 - Optioneel leading `<i data-icon>` (12px, erft de tekstkleur). Bold fills = witte tekst, behalve highlight (ink). A11y: betekenis staat altijd in de **tekst**, nooit alleen in de kleur; een tag is niet focusbaar (geen knop/link).
 - Styleguide-API: `<eff-tag [background]="'info|brand|warning|negative|highlight|positive'" [radius]="'medium|full'" [textSize] [weight]>`. Er is dus geen `Badge`.
 - **Survey/report-status** heeft een eigen hogere component **Survey Status** (`[surveyEndDate]`, `[isSurveyResponseComplete]`, `[surveyStatusFailed]`, `[showTooltip]`…) die zelf de juiste pill+tekst rendert (incl. draft/planned/running/completed). Bouw survey-status in productie dus níét na met een losse Tag. Prototype-pills als `gl-tag`, `mb-gpill`, `tr-conf-badge` zijn losse Tags → normaliseer naar `.tag`.
-> ⚠️ Figma/dev gap: `Eff Tag` heeft geen grijze/donkere background — de all-surveys "draft" (grijs) en "planned" (donker) pills zijn prototype-lokaal (`.tag.is-draft`/`.is-planned`) en horen in productie bij Survey Status.
+
+**Font-weight — SemiBold 600 is de tag.** De tekst in een tag is **altijd SemiBold (600)**; dat hoort bij het component, je zet er niets voor. Een tag met één label (`Draft`, `Standard`, `Planned`, `Completed`) schrijf je dus kaal:
+```html
+<span class="tag is-draft">Draft</span>          <!-- goed: component-gewicht -->
+<span class="tag is-draft text-w400">Draft</span> <!-- fout: leest te licht -->
+```
+`.text-w400` / `.text-w500` (de styleguide `[weight]`) zijn **alleen** voor het *contextuele* patroon: één vet statuswoord tegen een lichter detail. Wikkel dan het woord in `<b>` (dat blijft 600) en zet de rest lichter:
+```html
+<span class="tag tag-positive text-w400"><b>Completed</b> on 22 aug 2025</span>
+```
+Staat er geen detail achter het woord, gebruik het lichte gewicht dan niet — `text-w400` + `<b>Draft</b>` is een omweg naar precies dezelfde 600.
+
+**Grijze en donkere fills zitten in `components.css`** — `.tag.is-draft` (grijs, `--bg-tertiary` + `--content-base`) en `.tag.is-planned` (donker, `--bg-inverse` + `--content-inverse`), zodat elk scherm dezelfde pill toont. Ze blijven een **stand-in voor Survey Status**; in productie rendert dat component de status zelf.
+
+**Dezelfde tag, andere kleur.** De "Standard"-tag in een vragenlijst is exact dit component met een subtiele brand-vulling (`--bg-brand-subtle` + `--content-accent-turquoise`) — geen eigen component, geen ander gewicht. Zo ook de status-pills. Wijkt een tag in een scherm af in gewicht of grootte, dan is dat een fout in dat scherm, niet een variant.
+
+> ⚠️ Figma/dev gap: `Eff Tag` heeft (nog) geen subtiele brand-background voor de "Standard"-tag; die vulling is prototype-lokaal. De grijze/donkere fills horen in productie bij Survey Status.
 
 ### List
 Verticale stapel rijen met hairline-dividers. Elke rij = een leading content-blok (titel + optionele sub-regel) + optionele trailing meta/tag/actie. Het patroon achter survey-, project- en instellingenlijsten.

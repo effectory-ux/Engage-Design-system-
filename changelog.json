@@ -1,6 +1,13 @@
 {
-  "count": 1011,
+  "count": 1012,
   "entries": [
+    {
+      "hash": "d7ac1a5",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Stamp v1.10.3 in the bundle and rebuild changelog.json",
+      "pages": []
+    },
     {
       "hash": "831d222",
       "author": "Jente Insing",
