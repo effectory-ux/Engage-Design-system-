@@ -1,6 +1,27 @@
 {
-  "count": 1006,
+  "count": 1009,
   "entries": [
+    {
+      "hash": "967e35e",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Ship the Component-keuze section in the org bundle too",
+      "pages": []
+    },
+    {
+      "hash": "9b5d327",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Sync skill bundle for v1.10.1",
+      "pages": []
+    },
+    {
+      "hash": "f1ad64f",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Rebuild changelog.json (stale since 2026-07-22, 123 commits behind)",
+      "pages": []
+    },
     {
       "hash": "98e8ea6",
       "author": "Jente Insing",
