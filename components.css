@@ -532,6 +532,16 @@ input[type="search"].srch::-webkit-search-decoration,
 input[type="search"].srch::-webkit-search-cancel-button { -webkit-appearance: none; }
 
 /* Hover */
+/* Large search — for a page where search is the main action, not a filter in a
+   toolbar. Same field, one step up in height and type. */
+input[type="search"].srch-lg {
+  height: 44px;
+  padding: 0 var(--spacing-base) 0 40px;
+  font-size: 16px;
+  border-radius: var(--radius-md);
+}
+.search-wrap.is-lg .search-icon { left: 14px; width: 18px; height: 18px; }
+
 input[type="search"].srch:hover,
 input[type="search"].srch.is-hover { border-color: var(--border-action-hover); }
 
