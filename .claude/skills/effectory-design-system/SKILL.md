@@ -303,6 +303,28 @@ eerste.
 ---
 
 
+### 14. Bied de galerij-entry aan — maar commit niks zonder akkoord
+Elk prototype hoort in de galerij ([`effectory-ux/prototypes`](https://github.com/effectory-ux/prototypes)),
+maar die staat in een **andere repo** en de kaarten zijn met de hand samengesteld. Doe daarom na het
+bouwen een voorstel en wacht op akkoord.
+
+1. **Stel de entry voor** die in `prototypes.json` zou komen: `path` = de **entry-pagina**, `also`-regexes
+   die de overige schermen claimen (zodat een prototype van meerdere pagina's één kaart blijft met
+   "N schermen"), de `group` uit regel 12, en een korte, zelf geschreven omschrijving.
+2. **Vraag expliciet of je hem mag toevoegen.** Geen akkoord = niet committen in de galerij-repo.
+3. **Na akkoord:** push eerst het prototype zelf — `build-gallery.py` crawlt de bron-repo live via de
+   GitHub API en vindt ongepushte pagina's niet. Voeg dan de entry toe, draai `./build-gallery.py` en
+   commit **zowel** `prototypes.json` als de gegenereerde `index.html`. Alleen `prototypes.json`
+   committen laat de kaart achter op de oude build.
+4. **Check de output van de builder:** die print elke pagina die geen enkele kaart claimt. Staat een van je
+   nieuwe schermen in die lijst, dan dekt je `also` niet alles — fix dat vóór de commit.
+
+**Eén kaart per prototype, niet per pagina.** Regel 13 levert meerdere bestanden op; die horen allemaal bij
+dezelfde kaart.
+
+---
+
+
 ## Workflow
 
 1. **Lees de reference** — laad `design-system-reference.md` volledig
@@ -318,6 +340,7 @@ eerste.
    > SVG-maskers (o.a. Toggle-vinkje) en icoonfuncties werken niet zonder HTTP.
    > Start de server met `python3 serve.py` en open daarna:
    > `http://localhost:<poort>/prototypes/<bestandsnaam>.html`
+9. **Galerij aanbieden** — stel de `prototypes.json`-entry voor en vraag of je hem mag toevoegen (regel 14)
 
 ---
 
