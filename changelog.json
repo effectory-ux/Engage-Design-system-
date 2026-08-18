@@ -1,6 +1,921 @@
 {
-  "count": 883,
+  "count": 1006,
   "entries": [
+    {
+      "hash": "98e8ea6",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Skill: one file and one URL per screen, not one file swapping views",
+      "pages": []
+    },
+    {
+      "hash": "7f44815",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Add a small chip variant",
+      "pages": []
+    },
+    {
+      "hash": "818bc1a",
+      "author": "Jente Insing",
+      "date": "2026-08-18",
+      "subject": "Add a large search variant",
+      "pages": []
+    },
+    {
+      "hash": "46d0fb5",
+      "author": "Jente Insing",
+      "date": "2026-08-17",
+      "subject": "Stop teaching <base href=\"/\">, it breaks the moment a prototype is published",
+      "pages": []
+    },
+    {
+      "hash": "310a98c",
+      "author": "Jente Insing",
+      "date": "2026-08-17",
+      "subject": "Skill asks which track a new prototype belongs to",
+      "pages": []
+    },
+    {
+      "hash": "32ec5ce",
+      "author": "Jente Insing",
+      "date": "2026-08-17",
+      "subject": "Resolve icons and illustrations next to the script, not next to the page",
+      "pages": []
+    },
+    {
+      "hash": "27cb05a",
+      "author": "Jente Insing",
+      "date": "2026-08-13",
+      "subject": "Sync design system v1.9.39 from effectory-design-documentation@ff69710",
+      "pages": [
+        "text-field-docs.html",
+        "textarea-docs.html",
+        "upgrade-button-docs.html"
+      ]
+    },
+    {
+      "hash": "0237523",
+      "author": "Jente Insing",
+      "date": "2026-08-13",
+      "subject": "Sync design system v1.9.39 from effectory-design-documentation@be02c4c",
+      "pages": [
+        "prototypes-docs.html"
+      ]
+    },
+    {
+      "hash": "3fc47bc",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "Conversation Guide: restore V2 Choose flow on cards, restyle entry card",
+      "pages": []
+    },
+    {
+      "hash": "96cb766",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "V4 triage dialog: remove auto-advance after completing a response; user clicks Next",
+      "pages": []
+    },
+    {
+      "hash": "22d0650",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "Conversation Guide Phase 1: preview + download guide panel",
+      "pages": []
+    },
+    {
+      "hash": "8b0e9f4",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "V5 legend: white cards on light-grey container (2x2) so the response explanations pop",
+      "pages": []
+    },
+    {
+      "hash": "24e8ea5",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "V5 triage: one educational legend card + compact icon+label response chips per card",
+      "pages": []
+    },
+    {
+      "hash": "f340e99",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "V5 dialog content matches V4/V3; non-clickable multi-select cards; V4 centered progress",
+      "pages": []
+    },
+    {
+      "hash": "c194ac1",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-12",
+      "subject": "V4: use the same 'Choose how to respond' dialog content as V3 (option cards) in the multi-select wizard",
+      "pages": []
+    },
+    {
+      "hash": "57b2e13",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-11",
+      "subject": "Action center: white content background everywhere except the Actions page (kept grey)",
+      "pages": []
+    },
+    {
+      "hash": "93a3cdb",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-11",
+      "subject": "Add Conversation Guide page (results dashboard base from Action Center stepper)",
+      "pages": []
+    },
+    {
+      "hash": "5176431",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-11",
+      "subject": "Action center: show the question, theme and score above the response options in the step dialog",
+      "pages": []
+    },
+    {
+      "hash": "37ff2f4",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-07",
+      "subject": "Action center: date-picker popup no longer clipped in Monitor (flip up + un-clip container)",
+      "pages": []
+    },
+    {
+      "hash": "6d54dac",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-07",
+      "subject": "V1: add animated 'Explore more areas' link (matches V2)",
+      "pages": []
+    },
+    {
+      "hash": "25ded6b",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-07",
+      "subject": "Action center: Send copy, V4 footer/success lines, success Go-to-Actions, non-clickable cards",
+      "pages": []
+    },
+    {
+      "hash": "faee618",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-06",
+      "subject": "Action center: reliably flip Need-support dropdown so all options are visible everywhere",
+      "pages": []
+    },
+    {
+      "hash": "1adc763",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-06",
+      "subject": "Action center: wins explore now staggers like focus; fix inline support dropdown clipping",
+      "pages": []
+    },
+    {
+      "hash": "ab99b88",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-06",
+      "subject": "Action center: V4 dialog restructure, content-fit modals + dropdown flip, animated wins explore",
+      "pages": []
+    },
+    {
+      "hash": "3ae399e",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-06",
+      "subject": "V2: add animated 'Explore more areas' (staggered one-by-one reveal); remove V3",
+      "pages": []
+    },
+    {
+      "hash": "5339dbc",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-06",
+      "subject": "Action center: grey content area, base-color response list in Decide card, Focus-View score badges in Actions",
+      "pages": []
+    },
+    {
+      "hash": "513282d",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "V5 triage page: match card width to Focus View and center the content",
+      "pages": []
+    },
+    {
+      "hash": "19d9d32",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: V5 triage page cleanup + Actions empty-state chips restyle",
+      "pages": []
+    },
+    {
+      "hash": "cc7791e",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: card CTA 'Respond' -> 'Choose'; balanced Choose/Decide card with inline icons; bigger progress text",
+      "pages": []
+    },
+    {
+      "hash": "34b4df7",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: balanced educational card, CSS thumb tooltips, Promote everywhere, empty-state + Improve refinements",
+      "pages": []
+    },
+    {
+      "hash": "2c34890",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: reframe the educational card as 2 steps + outcome group; refine thumb tooltips",
+      "pages": []
+    },
+    {
+      "hash": "928121d",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: educational empty state + Create Custom Action, interactive Wins, Overview pin -> Actions",
+      "pages": []
+    },
+    {
+      "hash": "888a252",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: Promote option on Highest scores, V4/V5 Choose button + floating bar, thumb tooltips",
+      "pages": []
+    },
+    {
+      "hash": "c262616",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: thumbs-down 'not relevant' dialog, smart tags on top 3 cards, V2/V3 progress bar, V4/V5 whole-card select (border-only)",
+      "pages": []
+    },
+    {
+      "hash": "4649607",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: relevance thumbs (drop \"Not relevant\"), dialog reset on close, V4/V5 Choose button",
+      "pages": []
+    },
+    {
+      "hash": "c2d3ab3",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: searchable \"who can help\" dropdown + fix clipping + rename search copy",
+      "pages": []
+    },
+    {
+      "hash": "b7ba426",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center V4: triage dialog — controls above the card, progress by buttons, smoother slide",
+      "pages": []
+    },
+    {
+      "hash": "afbe405",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-05",
+      "subject": "Action center: Overview score-card pin back in the header (choose question → dialog)",
+      "pages": []
+    },
+    {
+      "hash": "5a6c66a",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center V5: sub-page triage (list, minimalistic)",
+      "pages": []
+    },
+    {
+      "hash": "7b55f3c",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center: V4 wizard refinements + cross-version done-card + explore tweaks",
+      "pages": []
+    },
+    {
+      "hash": "dbf83ed",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center: V4 triage wizard + create-new-action polish",
+      "pages": []
+    },
+    {
+      "hash": "eef5762",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center: V4 triage dialog, Create-new-action, Edit-details placement",
+      "pages": []
+    },
+    {
+      "hash": "445c58a",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center V4: multi-select Focus View → Triage sub-page",
+      "pages": []
+    },
+    {
+      "hash": "e07da64",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center: per-row Overview pins, Actions table, done-state + dialog polish",
+      "pages": []
+    },
+    {
+      "hash": "27cc1d0",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-04",
+      "subject": "Action center: match DS Overview layout, route pin to triage, rename to \"Improve\"",
+      "pages": []
+    },
+    {
+      "hash": "15e7ed8",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-03",
+      "subject": "Action center: Overview now embeds the real design-system Overview",
+      "pages": []
+    },
+    {
+      "hash": "a131ad5",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-03",
+      "subject": "Action center: Overview→dialog triage, Actions page, Highest-scores pin",
+      "pages": []
+    },
+    {
+      "hash": "542392b",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-03",
+      "subject": "Triage card: numbered steps (1/2/3) across v1/v2/v3; Overview pin opens the stepper dialog in v2/v3",
+      "pages": []
+    },
+    {
+      "hash": "b0eae19",
+      "author": "eray-effectory",
+      "date": "2026-08-03",
+      "subject": "Delete prototypes/LE",
+      "pages": []
+    },
+    {
+      "hash": "82f5b93",
+      "author": "eray-effectory",
+      "date": "2026-08-03",
+      "subject": "Create LE",
+      "pages": []
+    },
+    {
+      "hash": "442f055",
+      "author": "Eray Demirsoy",
+      "date": "2026-08-03",
+      "subject": "Action Center manager prototypes: v1 (Change/Edit clarity), v2 stepper, v3 stepper with inline explore",
+      "pages": []
+    },
+    {
+      "hash": "be02c4c",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: drop the indent guide lines",
+      "pages": []
+    },
+    {
+      "hash": "673b163",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: no indent cap; smaller steps with guide lines instead",
+      "pages": []
+    },
+    {
+      "hash": "a411248",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking (deep test): ten levels and realistic long names",
+      "pages": []
+    },
+    {
+      "hash": "6e42953",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: test page with a six-level structure",
+      "pages": []
+    },
+    {
+      "hash": "701d300",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: mobile toolbar unpinned and restyled, spacing tightened",
+      "pages": []
+    },
+    {
+      "hash": "032e119",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: mobile gets its own design, a list with a per-group sheet",
+      "pages": []
+    },
+    {
+      "hash": "c90ec70",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "integrations: the addendum message makes room for the toggle",
+      "pages": []
+    },
+    {
+      "hash": "ce349de",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "integrations: BambooHR configuration page",
+      "pages": []
+    },
+    {
+      "hash": "74f267b",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: the prototypes work on a phone",
+      "pages": []
+    },
+    {
+      "hash": "52d8ef9",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: no interactive element is mouse-only any more",
+      "pages": []
+    },
+    {
+      "hash": "e715b1c",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: arrow keys move through the group list",
+      "pages": []
+    },
+    {
+      "hash": "744a420",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: keyboard pass over the group list",
+      "pages": []
+    },
+    {
+      "hash": "75ea037",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: each group opens with one sentence stating its link",
+      "pages": []
+    },
+    {
+      "hash": "1be963d",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: drop the tag column from the survey-links chain",
+      "pages": []
+    },
+    {
+      "hash": "285511b",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking (effectory): seven real surveys to choose from instead of two",
+      "pages": []
+    },
+    {
+      "hash": "c8eb1b5",
+      "author": "Jente Insing",
+      "date": "2026-07-31",
+      "subject": "group-linking: one population per survey, and an overview that agrees with it",
+      "pages": []
+    },
+    {
+      "hash": "16d3b72",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "Drop \"Not relevant\" from the triage explainer",
+      "pages": []
+    },
+    {
+      "hash": "b0958b2",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "Add Action center manager focus view prototype",
+      "pages": []
+    },
+    {
+      "hash": "01397a8",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "group-linking: structure, status dots, carousel pause and contrast (a11y 7-15)",
+      "pages": []
+    },
+    {
+      "hash": "906c8fc",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "group-linking: keep the prototype's own URL, so a refresh stays on the page",
+      "pages": []
+    },
+    {
+      "hash": "e9c2f6f",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "group-linking: stop reading tooltips twice, and manage focus in dialogs",
+      "pages": []
+    },
+    {
+      "hash": "a474574",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "group-linking: fix the four blocking accessibility problems",
+      "pages": []
+    },
+    {
+      "hash": "44dafac",
+      "author": "Jente Insing",
+      "date": "2026-07-30",
+      "subject": "type-scale: bring components.css + prototypes onto the font scale",
+      "pages": []
+    },
+    {
+      "hash": "cdd796b",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "Fix the results-dashboard prototypes on GitHub Pages",
+      "pages": []
+    },
+    {
+      "hash": "27154a9",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "Drop the stacked-drawer variant of the results panels",
+      "pages": []
+    },
+    {
+      "hash": "7897016",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "Document the side-panel drill-down rules",
+      "pages": []
+    },
+    {
+      "hash": "d9426f7",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "Results dashboard: drill-down side panels with a Back button",
+      "pages": []
+    },
+    {
+      "hash": "4c8e241",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "tokens: reconcile all colors with the live styleguide + release skill v1.9.39",
+      "pages": []
+    },
+    {
+      "hash": "4fa2a53",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "group-linking: move the overlap percentage next to the confirm button",
+      "pages": []
+    },
+    {
+      "hash": "888c966",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "tokens: reconcile all colors with the live styleguide (dev = source of truth)",
+      "pages": [
+        "accordion-docs.html",
+        "announcement-dialog-docs.html",
+        "announcement-docs.html",
+        "avatar-docs.html",
+        "avatar-group-docs.html",
+        "badge-docs.html",
+        "border-radius-docs.html",
+        "breadcrumb-docs.html",
+        "button-big-docs.html",
+        "button-docs.html",
+        "card-docs.html",
+        "changelog-docs.html",
+        "checkbox-docs.html",
+        "colors-docs.html",
+        "contributing-docs.html",
+        "date-picker-docs.html",
+        "design-principles-docs.html",
+        "dialog-docs.html",
+        "dropdown-menu-docs.html",
+        "grid-layout-docs.html",
+        "icon-button-docs.html",
+        "iconography-docs.html",
+        "index.html",
+        "inline-notification-docs.html",
+        "introduction-docs.html",
+        "list-docs.html",
+        "main-navigation-docs.html",
+        "page-header-docs.html",
+        "prototypes-docs.html",
+        "radio-group-docs.html",
+        "search-docs.html",
+        "section-header-docs.html",
+        "select-docs.html",
+        "sentiment-button-docs.html",
+        "shadows-docs.html",
+        "side-panel-docs.html",
+        "spacing-docs.html",
+        "spotlight-docs.html",
+        "system-notifications-docs.html",
+        "tabs-docs.html",
+        "tag-docs.html",
+        "text-field-docs.html",
+        "textarea-docs.html",
+        "toggle-docs.html",
+        "tooltip-docs.html",
+        "typography-docs.html",
+        "upgrade-button-docs.html"
+      ]
+    },
+    {
+      "hash": "2f23be7",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "group-linking: route each connector style in its own lane",
+      "pages": []
+    },
+    {
+      "hash": "2f31a09",
+      "author": "Jente Insing",
+      "date": "2026-07-29",
+      "subject": "group-linking: ease the sticky chrome both ways, drop em dashes, tighten empty state",
+      "pages": []
+    },
+    {
+      "hash": "ed35fb9",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: drop the already-linked lockout, shorten the overlap badge, fewer toasts",
+      "pages": []
+    },
+    {
+      "hash": "7ee12fe",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: member section chevrons follow the DS accordion convention",
+      "pages": []
+    },
+    {
+      "hash": "525745a",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: drop the overlap subtitle from the compare dialog",
+      "pages": []
+    },
+    {
+      "hash": "9c5408a",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: simpler member section headers, collapsed by default",
+      "pages": []
+    },
+    {
+      "hash": "a98ebb3",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: split compared members into collapsible per-group sections",
+      "pages": []
+    },
+    {
+      "hash": "d6f15d0",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: bring the trend into view, tighten the preview, reposition the lens",
+      "pages": []
+    },
+    {
+      "hash": "0690f96",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: yellow field again, taller preview, reorder the celebration beats",
+      "pages": []
+    },
+    {
+      "hash": "a4de28a",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: drop the celebration scroll, fit the whole score in the lens",
+      "pages": []
+    },
+    {
+      "hash": "092df8b",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: animated magnifier on the new score, split member sections into cards",
+      "pages": []
+    },
+    {
+      "hash": "44edd9a",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: match the celebration preview's radius and page tint",
+      "pages": []
+    },
+    {
+      "hash": "926557b",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: celebration field from yellow to the light blue the design now uses",
+      "pages": []
+    },
+    {
+      "hash": "62b896f",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: make the translucent rim around the preview visible",
+      "pages": []
+    },
+    {
+      "hash": "f6a6125",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: match the reworked celebration design",
+      "pages": []
+    },
+    {
+      "hash": "ec7a03c",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: drop the sparkles from the celebration",
+      "pages": []
+    },
+    {
+      "hash": "8ec9629",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: give the celebration spring easing and a success payoff",
+      "pages": []
+    },
+    {
+      "hash": "c7bb18e",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: taller celebration illustration, translucent border on both sides",
+      "pages": []
+    },
+    {
+      "hash": "8761ae3",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: match the celebration preview to Figma, slow scroll then reveal",
+      "pages": []
+    },
+    {
+      "hash": "cc95a1d",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: 600px celebration dialog, smaller trend chart",
+      "pages": []
+    },
+    {
+      "hash": "84f34e1",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: rebuild the first-link celebration with an animated payoff",
+      "pages": []
+    },
+    {
+      "hash": "a186d8a",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: 'View participants' tooltip on the member count badge",
+      "pages": []
+    },
+    {
+      "hash": "6d04b25",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: more room between group name and member count",
+      "pages": []
+    },
+    {
+      "hash": "d364b5f",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: members list runs to the dialog's bottom edge",
+      "pages": []
+    },
+    {
+      "hash": "f9449f3",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: members scrollbar to the dialog edge, search scrolls with the list",
+      "pages": []
+    },
+    {
+      "hash": "6bb4dc6",
+      "author": "Jente Insing",
+      "date": "2026-07-28",
+      "subject": "Group linking prototypes: drop the members total footer, more air under the search",
+      "pages": []
+    },
+    {
+      "hash": "a4d3efc",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: simplify the group members dialog",
+      "pages": []
+    },
+    {
+      "hash": "70d2972",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: animate hiding and reopening the explainer",
+      "pages": []
+    },
+    {
+      "hash": "a5497bd",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: header description with Show more when the banner is hidden",
+      "pages": []
+    },
+    {
+      "hash": "607a8ec",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: coloured active filter states back, smaller explainer art",
+      "pages": []
+    },
+    {
+      "hash": "0f79b87",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Revert \"Group linking prototypes: move origin icons onto the connector line\"",
+      "pages": []
+    },
+    {
+      "hash": "c4da037",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: move origin icons onto the connector line",
+      "pages": []
+    },
+    {
+      "hash": "35b1ed9",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: filter chips become regular DS buttons with coloured count badges",
+      "pages": []
+    },
+    {
+      "hash": "a0758a0",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: small header on the survey picker dialog",
+      "pages": []
+    },
+    {
+      "hash": "3284542",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: survey picker rows to 24px vertical padding",
+      "pages": []
+    },
+    {
+      "hash": "2ee9caf",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: taller survey picker rows, tighter radio-to-title gap",
+      "pages": []
+    },
+    {
+      "hash": "6edb149",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: rebuild the survey picker to match Figma",
+      "pages": []
+    },
+    {
+      "hash": "1920617",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: drop the project name from the survey picker rows",
+      "pages": []
+    },
+    {
+      "hash": "82e4682",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: restyle step 1 to match Figma",
+      "pages": []
+    },
+    {
+      "hash": "a769cb4",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: fix explainer illustration path on GitHub Pages",
+      "pages": []
+    },
+    {
+      "hash": "f395adc",
+      "author": "Jente Insing",
+      "date": "2026-07-27",
+      "subject": "Group linking prototypes: rebuild the onboarding explainer to match Figma",
+      "pages": []
+    },
+    {
+      "hash": "f592cb3",
+      "author": "Jente Insing",
+      "date": "2026-07-22",
+      "subject": "Release skill v1.9.38 — all-surveys header spacing + divider",
+      "pages": []
+    },
     {
       "hash": "c93a2c2",
       "author": "Jente Insing",
