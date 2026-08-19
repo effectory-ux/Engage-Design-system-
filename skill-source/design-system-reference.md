@@ -348,6 +348,23 @@ Secondary = witte vulling + 1px `--border-action` + subtiele `--sh-action` (bijv
 States op `input.tf`: `.is-hover` `.is-focus` `.is-error` `.is-disabled` `.is-readonly`
 States op `.tf-num-wrap`: `.is-hover` `.is-focus` `.is-error` `.is-disabled`
 
+
+Label-rij (`.tf-lbl-row`) — optioneel icoon links van het label, een info-knop met tooltip, en een tekenteller rechts:
+```html
+<div class="tf-wrap">
+  <div class="tf-lbl-row">
+    <span class="tf-lbl-icon"><i data-icon="tag"></i></span>
+    <label class="tf-lbl">Survey name</label>
+    <button class="tf-info-btn" aria-label="Meer informatie">
+      <i data-icon="info"></i>
+      <span class="tf-tooltip">De datum waarna geen antwoorden meer binnenkomen.</span>
+    </button>
+    <span class="tf-char-count">0/80</span>
+  </div>
+  <input class="tf" type="text" maxlength="80" placeholder="Beschrijf het kort..." />
+</div>
+```
+Een icoon **in** het veld gaat via `.tf-field-icon` met `.tf-icon-left` of `.tf-icon-right` — alleen op de standaardvariant.
 ### Search
 ```html
 <div class="search-wrap">
@@ -357,6 +374,11 @@ States op `.tf-num-wrap`: `.is-hover` `.is-focus` `.is-error` `.is-disabled`
 ```
 States op `input.srch`: `.is-hover` `.is-focus` `.is-disabled`
 
+
+Grote variant — voor een pagina waar zoeken de **hoofdactie** is, niet een filter in een toolbar (44px hoog):
+```html
+<input type="search" class="srch srch-lg" placeholder="Zoeken..." />
+```
 ### Textarea
 ```html
 <div class="ta-wrap">
@@ -374,6 +396,8 @@ States op `input.srch`: `.is-hover` `.is-focus` `.is-disabled`
 ```
 States op `textarea.ta`: `.is-hover` `.is-focus` `.is-error` `.is-disabled`
 
+
+Dezelfde label-rij als bij Text Field, met de `ta-`-varianten: `.ta-lbl-row` met `.ta-lbl-icon`, een `.ta-info-btn` met `.ta-tooltip`, en `.ta-char-count` rechts.
 ### Select (Single)
 ```html
 <div class="slt-wrap">
@@ -394,6 +418,17 @@ States op `textarea.ta`: `.is-hover` `.is-focus` `.is-error` `.is-disabled`
 ```
 States: `.is-hover` `.is-focus` `.is-typing` `.is-error` `.is-warning` `.is-disabled`
 
+
+Melding onder het veld: `.slt-err` hoort bij `.slt.is-error`, `.slt-warn` is een waarschuwing zonder foutstate.
+```html
+<div class="slt-wrap">
+  <div class="slt-lbl">Label</div>
+  <div class="slt is-error"> … </div>
+  <div class="slt-err"><i data-icon="alert-circle"></i> Foutmelding</div>
+</div>
+
+<div class="slt-warn"><i data-icon="alert-triangle"></i> Waarschuwing</div>
+```
 ### Select (Multi)
 ```html
 <div class="ms" tabindex="0">
@@ -410,6 +445,8 @@ States: `.is-hover` `.is-focus` `.is-typing` `.is-error` `.is-warning` `.is-disa
 ```
 Chip-varianten: `.chip` `.chip-info` `.chip-error` `.chip-warning`
 
+
+`.chip-sm` is de kleine chip (12px): voor een label binnen een card, waar de normale chip te luid is.
 ### Selection Button
 ```html
 <button class="sel-btn">
@@ -493,6 +530,14 @@ Breedte: een dropdown groeit mee met de inhoud tot een max-breedte (~320px) en k
 
 > ⚠️ **Clipping vermijden — render de dropdown in een fixed overlay-laag.** Net als bij de Tooltip: een `.menu` die met `position:absolute` binnen een `overflow:hidden`- of scroll-container leeft, wordt afgekapt zodra hij buiten die container valt. Klassiek geval: een filter-/header-dropdown binnen een `.card` — en `.card` heeft zélf `overflow:hidden` (voor de ronde hoeken), dus de dropdown wordt op de kaartrand afgeknipt. Pure CSS lost dit niet op. Laat de trigger-klik de `.menu` met **`position:fixed`** + hoge `z-index` op berekende coördinaten onder de trigger zetten (rechts uitgelijnd op de trigger), **omhoog klappen** als er onderaan te weinig ruimte in de viewport is, en **clampen** binnen de viewport als laatste redmiddel; herbereken bij `scroll` (met capture, zodat inner scrollers meetellen) en `resize`, en sluit bij klik buiten het menu. Zo kan **geen enkele voorouder** (kaart, scroll-container, `overflow:hidden`) de dropdown ooit clippen. Dit geldt voor **álle popover-achtige overlays**: Dropdown menu, account-/portal-menu, filter-menu's, combobox-lijsten en date pickers. **Zet dus géén `overflow:hidden` op kaarten "voor de zekerheid"**, en reken erop dat de bestaande `.card` het al heeft — gebruik `position:fixed` voor elke overlay die eruit moet breken. Zie ook de identieke aanpak bij de Tooltip (*Clipping vermijden*).
 
+
+`.menu-footer` is de actiebalk onderaan een menu, met een scheidingslijn erboven. `.menu-stack` zet meerdere menu's onder elkaar in één popover.
+```html
+<div class="menu">
+  <div class="menu-item">Optie</div>
+  <div class="menu-footer"><button>Wissen</button><button>Toepassen</button></div>
+</div>
+```
 ### Checkbox
 ```html
 <!-- Bare -->
@@ -983,6 +1028,11 @@ Classes: `.announcement` (300px, `--bg-base`, `--border-base`, `--sh-dialogs`, `
 
 Echte Angular-API (`eff-tooltip-dialog`, `class="with-svg"`): `[svgUrl]` (illustratie), `[dialogTitle]`, `[dialogSubtitle]`, `[dialogButtonText]` (primary CTA, optioneel), `[dialogLinkButtonText]` (link/dismiss), `[targetElement]`, `[dialogPositionToTarget]` ('after'/'before'/'above'/'below'), `[dialogWidth]`, `[addOutlineToTargetElement]`, `[addHighlightToTargetElement]`, `(dialogClosedOutput)`. Gerenderd: `.tour-container` > `img.illustration` + `p.text-l5.text-w600` + `p.text-w400.text-subdued` + `.tour-footer` (`button.link` + `button.primary`). A11y: non-modal — geen focus stelen, `aria-live="polite"`, altijd dismissible.
 
+
+Sluitknop rechtsboven over de illustratie:
+```html
+<button class="ann-close ib ib-24 ib-secondary" aria-label="Sluiten"><i data-icon="cross"></i></button>
+```
 ### Main Navigation
 De primaire app-sidebar (240px, links). Bevat een portal-switcher bovenaan, navigatie-items in het midden, en het account-menu onderaan. Eén per scherm.
 
@@ -1180,7 +1230,7 @@ Het titelblok bovenaan een view: benoemt waar de gebruiker is, geeft context, en
   <div class="ph-divider"></div>
 </div>
 ```
-Classes: `.ph`, `.ph-eyebrow` (optionele overline, 12px uppercase, `--content-brand-base`), `.ph-row` (`align-items:center` → acties centreren op **titel+subtitle**; daarom staat de eyebrow búiten de row), `.ph-title` (26px `text-l3`, de page-`h1`). Het flexibele **subtitle-slot** `.ph-meta` met o.a.: platte tekst, `.ph-range` (datumrange met het `from-to`-icoon ertussen), `.ph-status` (`.ph-status-dot` + label + `.muted`), `.ph-link` (inline link-button, `--content-brand-secondary`). Voor een group/filter-selector in het slot: de bestaande **Selection Button** (`.sel-btn`). `.ph-controls` (rechter-acties: Button / Icon Button / Search). Optionele `.ph-tabs`/`.ph-tab` (**Tabs**-component; actief = 4px underline). `.ph-divider` (1px `--border-base`) sluit de header; in de app loopt die **full-bleed** tot de schermranden terwijl de content de container-padding houdt. Typografie: titel `text-l3`, subtitle `body-14`.
+Classes: `.ph`, `.ph-eyebrow` (optionele overline, 12px uppercase, `--content-brand-base`), `.ph-row` (`align-items:center` → acties centreren op **titel+subtitle**; daarom staat de eyebrow búiten de row), `.ph-title` (26px `text-l3`, de page-`h1`). Het flexibele **subtitle-slot** `.ph-meta` met o.a.: platte tekst, `.ph-range` (datumrange met het `from-to`-icoon ertussen), `.ph-status` (`.ph-status-dot` + label + `.muted`), `.ph-link` (inline link-button, `--content-brand-secondary`), `.ph-sep` (1px verticale scheiding tussen twee items in het slot). Voor een group/filter-selector in het slot: de bestaande **Selection Button** (`.sel-btn`). `.ph-controls` (rechter-acties: Button / Icon Button / Search). Optionele `.ph-tabs`/`.ph-tab` (**Tabs**-component; actief = 4px underline). `.ph-divider` (1px `--border-base`) sluit de header; in de app loopt die **full-bleed** tot de schermranden terwijl de content de container-padding houdt. Typografie: titel `text-l3`, subtitle `body-14`.
 
 > ⚠️ **Dev gap:** Angular-API nog te bevestigen; `.ph-*` is de prototype-structuur (titel/eyebrow/subtitle/acties/tabs componeren).
 
