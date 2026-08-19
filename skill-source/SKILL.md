@@ -5,7 +5,7 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.11.0
+**Version:** 1.12.0
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
@@ -285,6 +285,17 @@ Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat
 het antwoord in de oplevering, zodat het prototype met de juiste `group` in
 [`prototypes.json`](https://github.com/effectory-ux/prototypes) van de projects-pagina kan.
 
+**Stel deze vraag met de `AskUserQuestion`-tool**, samen met de naam uit regel 13 — één aanroep met twee
+vragen. De gebruiker krijgt dan klikbare opties in plaats van een lap tekst, en het scheelt een heen-en-weer:
+
+| Vraag | Header | Opties |
+|---|---|---|
+| Bij welke track hoort dit prototype? | `Track` | Surveying · Leadership enablement · Reporting · Platform |
+| Hoe moet dit prototype heten? | `Naam` | 2–3 voorstellen op basis van het scherm |
+
+Voeg zélf geen "Other"-optie toe; die komt er automatisch bij, zodat de gebruiker altijd een eigen track
+of naam kan typen. Is de tool in deze omgeving niet beschikbaar, vraag het dan gewoon in tekst.
+
 ---
 
 ### 13. Vraag hoe het prototype moet heten
@@ -298,7 +309,7 @@ hernoemen kost een nieuwe URL, en gedeelde links breken daarop.
 
 Weet de gebruiker het nog niet, doe dan een voorstel op basis van het scherm en laat het bevestigen.
 Benoem het onderwerp, niet de plek waar het toevallig begon: "CSM result settings" zegt meer dan
-"results overview".
+"results overview". Vraag dit met `AskUserQuestion`, in dezelfde aanroep als de track (regel 12).
 
 ---
 
@@ -358,6 +369,9 @@ het moet worden:
 | **Public** | krijgt een kaart op de projects-pagina, vindbaar voor het hele team |
 | **Hidden** | geen kaart; alleen te openen door wie de URL heeft |
 
+**Stel deze vraag ook met `AskUserQuestion`** — header `Zichtbaarheid`, met **Public** en **Hidden** als
+opties en per optie de uitleg uit de tabel hierboven.
+
 ⚠️ **Hidden is geen afscherming.** De pagina staat gewoon op een publieke Pages-site, dus de URL blijft
 voor iedereen te openen. Het enige verschil is dat hij niet op de projects-pagina verschijnt. Is iets
 écht niet deelbaar, zeg dat dan — een prototype is daar de verkeerde plek voor.
@@ -399,8 +413,8 @@ dezelfde kaart.
 1. **Lees de reference** — laad `design-system-reference.md` volledig
 2. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
 3. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
-4. **Vraag naar de track** — Surveying, Leadership enablement, Reporting of Platform (zie regel 12)
-5. **Vraag de naam** — hoe heet dit prototype? Bepaalt bestandsnaam, `<title>` en de kaart op de projects-pagina (zie regel 13)
+4. **Vraag naam + track** — één `AskUserQuestion` met beide vragen (regel 12 en 13)
+5. **Leg de naam vast** — bepaalt bestandsnaam, `<title>` en de kaart op de projects-pagina (regel 13)
 6. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
 7. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
@@ -412,7 +426,7 @@ dezelfde kaart.
     > SVG-maskers (o.a. Toggle-vinkje) en icoonfuncties werken niet zonder HTTP.
     > Start de server met `python3 serve.py` en open daarna:
     > `http://localhost:<poort>/<bestandsnaam>.html`
-12. **Vraag de zichtbaarheid** — public (kaart op de projects-pagina) of hidden (alleen via de URL)? Zie regel 15
+12. **Vraag de zichtbaarheid** — `AskUserQuestion`: public (kaart op de projects-pagina) of hidden (alleen via de URL). Zie regel 15
 
 ---
 
