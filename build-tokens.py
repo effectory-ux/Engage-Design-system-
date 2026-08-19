@@ -4,16 +4,20 @@ Reads the Figma variables export and generates:
   - tokens.css        — CSS custom properties for all modes
   - colors-tokens.js  — JS token data for the dynamic colors page
 
-The export used to be hardcoded to one person's Downloads folder, which meant
-nobody else could regenerate tokens — and by 2026-08-19 that file was gone, so
-nobody could at all. Give the path explicitly, or drop the export in the repo.
+FIGMA IS NO LONGER THE SOURCE OF TRUTH FOR TOKENS. tokens.css was reconciled by
+hand against the live dev styleguide on 2026-07-29 (commit 888c966, 164/164 on
+the light theme) because Figma's values were wrong. Writing from a Figma export
+would undo that, so this script REPORTS by default and only writes when you pass
+--write and mean it.
 
 Usage:
-  ./build-tokens.py                       uses ./figma-variables.json
-  ./build-tokens.py path/to/export.json   uses that file
-  FIGMA_VARIABLES=… ./build-tokens.py     same, via the environment
-  ./build-tokens.py --check               regenerate in memory and report whether
-                                          tokens.css / colors-tokens.js are current
+  ./build-tokens.py [export.json]           compare the export against what is
+                                            committed and print the differences
+  ./build-tokens.py [export.json] --write   actually overwrite tokens.css and
+                                            colors-tokens.js from the export
+  FIGMA_VARIABLES=… ./build-tokens.py       same, path via the environment
+
+Without an argument it looks for ./figma-variables.json.
 """
 import json, re, textwrap, os, sys
 
@@ -21,7 +25,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DEST_CSS = os.path.join(HERE, 'tokens.css')
 DEST_JS  = os.path.join(HERE, 'colors-tokens.js')
 
-CHECK = '--check' in sys.argv
+WRITE = '--write' in sys.argv
 positional = [a for a in sys.argv[1:] if not a.startswith('-')]
 SRC = positional[0] if positional else (
     os.environ.get('FIGMA_VARIABLES') or os.path.join(HERE, 'figma-variables.json'))
@@ -29,31 +33,38 @@ SRC = positional[0] if positional else (
 if not os.path.exists(SRC):
     print(f'✗ Figma variables export not found: {SRC}')
     print('')
-    print('  tokens.css is generated from a Figma variables export, so you need that')
-    print('  export first. Take it from the variables panel in the Figma file, then')
-    print('  either:')
+    print('  This script compares a Figma variables export against the committed')
+    print('  tokens. To do that it needs the export. Take it from the variables')
+    print('  panel in the Figma file, then either:')
     print('')
     print('    · save it as figma-variables.json next to this script, or')
     print('    · pass the path:  ./build-tokens.py ~/Downloads/variables.json, or')
     print('    · set FIGMA_VARIABLES=/path/to/export')
     print('')
-    print('  Never hand-edit tokens.css — the next run overwrites it.')
+    print('  Note: Figma is not the source of truth for tokens. This script only')
+    print('  writes when you pass --write.')
     sys.exit(1)
 
 
 def emit(path, content):
-    """Write the file, or in --check mode report whether it is already current."""
+    """Report the difference with what is committed; only write with --write."""
     current = None
     if os.path.exists(path):
         with open(path, encoding='utf-8') as fh:
             current = fh.read()
     name = os.path.basename(path)
-    if CHECK:
-        if current == content:
-            print(f'✓ up to date: {name}')
-            return True
-        print(f'✗ out of date: {name}')
-        return False
+    same = current == content
+    if not WRITE:
+        if same:
+            print(f'= {name} matches the export')
+        else:
+            a = (current or '').splitlines()
+            b = content.splitlines()
+            import difflib
+            n = sum(1 for line in difflib.unified_diff(a, b, lineterm='', n=0)
+                    if line[:1] in '+-' and line[:3] not in ('+++', '---'))
+            print(f'≠ {name} differs from the export ({n} lines)')
+        return same
     with open(path, 'w', encoding='utf-8') as fh:
         fh.write(content)
     print(f'Written: {path}')
@@ -329,10 +340,16 @@ js_lines.append("""  function getMode() {
 
 up_to_date.append(emit(DEST_JS, '\n'.join(js_lines) + '\n'))
 
-if CHECK and not all(up_to_date):
+if not WRITE:
     print('')
-    print('✗ Generated from the export, these differ from what is committed.')
-    print('  Either the export moved on and tokens.css was never rebuilt, or')
-    print('  tokens.css was hand-edited. Run ./build-tokens.py and commit.')
-    sys.exit(1)
+    if all(up_to_date):
+        print('The export and the committed files agree. Nothing to do.')
+    else:
+        print('Figma is NOT the source of truth for tokens — the committed files are,')
+        print('reconciled against the live dev styleguide. A difference here does not')
+        print('mean the committed files are wrong; it usually means Figma is behind.')
+        print('')
+        print('Only if you are certain the export is the correct newer version:')
+        print('  ./build-tokens.py ' + (positional[0] if positional else '<export>') + ' --write')
+    sys.exit(0)
 print('Done.')

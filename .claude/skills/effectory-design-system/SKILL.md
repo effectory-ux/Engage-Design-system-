@@ -181,9 +181,14 @@ Roep `ux-copy` aan zodra je tekst gaat schrijven of wijzigen — niet alleen op 
 ```
 Gebruik alleen iconnamen uit de lijst in `design-system-reference.md` sectie 5.
 
-### 6. tokens.css is auto-generated
-Nooit `tokens.css` handmatig bewerken. Alleen lezen en gebruiken.
-Regenereren: `./build-tokens.py <pad-naar-figma-export>` in de design-system repo.
+### 6. tokens.css komt uit het design system
+Nooit `tokens.css` handmatig bewerken — ook niet even, ook niet "alleen in dit prototype". Alleen lezen
+en gebruiken.
+
+Moet een tokenwaarde echt anders, dan is dat een wijziging in het design system en niet in je prototype.
+Meld het en verzin geen eigen waarde. **Figma is niet de bron voor tokens**: de waardes in `tokens.css`
+zijn afgestemd op de live dev-styleguide, en op punten waar Figma daarvan afwijkt heeft de styleguide het
+laatste woord.
 
 ### 7. Prototype is een productscherm
 Een prototype ziet eruit als een echte pagina in de app — niet als een docs-pagina.

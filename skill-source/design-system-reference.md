@@ -149,7 +149,7 @@ Gebruik altijd een van de klassen hierboven of een inline `font-size` die exact 
 
 ## 3. Design tokens (`tokens.css`)
 
-Tokens zijn auto-generated vanuit Figma via `build-tokens.py`. Nooit handmatig bewerken.
+Tokens komen uit het design system. Nooit handmatig bewerken — lees en gebruik ze. De waardes zijn afgestemd op de live dev-styleguide; **Figma is hier niet de bron**.
 
 ### Dark mode
 `tokens.css` bevat drie dark-mode lagen:
