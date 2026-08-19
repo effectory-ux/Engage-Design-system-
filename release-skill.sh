@@ -5,7 +5,8 @@
 #   https://github.com/effectory-ux/Engage-Design-system-/releases/download/skill-latest/effectory-design-system.zip
 #
 # Usage:  ./release-skill.sh
-# Token:  uses $GITHUB_TOKEN if set, otherwise the stored github.com git credential.
+# Auth:   the gh CLI. It picks up $GH_TOKEN / $GITHUB_TOKEN by itself, and
+#         otherwise uses whatever `gh auth login` stored.
 
 set -euo pipefail
 
@@ -23,42 +24,41 @@ ZIP="$ROOT/dist/$ASSET"
 VER=$(tr -d '[:space:]' < "$ROOT/VERSION")
 BUILT=$(date +"%Y-%m-%d %H:%M")
 TITLE="Effectory Design System — skill v$VER"
-BODY="Version **$VER** · built $BUILT\n\nAlways the latest build. Download $ASSET and upload it in Claude.ai → Organization settings → Skills → + Add. (Requires 'Code execution and file creation' enabled.)\n\nThe version number is also inside the bundle (VERSION file + SKILL.md)."
+BODY=$(cat <<EOF
+Version **$VER** · built $BUILT
 
-# 2. Resolve a token
-TOKEN="${GITHUB_TOKEN:-$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill 2>/dev/null | sed -n 's/^username=//p')}"
-if [ -z "$TOKEN" ]; then
-  echo "✗ No GitHub token. Set GITHUB_TOKEN or store a github.com credential (git push once)."
+Always the latest build. Download $ASSET and upload it in Claude.ai → Organization settings → Skills → + Add. (Requires 'Code execution and file creation' enabled.)
+
+The version number is also inside the bundle (VERSION file + SKILL.md).
+EOF
+)
+
+# 2. Publish with gh, which is already authenticated
+if ! command -v gh >/dev/null 2>&1; then
+  echo "✗ gh not found. Install the GitHub CLI (brew install gh), then run 'gh auth login'."
+  exit 1
+fi
+if ! gh auth status >/dev/null 2>&1; then
+  echo "✗ gh is not logged in. Run 'gh auth login' (or set GH_TOKEN)."
   exit 1
 fi
 
-API="https://api.github.com/repos/$OWNER/$REPO"
-hdr=(-H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json")
-
 echo "→ Publishing to release '$TAG'"
 
-META=$(printf '{"tag_name":"%s","target_commitish":"main","name":"%s","body":"%s"}' "$TAG" "$TITLE" "$BODY")
+GH=(--repo "$OWNER/$REPO")
 
-# 3. Get the release id, creating the rolling release if it doesn't exist yet
-ID=$(curl -s "${hdr[@]}" "$API/releases/tags/$TAG" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("id",""))')
-if [ -z "$ID" ]; then
-  ID=$(curl -s -X POST "${hdr[@]}" "$API/releases" -d "$META" | python3 -c 'import sys,json;print(json.load(sys.stdin).get("id",""))')
+# 3. Refresh the rolling release, creating it the first time
+if gh release view "$TAG" "${GH[@]}" >/dev/null 2>&1; then
+  gh release edit "$TAG" "${GH[@]}" --title "$TITLE" --notes "$BODY" >/dev/null
 else
-  # refresh title/body to the current version
-  curl -s -X PATCH "${hdr[@]}" "$API/releases/$ID" -d "$META" >/dev/null
+  gh release create "$TAG" "${GH[@]}" --target main --title "$TITLE" --notes "$BODY" >/dev/null
 fi
-if [ -z "$ID" ]; then echo "✗ Could not find or create the release."; exit 1; fi
 
-# 4. Remove any previous asset of the same name, then upload the fresh one
-for aid in $(curl -s "${hdr[@]}" "$API/releases/$ID/assets" \
-              | python3 -c "import sys,json;[print(a['id']) for a in json.load(sys.stdin) if a['name']=='$ASSET']"); do
-  curl -s -X DELETE "${hdr[@]}" "$API/releases/assets/$aid" >/dev/null
-done
+# 4. Replace the asset. --clobber overwrites the previous upload of the same name,
+#    so there is nothing to delete first.
+gh release upload "$TAG" "$ZIP" "${GH[@]}" --clobber >/dev/null
 
-URL=$(curl -s -X POST "${hdr[@]}" -H "Content-Type: application/zip" \
-        --data-binary @"$ZIP" \
-        "https://uploads.github.com/repos/$OWNER/$REPO/releases/$ID/assets?name=$ASSET" \
-        | python3 -c 'import sys,json;print(json.load(sys.stdin).get("browser_download_url",""))')
+URL="https://github.com/$OWNER/$REPO/releases/download/$TAG/$ASSET"
 
 echo ""
 echo "✓ Published v$VER. Shareable download URL (stable, always newest):"
