@@ -72,6 +72,11 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 .shell { display: flex; margin-top: var(--top-h); flex: 1; min-height: 0; }
 
 /* ─── SIDEBAR ─── */
+/* nav.js fetches nav.html and swaps this placeholder for the real .sidebar. Until
+   that lands the placeholder is an empty div with no width, so the content starts
+   hard left and then jumps right the moment the nav appears. Reserving the same
+   width here keeps the first paint in the right place. */
+#sidebar-placeholder { width: var(--sidebar-w); flex-shrink: 0; }
 .sidebar {
   width: var(--sidebar-w); flex-shrink: 0;
   position: sticky; top: var(--top-h); height: calc(100vh - var(--top-h));

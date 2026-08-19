@@ -9,6 +9,14 @@
   <link rel="stylesheet" href="styles.css" />
   <style>
 
+    /* Every other page centres its column via .content-cols; this page has no TOC,
+       so it centres its own wrapper at the same width and padding as .content —
+       the text then starts at the same x as on the component pages. */
+    .intro-wrap {
+      width: 100%; max-width: calc(880px + var(--toc-w)); margin-inline: auto;
+      padding-left: 48px; padding-right: 48px;
+    }
+
     /* ── Hero ── */
     .intro-hero {
       padding: 80px 0 72px;
@@ -117,7 +125,7 @@
 <div id="topnav-placeholder"></div>
 <div class="shell">
 <div id="sidebar-placeholder"></div>
-<div class="content-wrap" style="max-width:820px;">
+<div class="content-wrap intro-wrap">
 
   <!-- Hero -->
   <div class="intro-hero">
