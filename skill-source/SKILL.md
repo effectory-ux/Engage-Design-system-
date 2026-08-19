@@ -362,8 +362,15 @@ het moet worden:
 voor iedereen te openen. Het enige verschil is dat hij niet op de projects-pagina verschijnt. Is iets
 écht niet deelbaar, zeg dat dan — een prototype is daar de verkeerde plek voor.
 
-**Bij hidden:** voeg geen entry toe en meld bij de oplevering dat het prototype alleen via zijn URL te
-vinden is.
+**Bij hidden:** voeg de entry gewoon toe met `"hidden": true`. De kaart wordt dan niet gerenderd, maar
+naam, track, eigenaar en omschrijving blijven bewaard en de pagina's blijven geclaimd — dus geen
+`ignore`-regex, en de builder klaagt niet over niet-opgeëiste pagina's. Publiceren is later één vlag
+weghalen. Meld bij de oplevering dat het prototype alleen via zijn URL te vinden is.
+
+```json
+{ "name": "…", "desc": "…", "owner": "…", "group": "…",
+  "repo": "engage", "path": "prototypes/….html", "hidden": true }
+```
 
 **Bij public:**
 
