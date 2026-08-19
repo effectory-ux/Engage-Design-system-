@@ -55,7 +55,7 @@
     /* Inline search: borderless at rest, reveals the box on hover/focus (matches the inline text field) */
     .flt-bar input[type="search"].srch { border-color: transparent; background: transparent; box-shadow: none; }
     .flt-bar input[type="search"].srch:hover { border-color: var(--border-action-hover); background: var(--bg-input-hover); }
-    .flt-bar input[type="search"].srch:focus { border-color: var(--border-brand-base); background: var(--bg-input); }
+    .flt-bar input[type="search"].srch:focus { border-color: var(--border-brand); background: var(--bg-input); }
     .flt-cb { display: inline-flex; align-items: center; gap: var(--spacing-tight); font-size: 14px; font-weight: 500; color: var(--content-secondary); white-space: nowrap; cursor: pointer; height: 36px; padding: 0 var(--spacing-base-tight); }
     .flt-bar .sel-btn-inline { white-space: nowrap; }
     /* Match the checkbox label size (14px) so all filter-bar text shares one baseline */
@@ -80,14 +80,14 @@
     /* Draft + Planned are NOT Eff Tag backgrounds — in production these come from
        the dedicated Survey Status component. Prototype-local fills match the live app. */
     .surveys-list .tag.is-draft   { background: var(--bg-tertiary);    color: var(--content-base); }
-    .surveys-list .tag.is-planned { background: var(--bg-inverse-base); color: #fff; }
+    .surveys-list .tag.is-planned { background: var(--bg-inverse); color: #fff; }
 
     /* Response rate — product-specific trailing widget */
     .srv-rr { flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; width: 56px; }
     .srv-rr-top { display: flex; align-items: center; justify-content: center; gap: var(--spacing-extra-tight); font-size: 14px; font-weight: 500; color: var(--content-base); }
     .srv-rr-top i { width: 14px; height: 14px; display: flex; flex-shrink: 0; color: var(--content-secondary); }
     .srv-bar { height: 6px; border-radius: var(--radius-sm); background: var(--bg-tertiary); overflow: hidden; }
-    .srv-bar-fill { height: 100%; border-radius: var(--radius-full); background: var(--bg-info-base); }
+    .srv-bar-fill { height: 100%; border-radius: var(--radius-full); background: var(--bg-info); }
 
     .surveys-list .list-item .ib { flex-shrink: 0; }
 

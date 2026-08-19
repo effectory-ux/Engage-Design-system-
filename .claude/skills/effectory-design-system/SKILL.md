@@ -16,6 +16,40 @@ Laad voor elke bouwsessie eerst:
 Read(".claude/skills/effectory-design-system/design-system-reference.md")
 ```
 
+
+### Design system updates — `auto` of `manual`
+
+Een prototype draait op een **gepinde** kopie van het design system. Hoe die kopie ververst wordt,
+bepaalt de gebruiker. De keuze staat in `ds-pin.json` in de projectmap:
+
+```json
+{
+  "designSystem": "effectory-ux/Engage-Design-system-",
+  "ref": "d7ac1a5",
+  "pinned": "2026-08-19",
+  "update": "auto"
+}
+```
+
+- **`"update": "auto"`** *(standaard)* — haal bij de start van een bouwsessie de nieuwste versie op
+  (`tools/ds-update.sh`) en meld in één zin wat er veranderd is. Zo werk je altijd met het actuele system.
+- **`"update": "manual"`** — verander niets. Meld alleen dat er een update klaarstaat en op welke
+  ref het project nu staat; de gebruiker beslist. Gebruik dit zodra een prototype af is, gedeeld is
+  of in de galerij staat: dan hoort het niet meer te bewegen.
+
+Regels:
+
+1. Ontbreekt `ds-pin.json`, behandel het project als **`auto`** en maak het bestand aan bij de eerste update.
+2. Bij `manual` **nooit** ongevraagd verversen — ook niet "even snel" om een bug te fixen. Vraag het.
+3. Vraagt de gebruiker erom ("zet dit vast", "bevries het design system", "detach"), zet dan
+   `"update": "manual"`. Vraagt hij om los te laten ("weer meelopen", "attach"), zet `"auto"`.
+4. De gebruiker kan het ook in de prompt zeggen ("bouw dit maar pin het design system") — dat wint
+   van wat er in het bestand staat, en je legt het daarna vast.
+5. `tools/ds-update.sh --check` zegt alleen of het project achterloopt, zonder iets te wijzigen.
+
+> Op termijn komt deze schakelaar in de prototype-toolbar; tot die tijd is `ds-pin.json` plus de
+> prompt de plek waar het geregeld wordt.
+
 ---
 
 ## Referentie-prototypes (bekende schermen)
@@ -156,7 +190,7 @@ Gebruik de boilerplate uit `design-system-reference.md` sectie 1, met deze links
 ### 3. Tokens, geen hardcoded waarden
 Gebruik altijd design tokens of foundation-variabelen voor kleuren, spacing en shadows.
 Nooit: `color: #0a9d99`, `padding: 16px`, `box-shadow: 0 2px 4px ...`
-Altijd: `color: var(--content-brand-base)`, `padding: var(--spacing-base)`, `box-shadow: var(--sh-card)`
+Altijd: `color: var(--content-brand)`, `padding: var(--spacing-base)`, `box-shadow: var(--sh-card)`
 
 ### 3b. Let op contrast bij tekstkleuren
 Kies tekstkleuren op **leesbaarheid/contrast**, niet alleen op hiërarchie.

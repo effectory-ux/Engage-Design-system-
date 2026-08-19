@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iconography — Engage Design System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Size scale row */
+    .size-row {
+      display: flex; align-items: flex-end; gap: 48px;
+      padding: 32px; background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+    }
+    .size-cell { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .size-cell svg { color: var(--content-base); }
+    .size-label {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11.5px; color: var(--content-subtle); font-weight: 600;
+    }
+    .size-use { font-size: 12px; color: var(--content-subtle); max-width: 140px; text-align: center; line-height: 1.5; }
+
+    /* Icon grid */
+    .icon-toolbar {
+      display: flex; gap: 12px; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .icon-search {
+      flex: 1; min-width: 220px;
+      border: 1px solid var(--border-base); border-radius: var(--radius-base);
+      padding: 8px 12px; font-size: 13px; background: var(--bg-base);
+      font-family: inherit; color: var(--content-base);
+    }
+    .icon-search:focus { outline: none; border-color: var(--border-brand); }
+
+    .icon-count {
+      font-size: 12px; color: var(--content-subtle);
+      margin: 14px 0 0;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    .icon-cell.copied { border-color: var(--border-brand); background: var(--bg-secondary); }
+    .icon-cell.copied .icon-cell-name::after { content: ' · copied'; color: var(--content-brand); }
+    [aria-busy="true"]::before {
+      content: 'Loading icons…';
+      display: block; grid-column: 1 / -1;
+      font-size: 12.5px; color: var(--content-subtle); padding: 24px 0;
+    }
+    .icon-cell svg { width: 24px; height: 24px; color: var(--content-base); }
+    .icon-cell svg [fill]:not([fill="none"]) { fill: currentColor; }
+    .icon-cell svg [stroke]:not([stroke="none"]) { stroke: currentColor; }
+
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+    }
+    .icon-cell {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 8px;
+      border: 1px solid var(--border-base-hover); border-radius: var(--radius-md);
+      background: var(--bg-base); cursor: pointer;
+      transition: border-color .12s ease, background .12s ease;
+    }
+    .icon-cell:hover {
+      border-color: var(--border-base);
+      background: var(--bg-secondary);
+    }
+    .icon-cell svg { color: var(--content-base); flex-shrink: 0; }
+    .icon-cell-name {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10.5px; color: var(--content-subtle);
+      text-align: center; word-break: break-all; line-height: 1.4;
+    }
+
+    .note {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-base);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      font-size: 13.5px; color: var(--content-secondary); line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .note strong { color: var(--content-base); font-weight: 600; }
+    .note a { color: var(--content-action); text-decoration: underline; text-underline-offset: 2px; font-weight: inherit; }
+    .note a:hover { color: var(--content-action-hover); }
+    .g-code {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px; background: var(--bg-secondary);
+      padding: 1px 6px; border-radius: var(--radius-sm); border: 1px solid var(--border-base);
+    }
+
+    /* Example usage row */
+    .usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .usage-card {
+      border: 1px solid var(--border-base); border-radius: var(--radius-lg);
+      background: var(--bg-base); overflow: hidden;
+    }
+    .usage-demo {
+      padding: 24px; background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-base);
+      min-height: 90px; display: flex; align-items: center; justify-content: center;
+    }
+    .usage-meta { padding: 12px 16px; }
+    .usage-title { font-size: 13px; font-weight: 600; color: var(--content-base); margin-bottom: 4px; }
+    .usage-desc { font-size: 12.5px; color: var(--content-subtle); line-height: 1.5; }
+
+    /* Demo primitives */
+    .d-btn {
+      background: var(--bg-brand); color: var(--content-on-brand-base);
+      border: 1px solid var(--border-brand); box-shadow: var(--sh-action);
+      border-radius: var(--radius-base); height: 36px; padding: 0 12px; font-size: 14px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .d-icon-btn {
+      width: 32px; height: 32px; border: 1px solid var(--border-base);
+      background: var(--bg-base); border-radius: var(--radius-base);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--content-base);
+    }
+    .d-menu-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; font-size: 13px; color: var(--content-base);
+      border-radius: var(--radius-base); min-width: 200px;
+    }
+    .d-menu-row:hover { background: var(--bg-secondary); }
+    .d-alert {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--radius-md);
+      background: var(--bg-secondary); color: var(--content-base);
+      font-size: 13px;
+      border: 1px solid var(--border-base);
+    }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+<div class="page-header-row">
+<div class="page-header">
+    <div class="page-badges">
+    </div>
+    <h1 class="text-l1">Iconography</h1>
+    <p class="page-desc">Engage uses a single line-icon set — consistent stroke width, square optical alignment, and three fixed sizes. Icons carry meaning at a glance: pair them with a label wherever the meaning isn't obvious, and let them stand alone only for universally understood actions.</p>
+  </div>
+</div><!-- /page-header-row -->
+<div class="content-cols">
+<article class="content">
+
+<!-- SIZES -->
+  <section class="section" id="sizes">
+    <h2 class="text-l3">Sizes</h2>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6; margin-bottom:20px;">Three fixed sizes. Pick the one that matches the surrounding text size — icons and text should feel balanced, not dominant.</p>
+
+    <div class="size-row">
+      <div class="size-cell">
+        <!-- 16 -->
+        <span style="display:inline-flex;width:16px;height:16px;flex-shrink:0"><i data-icon="search"></i></span>
+        <span class="size-label">16 px</span>
+        <span class="size-use">Inline with body text, dense lists, compact controls.</span>
+      </div>
+      <div class="size-cell">
+        <!-- 24 -->
+        <span style="display:inline-flex;width:24px;height:24px;flex-shrink:0"><i data-icon="search"></i></span>
+        <span class="size-label">24 px</span>
+        <span class="size-use">Default. Buttons, nav items, menu rows, toolbars.</span>
+      </div>
+      <div class="size-cell">
+        <!-- 32 -->
+        <span style="display:inline-flex;width:32px;height:32px;flex-shrink:0"><i data-icon="search"></i></span>
+        <span class="size-label">32 px</span>
+        <span class="size-use">Empty states, feature highlights, large header actions.</span>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Stroke stays at 2 px</strong> across all sizes. Don't rescale the SVG stroke-width — it breaks visual consistency against text and against other icons on the same surface.
+    </div>
+  </section>
+
+  
+
+  <!-- LIBRARY -->
+  <section class="section" id="library">
+    <h2 class="text-l3">Library</h2>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6; margin-bottom:16px;">All 199 general icons, loaded straight from the design system. Search to filter, click any icon to copy its name.</p>
+
+    <div class="note">
+      Full set: <a href="https://www.figma.com/design/pQwaTgTOFsS96zxIPZ6SHm/%F0%9F%8D%91-Assets?node-id=2958-169" target="_blank">Figma — Assets · General icons</a> · <a href="https://styleguide.effectory.com/styles/icons" target="_blank">Styleguide</a>
+    </div>
+
+    <div class="icon-toolbar">
+      <input id="icon-search" class="icon-search" type="text" placeholder="Search icons — e.g. search, chevron, user, trash…" oninput="filterIcons(this.value)" />
+    </div>
+
+    <div id="icon-grid-all" class="icon-grid" aria-busy="true"></div>
+    <div class="icon-count" id="icon-count"></div>
+    <div class="note" id="no-results" style="display:none;">No icons match your search. Try a different term, or browse the full set in <a href="https://www.figma.com/design/pQwaTgTOFsS96zxIPZ6SHm/%F0%9F%8D%91-Assets?node-id=2958-169" target="_blank">Figma</a>.</div>
+  </section>
+
+  <!-- FILE TYPE ICONS -->
+  <section class="section" id="file-types">
+    <h2 class="text-l3">File type icons</h2>
+    <p style="font-size:14px; color:var(--content-secondary); line-height:1.6; margin-bottom:16px;">Multi-colour icons for file attachments and uploads. Unlike the general library, these keep their own brand colours, so embed them with an <span class="g-code">&lt;img&gt;</span> tag rather than <span class="g-code">&lt;i data-icon&gt;</span> (which would recolour them to <span class="g-code">currentColor</span>).</p>
+    <div class="icon-grid">
+      <div class="icon-cell"><img src="../assets/icons/pdf-file.svg" alt="PDF file" style="width:32px;height:40px;flex-shrink:0;" /><span class="icon-cell-name">pdf-file</span></div>
+      <div class="icon-cell"><img src="../assets/icons/xls-file.svg" alt="Excel file" style="width:32px;height:40px;flex-shrink:0;" /><span class="icon-cell-name">xls-file</span></div>
+      <div class="icon-cell"><img src="../assets/icons/ppt-file.svg" alt="PowerPoint file" style="width:32px;height:40px;flex-shrink:0;" /><span class="icon-cell-name">ppt-file</span></div>
+      <div class="icon-cell"><img src="../assets/icons/unknown-file.svg" alt="Unknown file type" style="width:32px;height:40px;flex-shrink:0;" /><span class="icon-cell-name">unknown-file</span></div>
+    </div>
+    <div class="dev-code-wrap" style="margin-top:16px;">
+      <button class="dev-copy-btn">Copy</button>
+      <pre><code><span class="ct">&lt;img</span> <span class="ca">src</span>=<span class="cv">"../assets/icons/pdf-file.svg"</span> <span class="ca">alt</span>=<span class="cv">"PDF file"</span> <span class="ca">width</span>=<span class="cv">"32"</span> <span class="ca">height</span>=<span class="cv">"40"</span> <span class="ct">/&gt;</span></code></pre>
+    </div>
+  </section>
+
+  <!-- USAGE -->
+  <section class="section" id="usage">
+    <h2 class="text-l3">Usage</h2>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6; margin-bottom:20px;">Icons earn their place when they clarify — and get in the way when they don't. A few patterns that hold up everywhere.</p>
+
+    <div class="usage-grid">
+
+      <div class="usage-card">
+        <div class="usage-demo">
+          <button class="d-btn">
+            <span style="display:inline-flex;width:16px;height:16px;flex-shrink:0"><i data-icon="download"></i></span>
+            Download report
+          </button>
+        </div>
+        <div class="usage-meta">
+          <div class="usage-title">Icon + label in buttons</div>
+          <div class="usage-desc">Use a 16&nbsp;px icon with <span class="g-code">spacing-extra-tight</span> to the label. The icon reinforces the action — the label carries the meaning.</div>
+        </div>
+      </div>
+
+      <div class="usage-card">
+        <div class="usage-demo">
+          <div style="display:flex; gap:8px;">
+            <button class="d-icon-btn" aria-label="Edit"><span style="display:inline-flex;width:18px;height:18px"><i data-icon="edit"></i></span></button>
+            <button class="d-icon-btn" aria-label="Share"><span style="display:inline-flex;width:18px;height:18px"><i data-icon="share"></i></span></button>
+            <button class="d-icon-btn" aria-label="Delete"><span style="display:inline-flex;width:18px;height:18px"><i data-icon="trash"></i></span></button>
+          </div>
+        </div>
+        <div class="usage-meta">
+          <div class="usage-title">Icon-only controls</div>
+          <div class="usage-desc">Reserve for universally understood actions (edit, share, delete). Always include an <span class="g-code">aria-label</span> — there's no text to fall back on.</div>
+        </div>
+      </div>
+
+      <div class="usage-card">
+        <div class="usage-demo">
+          <div style="display:flex; flex-direction:column; gap:2px; width:100%; max-width:220px;">
+            <div class="d-menu-row">
+              <span style="display:inline-flex;width:18px;height:18px;flex-shrink:0"><i data-icon="home"></i></span>
+              Home
+            </div>
+            <div class="d-menu-row">
+              <span style="display:inline-flex;width:18px;height:18px;flex-shrink:0"><i data-icon="Barchart-1"></i></span>
+              Reports
+            </div>
+            <div class="d-menu-row">
+              <span style="display:inline-flex;width:18px;height:18px;flex-shrink:0"><i data-icon="gear"></i></span>
+              Settings
+            </div>
+          </div>
+        </div>
+        <div class="usage-meta">
+          <div class="usage-title">Nav &amp; menu rows</div>
+          <div class="usage-desc">18–20&nbsp;px icon aligned left, label aligned to the icon. Icons improve scanability down a long list.</div>
+        </div>
+      </div>
+
+      <div class="usage-card">
+        <div class="usage-demo">
+          <div class="d-alert">
+            <span style="display:inline-flex;width:18px;height:18px;flex-shrink:0;color: var(--content-highlight)"><i data-icon="alert-triangle"></i></span>
+            Survey ends in 2 days.
+          </div>
+        </div>
+        <div class="usage-meta">
+          <div class="usage-title">Status &amp; inline feedback</div>
+          <div class="usage-desc">Icons carry the tone so the text stays neutral. Info, success, warning, and error each pair with a fixed icon.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+
+  <!-- GUIDANCE -->
+  <section class="section" id="guidance">
+    <h2 class="text-l3">Guidance</h2>
+
+    <h3 class="text-l4">Always use the icon library</h3>
+    <p style="font-size:14px; color:var(--content-secondary); line-height:1.6; margin-bottom:12px;">Every icon in the product must come from this library, loaded via <span class="g-code">&lt;i data-icon="name"&gt;</span>. Never paste an inline <span class="g-code">&lt;svg&gt;</span> — sizes drift, colours can't pick up <span class="g-code">currentColor</span>, and the icon won't update when the library changes.</p>
+    <div class="dev-code-wrap" style="margin-bottom:24px;">
+      <pre><code><span class="cc">&lt;!-- ✅ Correct --&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">data-icon</span>=<span class="cv">"download"</span> <span class="ca">style</span>=<span class="cv">"display:flex;width:16px;height:16px;"</span><span class="ct">&gt;&lt;/i&gt;</span>
+
+<span class="cc">&lt;!-- ❌ Wrong --&gt;</span>
+<span class="ct">&lt;svg</span> <span class="ca">width</span>=<span class="cv">"16"</span> <span class="ca">height</span>=<span class="cv">"16"</span> <span class="ca">viewBox</span>=<span class="cv">"0 0 16 16"</span><span class="ct">&gt;</span>...<span class="ct">&lt;/svg&gt;</span></code></pre>
+    </div>
+    <p style="font-size:14px; color:var(--content-secondary); line-height:1.6; margin-bottom:24px;">Set width, height, and colour on the host <span class="g-code">&lt;i&gt;</span> element — the SVG inside fills it automatically and inherits <span class="g-code">currentColor</span>. The only exceptions are decorative shapes (e.g. callout lines, do/don't ticks) where no semantic icon exists.</p>
+
+    <h3 class="text-l4">Meaning first, decoration never</h3>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6; margin-bottom:24px;">Every icon should clarify something the label alone can't. If you added it for visual flavour, remove it — decorative icons add noise to the scan.</p>
+
+    <h3 class="text-l4">One icon per meaning</h3>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6; margin-bottom:24px;">The same action always gets the same icon. If <span class="g-code">edit</span> means "edit" in one place, don't use <span class="g-code">pen-tool</span> elsewhere. Consistency builds the visual vocabulary users rely on.</p>
+
+    <h3 class="text-l4">Match the size to the context</h3>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6; margin-bottom:24px;">16&nbsp;px next to body text, 24&nbsp;px in buttons and menu rows, 32&nbsp;px in empty states. Don't free-scale — if nothing fits, the container is likely the wrong size.</p>
+
+    <h3 class="text-l4">Always label icon-only buttons</h3>
+    <p style="font-size:13.5px; color:var(--content-secondary); line-height:1.6;">An icon without a visible label still needs an <span class="g-code">aria-label</span> and a tooltip. Assistive tech and first-time users both lose if the meaning lives only in the glyph.</p>
+  </section>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+    <a class="pag-card" href="colors-docs.html">
+      <span class="pag-dir">← Previous</span>
+      <span class="pag-name">Color</span>
+    </a>
+    <a class="pag-card right" href="motion-docs.html">
+      <span class="pag-dir">Next →</span>
+      <span class="pag-name">Motion</span>
+    </a>
+  </div>
+
+</article>
+
+<div class="toc-col">
+  <nav class="toc">
+    <div class="toc-title">ON THIS PAGE</div>
+    <a class="toc-link" href="#sizes">Sizes</a>
+    <a class="toc-link" href="#library">Library</a>
+    <a class="toc-link" href="#file-types">File type icons</a>
+    <a class="toc-link" href="#usage">Usage</a>
+    <a class="toc-link" href="#guidance">Guidance</a>
+  </nav>
+</div>
+
+</div>
+</div>
+
+<script src="nav.js"></script>
+<script>
+  const ICONS = [
+    "accessibility","activity","add-on","aggregations","alert-circle","alert-triangle","alert-triangle-1",
+    "all changes","approximately","archive","archive-1","arrow-down","arrow-left","arrow-right","arrow-sub",
+    "arrow-up","asterisk","at-mail","Barchart-1","barchart-2","bell","benchmark-down","benchmark-up","bold",
+    "book-open","bookmark","bookmark-filled","box","briefcase","building","bullet-point","calendar",
+    "calendar-add","calendar-recurring","calendar-remove","category","check","check-square","chevron-down",
+    "chevron-down-small","chevron-end","chevron-left","chevron-right","chevron-start","chevron-up",
+    "clipboard","clipboard-a","clipboard-note","clipboard-settings","Clock","code","collapse-left",
+    "collapse-right","compass","cookie","copy","correlation-positive","cpu","cross","desktop",
+    "double-chevron-down","double-chevron-up","down-vote","download","download-2","drag-drop","edit",
+    "edit-inline","equal","ESG scan","ESG scan-1","ESG scan-2","excel","expand-left","expand-right",
+    "export","external-link","eye","eye-off","featured","file","file-error","file-plus","filter",
+    "find-replace","flag","folder","from-to","gear","gender-male","gender-male-1","gender-non-binary","gift","globe",
+    "goals","group","help","hierarchy","home","import-export","info","italic","key","language",
+    "layer-up-alt","layout","lightbulb","link","list-unordered","lock","log-out","love","magic wand","mail",
+    "maximize","menu","message","message-filled","minimize","minus","mobile","moon","more-horizontal",
+    "more-vertical","net-promoter-score","net-promoter-score-detractor","net-promoter-score-passive",
+    "palette","passkey","pause","pen-tool","percent","pie-chart","pin","pin-filled","pipet","play","plus",
+    "plus-minus","point-scale","privacy","randomize","refresh","response","rotate-backward",
+    "rotate-forward","search","segments","select","selected","send","shapes","share","share-1","shield",
+    "single-answer","single-answer-1","sliders","sort-ascending","sort-descending","star","star-filled",
+    "stop","Strategic fitness scan","structure","sun","table","tag","target","text-entry","themes",
+    "toggle-left","toggle-right","tool","top-3-filled","trash","Tree","Trend-down","trend-stable",
+    "Trend-up","Type","underline","undo","unlock","up-vote","upload","upload-file","user","user-badge",
+    "user-check","user-min","user-plus","users","version-history","waypoint","win","words","youtube",
+    "zap","zap-filled"
+  ];
+
+  function normalizeSvg(text) {
+    // Strip hardcoded brand colors so icons inherit currentColor via CSS.
+    return text
+      .replace(/\sfill="#[0-9a-fA-F]{3,8}"/g, ' fill="currentColor"')
+      .replace(/\sstroke="#[0-9a-fA-F]{3,8}"/g, ' stroke="currentColor"');
+  }
+
+  async function loadIcons() {
+    const grid = document.getElementById('icon-grid-all');
+    const frag = document.createDocumentFragment();
+    const sorted = [...ICONS].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
+    const results = await Promise.all(sorted.map(async name => {
+      try {
+        const r = await fetch(`assets/icons/${encodeURIComponent(name)}.svg`);
+        if (!r.ok) return { name, svg: null };
+        return { name, svg: normalizeSvg(await r.text()) };
+      } catch { return { name, svg: null }; }
+    }));
+
+    for (const { name, svg } of results) {
+      const cell = document.createElement('div');
+      cell.className = 'icon-cell';
+      cell.dataset.name = name.toLowerCase();
+      cell.title = `Click to copy · ${name}`;
+      cell.innerHTML = (svg || '<svg width="24" height="24"></svg>') +
+        `<span class="icon-cell-name">${name}</span>`;
+      cell.addEventListener('click', () => {
+        navigator.clipboard?.writeText(name);
+        cell.classList.add('copied');
+        setTimeout(() => cell.classList.remove('copied'), 1200);
+      });
+      frag.appendChild(cell);
+    }
+    grid.removeAttribute('aria-busy');
+    grid.appendChild(frag);
+    document.getElementById('icon-count').textContent =
+      `${ICONS.length} icons`;
+  }
+
+  function filterIcons(q) {
+    q = (q || '').trim().toLowerCase();
+    const cells = document.querySelectorAll('#icon-grid-all .icon-cell');
+    let visible = 0;
+    cells.forEach(cell => {
+      const match = !q || cell.dataset.name.includes(q);
+      cell.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    document.getElementById('no-results').style.display = visible ? 'none' : '';
+    document.getElementById('icon-count').textContent =
+      q ? `${visible} of ${ICONS.length} icons` : `${ICONS.length} icons`;
+  }
+
+  loadIcons();
+</script>
+</body>
+</html>

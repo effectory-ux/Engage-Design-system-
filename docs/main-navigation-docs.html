@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Main Navigation — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Main Navigation (app sidebar) ── */
+    .mainnav {
+      width: 240px; flex-shrink: 0; background: var(--bg-base); border: 1px solid var(--border-base);
+      border-radius: var(--radius-lg); display: flex; flex-direction: column; padding: 16px 0;
+      font-family: 'Poppins', sans-serif; height: 480px; overflow: hidden;
+    }
+    /* Personal portal remaps the brand tokens (mirrors html[data-portal="personal"]) */
+    .mainnav.is-personal { --bg-brand-subtle-selected: #ffefc2; --content-brand: #8a4b15; }
+
+    /* portal switcher */
+    .mn-portal { display: flex; align-items: center; gap: 6px; margin: 0 16px 24px; }
+    .mn-portal-btn { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 8px 10px; border: none; background: transparent; border-radius: var(--radius-md); cursor: pointer; font-family: inherit; }
+    .mn-portal-btn:hover { background: var(--bg-base-hover); }
+    .mn-logo { width: 40px; height: 40px; flex-shrink: 0; background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzMwQjNBRiIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE5LjkwNTggMjIuOTIyNkMyMy41Mjk4IDIyLjkyMjYgMjYuNDc4MyAxOS45NzQ0IDI2LjQ3ODMgMTYuMzUwMkMyNi40NzgzIDEyLjcyNjIgMjMuNTI5OCA5Ljc3NzcxIDE5LjkwNTggOS43Nzc3MUMxNi4yODE2IDkuNzc3NzEgMTMuMzMzMiAxMi43MjYyIDEzLjMzMzIgMTYuMzUwMkMxMy4zMzMyIDE5Ljk3NDQgMTYuMjgxNiAyMi45MjI2IDE5LjkwNTggMjIuOTIyNlpNMTcuMDI0NiAxNi4zNTAyQzE3LjAyNDYgMTQuNzYxNSAxOC4zMTcyIDEzLjQ2ODYgMTkuOTA2MSAxMy40Njg2QzIxLjQ5NDggMTMuNDY4NiAyMi43ODc1IDE0Ljc2MTUgMjIuNzg3NSAxNi4zNTAyQzIyLjc4NzUgMTcuOTM5IDIxLjQ5NDggMTkuMjMxNyAxOS45MDYxIDE5LjIzMTdDMTguMzE3MiAxOS4yMzE3IDE3LjAyNDYgMTcuOTM5IDE3LjAyNDYgMTYuMzUwMlpNMjUuNzM2MyAyNS4xMTFDMjYuNTY5MiAyNS4xMTEgMjcuMjQ0MyAyNS43ODYxIDI3LjI0NDMgMjYuNjE5VjI4Ljk0MDRIMTQuNTU0OUwxMi42NjY1IDMwLjExMDZWMjYuNjMyNkMxMi42NjY1IDI1Ljc5MjEgMTMuMzQ3OCAyNS4xMTEgMTQuMTg4MyAyNS4xMTFIMjUuNzM2M1oiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo="); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .mainnav.is-personal .mn-logo { background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMTIuOEMwIDguMzE5NTggMCA2LjA3OTM3IDAuODcxOTQ4IDQuMzY4MDhDMS42Mzg5MyAyLjg2Mjc4IDIuODYyNzggMS42Mzg5MyA0LjM2ODA4IDAuODcxOTQ4QzYuMDc5MzcgMCA4LjMxOTU4IDAgMTIuOCAwSDI3LjJDMzEuNjgwNCAwIDMzLjkyMDYgMCAzNS42MzE5IDAuODcxOTQ4QzM3LjEzNzIgMS42Mzg5MyAzOC4zNjExIDIuODYyNzggMzkuMTI4MSA0LjM2ODA4QzQwIDYuMDc5MzcgNDAgOC4zMTk1OCA0MCAxMi44VjI3LjJDNDAgMzEuNjgwNCA0MCAzMy45MjA2IDM5LjEyODEgMzUuNjMxOUMzOC4zNjExIDM3LjEzNzIgMzcuMTM3MiAzOC4zNjExIDM1LjYzMTkgMzkuMTI4MUMzMy45MjA2IDQwIDMxLjY4MDQgNDAgMjcuMiA0MEgxMi44QzguMzE5NTggNDAgNi4wNzkzNyA0MCA0LjM2ODA4IDM5LjEyODFDMi44NjI3OCAzOC4zNjExIDEuNjM4OTMgMzcuMTM3MiAwLjg3MTk0OCAzNS42MzE5QzAgMzMuOTIwNiAwIDMxLjY4MDQgMCAyNy4yVjEyLjhaIiBmaWxsPSIjRkRCRDEyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTkuOTA1OCAyMi45MjI2QzIzLjUyOTggMjIuOTIyNiAyNi40NzgzIDE5Ljk3NDQgMjYuNDc4MyAxNi4zNTAyQzI2LjQ3ODMgMTIuNzI2MiAyMy41Mjk4IDkuNzc3NzEgMTkuOTA1OCA5Ljc3NzcxQzE2LjI4MTYgOS43Nzc3MSAxMy4zMzMyIDEyLjcyNjIgMTMuMzMzMiAxNi4zNTAyQzEzLjMzMzIgMTkuOTc0NCAxNi4yODE2IDIyLjkyMjYgMTkuOTA1OCAyMi45MjI2Wk0xNy4wMjQ2IDE2LjM1MDJDMTcuMDI0NiAxNC43NjE1IDE4LjMxNzIgMTMuNDY4NiAxOS45MDYxIDEzLjQ2ODZDMjEuNDk0OCAxMy40Njg2IDIyLjc4NzUgMTQuNzYxNSAyMi43ODc1IDE2LjM1MDJDMjIuNzg3NSAxNy45MzkgMjEuNDk0OCAxOS4yMzE3IDE5LjkwNjEgMTkuMjMxN0MxOC4zMTcyIDE5LjIzMTcgMTcuMDI0NiAxNy45MzkgMTcuMDI0NiAxNi4zNTAyWk0yNS43MzYzIDI1LjExMUMyNi41NjkyIDI1LjExMSAyNy4yNDQzIDI1Ljc4NjEgMjcuMjQ0MyAyNi42MTlWMjguOTQwNEgxNC41NTQ5TDEyLjY2NjUgMzAuMTEwNlYyNi42MzI2QzEyLjY2NjUgMjUuNzkyMSAxMy4zNDc4IDI1LjExMSAxNC4xODgzIDI1LjExMUgyNS43MzYzWiIgZmlsbD0iIzE5Mjc0MyIvPgo8L3N2Zz4K"); }
+    .mn-portal-btn b { font-size: 16px; font-weight: 600; color: var(--content-base); }
+    .mn-portal-btn .mn-chev { margin-left: auto; width: 16px; height: 16px; color: var(--content-base); display: flex; }
+
+    /* nav items */
+    .mn-nav { display: flex; flex-direction: column; gap: 8px; padding: 0 16px; }
+    .mn-item { display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 14px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; color: var(--content-action); text-decoration: none; cursor: pointer; border: none; background: transparent; font-family: inherit; width: 100%; text-align: left; transition: background .1s, color .1s; }
+    .mn-item > i[data-icon] { width: 16px; height: 16px; display: flex; flex-shrink: 0; color: var(--content-action); }
+    .mn-item .mn-chev { margin-left: auto; width: 16px; height: 16px; color: var(--content-subtle); display: flex; }
+    .mn-item:hover, .mn-item.is-hover { background: var(--bg-base-hover); color: var(--content-base); }
+    .mn-item.is-active { background: var(--bg-brand-subtle-selected); color: var(--content-base); font-weight: 600; }
+    .mn-item.is-active > i[data-icon] { color: var(--content-brand); }
+
+    /* expandable group */
+    .mn-sub { display: flex; flex-direction: column; gap: 2px; padding: 2px 0 6px; }
+    .mn-subitem { display: flex; align-items: center; height: 44px; padding: 0 14px 0 42px; border-radius: var(--radius-md); font-size: 14px; color: var(--content-action); text-decoration: none; cursor: pointer; }
+    .mn-subitem:hover { background: var(--bg-base-hover); color: var(--content-base); }
+    .mn-subitem.is-active { background: var(--bg-brand-subtle-selected); color: var(--content-base); font-weight: 600; }
+    .mn-sub-divider { height: 1px; background: var(--border-base); margin: 6px 16px; }
+
+    /* footer: help + account */
+    .mn-foot { margin-top: auto; padding: 0 16px; display: flex; flex-direction: column; gap: 4px; }
+    .mn-foot-divider { height: 1px; background: var(--border-base); margin: 6px 0; }
+    .mn-user { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-md); cursor: pointer; }
+    .mn-user:hover, .mn-user.is-hover { background: var(--bg-base-hover); }
+    .mn-user.is-pressed { background: var(--bg-base-pressed); }
+    .mn-user .mn-meta { line-height: 1.3; min-width: 0; }
+    .mn-user .mn-name { font-size: 14px; font-weight: 500; color: var(--content-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mn-user .mn-org { font-size: 12px; color: var(--content-secondary); }
+    .mn-user > i[data-icon] { width: 16px; height: 16px; margin-left: auto; color: var(--content-subtle); display: flex; }
+
+    /* Avatar component (from the design system) — used in the account button */
+    .av { display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-full); font-family: 'Poppins', sans-serif; font-weight: 600; flex-shrink: 0; user-select: none; box-sizing: border-box; }
+    .av-36 { width: 36px; height: 36px; font-size: 14px; }
+    .av-blue { background: var(--bg-accent-blue-subtle); color: var(--content-accent-blue); }
+
+    /* account & portal dropdowns — the documented Dropdown Menu (.menu) component */
+    .menu { width: 240px; background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); box-shadow: var(--sh-popovers); padding: 8px; font-family: 'Poppins', sans-serif; }
+    .menu-header { padding: 6px 8px 10px; font-size: 14px; font-weight: 600; color: var(--content-base); }
+    .menu-divider { height: 1px; background: var(--border-base); margin: 4px 0; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: var(--radius-md); cursor: pointer; color: var(--content-base); line-height: 20px; }
+    .menu-item:hover { background: var(--bg-base-hover); }
+    .menu-item.is-selected { background: var(--bg-brand-subtle); }
+    .menu-item-body { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 2px; }
+    .menu-item-title { font-weight: 400; font-size: 14px; line-height: 1.6; color: var(--content-base); }
+    .menu-item-sub { font-weight: 400; font-size: 12px; line-height: 1.6; color: var(--content-secondary); }
+    .menu-item-icon { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; color: var(--content-subtle); flex-shrink: 0; }
+    .menu-item-check { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; color: var(--content-brand); flex-shrink: 0; }
+    .pi-logo { width: 24px; height: 24px; flex-shrink: 0; background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .pi-logo-coordinator { background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iOCIgZmlsbD0iIzMwQjNBRiIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTE5LjkwNTggMjIuOTIyNkMyMy41Mjk4IDIyLjkyMjYgMjYuNDc4MyAxOS45NzQ0IDI2LjQ3ODMgMTYuMzUwMkMyNi40NzgzIDEyLjcyNjIgMjMuNTI5OCA5Ljc3NzcxIDE5LjkwNTggOS43Nzc3MUMxNi4yODE2IDkuNzc3NzEgMTMuMzMzMiAxMi43MjYyIDEzLjMzMzIgMTYuMzUwMkMxMy4zMzMyIDE5Ljk3NDQgMTYuMjgxNiAyMi45MjI2IDE5LjkwNTggMjIuOTIyNlpNMTcuMDI0NiAxNi4zNTAyQzE3LjAyNDYgMTQuNzYxNSAxOC4zMTcyIDEzLjQ2ODYgMTkuOTA2MSAxMy40Njg2QzIxLjQ5NDggMTMuNDY4NiAyMi43ODc1IDE0Ljc2MTUgMjIuNzg3NSAxNi4zNTAyQzIyLjc4NzUgMTcuOTM5IDIxLjQ5NDggMTkuMjMxNyAxOS45MDYxIDE5LjIzMTdDMTguMzE3MiAxOS4yMzE3IDE3LjAyNDYgMTcuOTM5IDE3LjAyNDYgMTYuMzUwMlpNMjUuNzM2MyAyNS4xMTFDMjYuNTY5MiAyNS4xMTEgMjcuMjQ0MyAyNS43ODYxIDI3LjI0NDMgMjYuNjE5VjI4Ljk0MDRIMTQuNTU0OUwxMi42NjY1IDMwLjExMDZWMjYuNjMyNkMxMi42NjY1IDI1Ljc5MjEgMTMuMzQ3OCAyNS4xMTEgMTQuMTg4MyAyNS4xMTFIMjUuNzM2M1oiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo="); }
+    .pi-logo-personal { background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAgMTIuOEMwIDguMzE5NTggMCA2LjA3OTM3IDAuODcxOTQ4IDQuMzY4MDhDMS42Mzg5MyAyLjg2Mjc4IDIuODYyNzggMS42Mzg5MyA0LjM2ODA4IDAuODcxOTQ4QzYuMDc5MzcgMCA4LjMxOTU4IDAgMTIuOCAwSDI3LjJDMzEuNjgwNCAwIDMzLjkyMDYgMCAzNS42MzE5IDAuODcxOTQ4QzM3LjEzNzIgMS42Mzg5MyAzOC4zNjExIDIuODYyNzggMzkuMTI4MSA0LjM2ODA4QzQwIDYuMDc5MzcgNDAgOC4zMTk1OCA0MCAxMi44VjI3LjJDNDAgMzEuNjgwNCA0MCAzMy45MjA2IDM5LjEyODEgMzUuNjMxOUMzOC4zNjExIDM3LjEzNzIgMzcuMTM3MiAzOC4zNjExIDM1LjYzMTkgMzkuMTI4MUMzMy45MjA2IDQwIDMxLjY4MDQgNDAgMjcuMiA0MEgxMi44QzguMzE5NTggNDAgNi4wNzkzNyA0MCA0LjM2ODA4IDM5LjEyODFDMi44NjI3OCAzOC4zNjExIDEuNjM4OTMgMzcuMTM3MiAwLjg3MTk0OCAzNS42MzE5QzAgMzMuOTIwNiAwIDMxLjY4MDQgMCAyNy4yVjEyLjhaIiBmaWxsPSIjRkRCRDEyIi8+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMTkuOTA1OCAyMi45MjI2QzIzLjUyOTggMjIuOTIyNiAyNi40NzgzIDE5Ljk3NDQgMjYuNDc4MyAxNi4zNTAyQzI2LjQ3ODMgMTIuNzI2MiAyMy41Mjk4IDkuNzc3NzEgMTkuOTA1OCA5Ljc3NzcxQzE2LjI4MTYgOS43Nzc3MSAxMy4zMzMyIDEyLjcyNjIgMTMuMzMzMiAxNi4zNTAyQzEzLjMzMzIgMTkuOTc0NCAxNi4yODE2IDIyLjkyMjYgMTkuOTA1OCAyMi45MjI2Wk0xNy4wMjQ2IDE2LjM1MDJDMTcuMDI0NiAxNC43NjE1IDE4LjMxNzIgMTMuNDY4NiAxOS45MDYxIDEzLjQ2ODZDMjEuNDk0OCAxMy40Njg2IDIyLjc4NzUgMTQuNzYxNSAyMi43ODc1IDE2LjM1MDJDMjIuNzg3NSAxNy45MzkgMjEuNDk0OCAxOS4yMzE3IDE5LjkwNjEgMTkuMjMxN0MxOC4zMTcyIDE5LjIzMTcgMTcuMDI0NiAxNy45MzkgMTcuMDI0NiAxNi4zNTAyWk0yNS43MzYzIDI1LjExMUMyNi41NjkyIDI1LjExMSAyNy4yNDQzIDI1Ljc4NjEgMjcuMjQ0MyAyNi42MTlWMjguOTQwNEgxNC41NTQ5TDEyLjY2NjUgMzAuMTEwNlYyNi42MzI2QzEyLjY2NjUgMjUuNzkyMSAxMy4zNDc4IDI1LjExMSAxNC4xODgzIDI1LjExMUgyNS43MzYzWiIgZmlsbD0iIzE5Mjc0MyIvPgo8L3N2Zz4K"); }
+
+    /* doc layout helpers */
+    .anatomy-fig { position: relative; background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 40px; margin-bottom: 24px; display: flex; justify-content: center; }
+    .anatomy-fig .mainnav { pointer-events: none; }
+    .mn-prev { display: flex; justify-content: center; align-items: flex-start; padding: 28px 20px; flex: 1; }
+    .variant-row { grid-template-columns: minmax(300px, 1fr) 1fr; }
+    .variant-row-btn { padding: 28px; align-items: flex-start; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: var(--radius-base); border: 1px solid transparent; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .btn-primary { background: var(--bg-brand); border-color: var(--border-brand); color: var(--content-on-brand-base); box-shadow: var(--sh-action); }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Main Navigation</h1>
+      <p class="page-desc">The primary sidebar that frames the whole platform — it switches portals, links to the top-level areas, and holds the user's account menu. One per screen, always on the left.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">A fixed-width column with a portal switcher on top, the navigation items in the middle, and the account menu pinned to the bottom.</p>
+          <div class="anatomy-fig">
+            <div class="mainnav" style="pointer-events:none;">
+              <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn"><b>Coordinator</b> <i data-icon="chevron-down" class="mn-chev"></i></button></div>
+              <nav class="mn-nav">
+                <a class="mn-item is-active"><i data-icon="home"></i> Home</a>
+                <a class="mn-item"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-down" class="mn-chev"></i></a>
+                <a class="mn-item"><i data-icon="refresh"></i> 360° Feedback</a>
+                <a class="mn-item"><i data-icon="globe"></i> Organization <i data-icon="chevron-down" class="mn-chev"></i></a>
+              </nav>
+              <div class="mn-foot">
+                <a class="mn-item"><i data-icon="help"></i> Help &amp; learn</a>
+                <div class="mn-foot-divider"></div>
+                <div class="mn-user"><div class="av av-36 av-blue">JR</div><div class="mn-meta"><div class="mn-name">Jamal van Rooi…</div><div class="mn-org">Effectory B.V.</div></div><i data-icon="chevron-down"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Portal switcher</span> — Logo + the active portal name (Coordinator / Personal). Opens a menu to switch portal.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Navigation item</span> — A top-level destination with an icon and label. The active one is highlighted in the portal's accent colour.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Expandable group</span> — Items with a chevron (Surveys, Organization) reveal sub-items when opened.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Help &amp; learn</span> — A persistent support entry above the account menu.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">5</div><div><span class="anatomy-term">Account menu</span> — Avatar, name and organization; opens the user dropdown (switch organization, appearance, language, log out…).</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">The Main Navigation is the backbone of the app. Keep it stable, shallow, and predictable.</p>
+
+          <h3 class="text-l4">Group, don't flatten</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="mn-prev">
+                <div class="mainnav" style="pointer-events:none; height:320px;">
+                  <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn"><b>Coordinator</b> <i data-icon="chevron-down" class="mn-chev"></i></button></div>
+                  <nav class="mn-nav">
+                    <a class="mn-item"><i data-icon="home"></i> Home</a>
+                    <a class="mn-item is-active"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-up" class="mn-chev"></i></a>
+                    <div class="mn-sub"><a class="mn-subitem is-active">All surveys</a><a class="mn-subitem">Projects</a></div>
+                    <a class="mn-item"><i data-icon="refresh"></i> 360° Feedback</a>
+                  </nav>
+                </div>
+              </div>
+              <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Tuck related destinations under an expandable group.</div>
+            </div>
+            <div class="dd-card">
+              <div class="mn-prev">
+                <div class="mainnav" style="pointer-events:none; height:320px;">
+                  <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn"><b>Coordinator</b> <i data-icon="chevron-down" class="mn-chev"></i></button></div>
+                  <nav class="mn-nav">
+                    <a class="mn-item is-active"><i data-icon="home"></i> Home</a>
+                    <a class="mn-item"><i data-icon="clipboard"></i> All surveys</a>
+                    <a class="mn-item"><i data-icon="clipboard"></i> Projects</a>
+                    <a class="mn-item"><i data-icon="globe"></i> Employees</a>
+                    <a class="mn-item"><i data-icon="globe"></i> Segments</a>
+                    <a class="mn-item"><i data-icon="globe"></i> Integrations</a>
+                  </nav>
+                </div>
+              </div>
+              <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Flatten everything into a long, undifferentiated list.</div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Exactly one active item</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="mn-prev">
+                <div class="mainnav" style="pointer-events:none; height:260px;">
+                  <nav class="mn-nav" style="margin-top:6px;">
+                    <a class="mn-item is-active"><i data-icon="home"></i> Home</a>
+                    <a class="mn-item"><i data-icon="clipboard"></i> Surveys</a>
+                    <a class="mn-item"><i data-icon="refresh"></i> 360° Feedback</a>
+                  </nav>
+                </div>
+              </div>
+              <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Highlight only the section the user is in.</div>
+            </div>
+            <div class="dd-card">
+              <div class="mn-prev">
+                <div class="mainnav" style="pointer-events:none; height:260px;">
+                  <nav class="mn-nav" style="margin-top:6px;">
+                    <a class="mn-item is-active"><i data-icon="home"></i> Home</a>
+                    <a class="mn-item is-active"><i data-icon="clipboard"></i> Surveys</a>
+                    <a class="mn-item is-active"><i data-icon="refresh"></i> 360° Feedback</a>
+                  </nav>
+                </div>
+              </div>
+              <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Highlight multiple items — the user can't tell where they are.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">The navigation adapts to the portal, and groups expand to reveal their sub-items.</p>
+
+          <h3 class="text-l4">By portal</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="mainnav" style="height:300px;">
+                  <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn"><b>Coordinator</b> <i data-icon="chevron-down" class="mn-chev"></i></button></div>
+                  <nav class="mn-nav">
+                    <a class="mn-item is-active"><i data-icon="home"></i> Home</a>
+                    <a class="mn-item"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-down" class="mn-chev"></i></a>
+                    <a class="mn-item"><i data-icon="refresh"></i> 360° Feedback</a>
+                    <a class="mn-item"><i data-icon="globe"></i> Organization <i data-icon="chevron-down" class="mn-chev"></i></a>
+                  </nav>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Coordinator</strong> — The admin-facing portal (teal accent). Manages surveys, 360° feedback and the organization.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="mainnav is-personal" style="height:300px;">
+                  <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn"><b>Personal</b> <i data-icon="chevron-down" class="mn-chev"></i></button></div>
+                  <nav class="mn-nav">
+                    <a class="mn-item is-active"><i data-icon="home"></i> Home</a>
+                    <a class="mn-item"><i data-icon="clipboard"></i> Your feedback</a>
+                    <a class="mn-item"><i data-icon="refresh"></i> 360° Feedback</a>
+                  </nav>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Personal</strong> — The employee-facing portal (yellow accent). A shorter list focused on the individual's own feedback. The accent colour of the active item follows the portal.</div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Group — collapsed &amp; expanded</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="mainnav" style="height:auto; padding:12px;">
+                  <nav class="mn-nav" style="padding:0;"><a class="mn-item"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-down" class="mn-chev"></i></a></nav>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Collapsed</strong> — The group header shows a down-chevron. Click to expand.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="mainnav" style="height:auto; padding:12px;">
+                  <nav class="mn-nav" style="padding:0;">
+                    <a class="mn-item is-active"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-up" class="mn-chev"></i></a>
+                    <div class="mn-sub"><a class="mn-subitem is-active">All surveys</a><a class="mn-subitem">Projects</a></div>
+                  </nav>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Expanded</strong> — Sub-items appear indented under the header (up-chevron). A divider can separate setting-level items, as in Organization.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="states">
+          <h2 class="text-l3">States</h2>
+          <p class="section-lead">Navigation items and the account button respond to interaction.</p>
+
+          <h3 class="text-l4">Navigation item</h3>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Default</span><div class="mainnav" style="height:auto;width:216px;padding:0;border:0;background:transparent;pointer-events:none;"><div class="mn-nav" style="padding:0;"><a class="mn-item" tabindex="-1"><i data-icon="home"></i> Home</a></div></div></div>
+            <div class="state-col"><span class="state-lbl">Hover</span><div class="mainnav" style="height:auto;width:216px;padding:0;border:0;background:transparent;pointer-events:none;"><div class="mn-nav" style="padding:0;"><a class="mn-item is-hover" tabindex="-1"><i data-icon="home"></i> Home</a></div></div></div>
+            <div class="state-col"><span class="state-lbl">Active</span><div class="mainnav" style="height:auto;width:216px;padding:0;border:0;background:transparent;pointer-events:none;"><div class="mn-nav" style="padding:0;"><a class="mn-item is-active" tabindex="-1"><i data-icon="home"></i> Home</a></div></div></div>
+          </div>
+
+          <h3 class="text-l4">Account menu button</h3>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Default</span><div class="mainnav" style="height:auto;width:216px;padding:0;border:0;background:transparent;pointer-events:none;"><div class="mn-user" style="border-top:0;margin:0;"><div class="av av-36 av-blue">JR</div><div class="mn-meta"><div class="mn-name">Jamal van Rooi…</div><div class="mn-org">Effectory B.V.</div></div><i data-icon="chevron-down"></i></div></div></div>
+            <div class="state-col"><span class="state-lbl">Hover</span><div class="mainnav" style="height:auto;width:216px;padding:0;border:0;background:transparent;pointer-events:none;"><div class="mn-user is-hover" style="border-top:0;margin:0;"><div class="av av-36 av-blue">JR</div><div class="mn-meta"><div class="mn-name">Jamal van Rooi…</div><div class="mn-org">Effectory B.V.</div></div><i data-icon="chevron-down"></i></div></div></div>
+            <div class="state-col"><span class="state-lbl">Pressed</span><div class="mainnav" style="height:auto;width:216px;padding:0;border:0;background:transparent;pointer-events:none;"><div class="mn-user is-pressed" style="border-top:0;margin:0;"><div class="av av-36 av-blue">JR</div><div class="mn-meta"><div class="mn-name">Jamal van Rooi…</div><div class="mn-org">Effectory B.V.</div></div><i data-icon="chevron-down"></i></div></div></div>
+          </div>
+        </section>
+
+        <section class="section" id="menus">
+          <h2 class="text-l3">Menus</h2>
+          <p class="section-lead">Both the portal switcher and the account button open a menu built with the Dropdown Menu component.</p>
+
+          <h3 class="text-l4">Portal switcher</h3>
+          <p>Opens below the switcher. A header introduces the choice, each role shows its logo, and a check marks the active one.</p>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Portal menu</span>
+              <div class="menu" style="pointer-events:none;">
+                <div class="menu-header">Switch my role</div>
+                <div class="menu-item is-selected"><span class="pi-logo pi-logo-coordinator"></span><div class="menu-item-body"><span class="menu-item-title">Coordinator</span></div><i data-icon="check" class="menu-item-check"></i></div>
+                <div class="menu-item"><span class="pi-logo pi-logo-personal"></span><div class="menu-item-body"><span class="menu-item-title">Personal</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Account menu</h3>
+          <p>Opens above the account button. Groups account-level actions; the last item (Log out) sits below a divider.</p>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Account menu</span>
+              <div class="menu" style="pointer-events:none;">
+                <div class="menu-item"><i data-icon="building" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Switch organization</span></div></div>
+                <div class="menu-item"><i data-icon="gift" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Preview features</span></div></div>
+                <div class="menu-item"><i data-icon="sun" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Appearance</span><span class="menu-item-sub">Light</span></div></div>
+                <div class="menu-item"><i data-icon="globe" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Change language</span></div></div>
+                <div class="menu-item"><i data-icon="cookie" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Cookie settings</span></div></div>
+                <div class="menu-divider"></div>
+                <div class="menu-item"><i data-icon="log-out" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Log out</span></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="content-guidelines">
+          <h2 class="text-l3">Content guidelines</h2>
+          <p class="section-lead">Labels are the wayfinding system — keep them short, concrete, and stable.</p>
+          <div class="cg-rule">
+            <h3 class="text-l4">Short, noun-based labels</h3>
+            <p>One or two words that name the destination — not a sentence or an action.</p>
+            <div class="dd-grid">
+              <div class="dd-card"><div class="mn-prev"><div class="mainnav" style="pointer-events:none;height:auto;width:220px;padding:12px;"><div class="mn-nav" style="padding:0;"><a class="mn-item"><i data-icon="clipboard"></i> Surveys</a><a class="mn-item"><i data-icon="globe"></i> Organization</a></div></div></div><div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Clear nouns: "Surveys", "Organization".</div></div>
+              <div class="dd-card"><div class="mn-prev"><div class="mainnav" style="pointer-events:none;height:auto;width:220px;padding:12px;"><div class="mn-nav" style="padding:0;"><a class="mn-item"><i data-icon="clipboard"></i> Manage your surveys</a><a class="mn-item"><i data-icon="globe"></i> Org. stuff</a></div></div></div><div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Verbose phrases or vague abbreviations.</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">A light surface with a portal-coloured accent for the active item.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code></td><td>Sidebar surface + dropdown</td><td>#ffffff</td></tr>
+              <tr><td><code>--border-base</code></td><td>Right border + dividers</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--bg-base-hover</code></td><td>Item hover</td><td>—</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Item label (rest)</td><td>rgba(25,39,67,.8)</td></tr>
+              <tr><td><code>--content-subtle</code></td><td>Item icons (rest), chevrons, org line</td><td>rgba(25,39,67,.5)</td></tr>
+              <tr><td><code>--bg-brand-subtle-selected</code></td><td>Active-item highlight — remaps with the portal (Coordinator / Personal)</td><td>#d2f8f6 / #ffefc2</td></tr>
+              <tr><td><code>--content-brand</code></td><td>Active-item icon</td><td>#166764 / #8a4b15</td></tr>
+              <tr><td><code>--logo-bg</code></td><td>Portal logo square (Coordinator / Personal)</td><td>#30b3af / #fdbd12</td></tr>
+              <tr><td><code>--sh-dialogs</code></td><td>Account dropdown shadow</td><td>0 4px 12px rgba(25,39,67,.08)</td></tr>
+              <tr><td><code>--radius-lg</code></td><td>Dropdown / item radius</td><td>12px / 9px</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">The Main Navigation is a landmark — it must be reachable and understandable by keyboard and screen readers.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Use the nav landmark.</strong> Wrap it in <code>&lt;nav aria-label="Main"&gt;</code> so screen-reader users can jump straight to it.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Mark the current page.</strong> The active item carries <code>aria-current="page"</code> — colour alone is not enough.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Expose group state.</strong> Expandable groups use <code>aria-expanded</code> on the header and group their sub-items so the relationship is announced.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Full keyboard order.</strong> Portal switcher → items → groups → Help &amp; learn → account menu, all reachable with <kbd>Tab</kbd>; <code>Enter</code>/<code>Space</code> activate.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Icons are decorative.</strong> The label carries the meaning, so item icons are hidden from assistive tech (<code>aria-hidden</code>).</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Account menu is a menu.</strong> The button uses <code>aria-haspopup="menu"</code> + <code>aria-expanded</code>; <code>Escape</code> closes it and returns focus to the button.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <div></div>
+          <a class="pag-card right" href="segmented-control-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Segmented Control</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#states">States</a>
+          <a class="toc-link" href="#menus">Menus</a>
+          <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">⚠️</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">Dev gap</span>
+            <span class="dev-gap-text">The Angular component/selector and inputs for the app sidebar still need to be confirmed from the styleguide source. The markup below is the <strong>design-system prototype structure</strong> (the classes shipped in <code>components.css</code>) — use it as a visual reference, not a copy-paste-ready production API.</span>
+          </div>
+        </div>
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">⚠️</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">Figma gap</span>
+            <span class="dev-gap-text">In Figma the <strong>active</strong> navigation item's label is <strong>Semi&nbsp;Bold (600)</strong>, but the current implementation in dev renders it at the regular Medium (500) weight — it does not bump to semi-bold. Align the active-item label to <code>font-weight: 600</code> in the production component to match the design.</span>
+          </div>
+        </div>
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Switch portal, pick the active item, and expand groups. The code reflects the prototype structure.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="padding:32px; align-items:flex-start;"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">portal</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-portal"><option value="coordinator" selected>Coordinator</option><option value="personal">Personal</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">active item</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-active"><option value="home" selected>Home</option><option value="surveys">Surveys</option><option value="feedback">360° Feedback</option><option value="org">Organization</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">expand Surveys</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-exp-surveys"><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">expand Organization</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-exp-org"><span class="pg-toggle-track"></span></label></div></div>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Prototype structure</h2>
+          <p class="section-lead">Classes shipped in <code>components.css</code> for building prototypes with the design-system skill.</p>
+          <table class="token-table">
+            <thead><tr><th>Class</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>.mainnav</code></td><td>The sidebar (240px). Add <code>.is-personal</code> for the Personal portal accent.</td></tr>
+              <tr><td><code>.mn-portal</code> · <code>.mn-logo</code> · <code>.mn-portal-btn</code></td><td>Portal switcher: static logo + the clickable label button (only the label/chevron has a hover background — the logo is not part of the button).</td></tr>
+              <tr><td><code>.mn-nav</code> · <code>.mn-item</code></td><td>Item list + a single item (icon + label + optional <code>.mn-chev</code>). States: <code>.is-hover</code>, <code>.is-active</code>.</td></tr>
+              <tr><td><code>.mn-sub</code> · <code>.mn-subitem</code></td><td>Expanded group's sub-items (indented). <code>.mn-sub-divider</code> separates setting-level items.</td></tr>
+              <tr><td><code>.mn-foot</code> · <code>.mn-user</code></td><td>Bottom region: Help &amp; learn + account button (<code>.av</code>, <code>.mn-name</code>, <code>.mn-org</code>). States: <code>.is-hover</code>, <code>.is-pressed</code>.</td></tr>
+              <tr><td><code>.menu</code> · <code>.menu-item</code></td><td>The portal switcher and account dropdowns use the shared <a href="dropdown-menu-docs.html">Dropdown Menu</a> component (<code>.menu-item-icon</code>, <code>.menu-item-body</code> → <code>.menu-item-title</code>/<code>.menu-item-sub</code>, <code>.menu-item-check</code>, <code>.menu-header</code>, <code>.menu-divider</code>). The portal menu's role logos use <code>.pi-logo</code>.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The active item uses design tokens directly; switching to the Personal portal (<code>html[data-portal="personal"]</code>) remaps them to the yellow brand.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-brand-subtle-selected</code></td><td>Active-item highlight background</td></tr>
+              <tr><td><code>--content-brand</code></td><td>Active-item icon</td></tr>
+              <tr><td><code>--logo-bg</code></td><td>Portal logo square fill</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Wire up the landmark, current-page and expand semantics.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>&lt;nav aria-label="Main"&gt;</strong> wraps the items; the active item gets <code>aria-current="page"</code>.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>aria-expanded</strong> on group headers; <strong>aria-haspopup="menu"</strong> on the account button.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>aria-hidden</strong> on decorative item icons; labels carry the meaning.</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-props">Prototype structure</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+    const defaults = { portal:'coordinator', active:'home', surveys:false, org:false };
+    function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+    function state(){return{
+      portal:document.getElementById('pg-portal').value,
+      active:document.getElementById('pg-active').value,
+      surveys:document.getElementById('pg-exp-surveys').checked,
+      org:document.getElementById('pg-exp-org').checked,
+    };}
+    // Tracks which sub-item is active per expandable group. A group header itself
+    // is never "active" — when a group is the active section, its sub-item carries
+    // the highlight (the first one by default).
+    const activeSub = { surveys:'All surveys', org:'Employees' };
+    const firstSub = { surveys:'All surveys', org:'Employees' }; // default active sub-item per group
+    function item(icon, label, key, s, group){
+      const isActive = !group && s.active===key; // parent group headers are never active
+      const expanded = group ? (group==='surveys'?s.surveys:s.org) : null;
+      const chev = group ? ` <i data-icon="${expanded?'chevron-up':'chevron-down'}" class="mn-chev"></i>` : '';
+      const aria = group ? ` aria-expanded="${expanded}"` : (isActive ? ' aria-current="page"' : '');
+      return `<a class="mn-item${isActive?' is-active':''}" data-key="${key}"${group?` data-group="${group}"`:''}${aria}><i data-icon="${icon}"></i> ${label}${chev}</a>`;
+    }
+    function sub(label, group, s){
+      const isActive = s.active===group && activeSub[group]===label;
+      return `<a class="mn-subitem${isActive?' is-active':''}" data-sub="${label}" data-subgroup="${group}">${label}</a>`;
+    }
+    function buildHtml(s){
+      const personal = s.portal==='personal';
+      let items = '';
+      items += item('home','Home','home',s);
+      if (personal){
+        items += item('clipboard','Your feedback','surveys',s);
+        items += item('refresh','360° Feedback','feedback',s);
+      } else {
+        items += item('clipboard','Surveys','surveys',s,'surveys');
+        if (s.surveys) items += `<div class="mn-sub">${sub('All surveys','surveys',s)}${sub('Projects','surveys',s)}</div>`;
+        items += item('refresh','360° Feedback','feedback',s);
+        items += item('globe','Organization','org',s,'org');
+        if (s.org) items += `<div class="mn-sub">${sub('Employees','org',s)}${sub('Reporting structures','org',s)}${sub('Segments','org',s)}${sub('Integrations','org',s)}<div class="mn-sub-divider"></div>${sub('Admins','org',s)}${sub('Security','org',s)}</div>`;
+      }
+      return `<div class="mainnav${personal?' is-personal':''}" style="height:480px;">
+        <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn" data-action="portal"><b>${personal?'Personal':'Coordinator'}</b> <i data-icon="chevron-down" class="mn-chev"></i></button></div>
+        <nav class="mn-nav" aria-label="Main">${items}</nav>
+        <div class="mn-foot">
+          <a class="mn-item"><i data-icon="help"></i> Help &amp; learn</a>
+          <div class="mn-foot-divider"></div>
+          <div class="mn-user"><div class="av av-36 av-blue">JR</div><div class="mn-meta"><div class="mn-name">Jamal van Rooi…</div><div class="mn-org">Effectory B.V.</div></div><i data-icon="chevron-down"></i></div>
+        </div>
+      </div>`;
+    }
+    function buildCode(s){
+      const personal = s.portal==='personal';
+      const L = [];
+      L.push(`<div class="mainnav${personal?' is-personal':''}">`);
+      L.push('  <div class="mn-portal"><span class="mn-logo"></span><button class="mn-portal-btn">…</button></div>');
+      L.push('  <nav class="mn-nav" aria-label="Main">');
+      L.push(`    <a class="mn-item${s.active==='home'?' is-active':''}" ${s.active==='home'?'aria-current="page" ':''}><i data-icon="home"></i> Home</a>`);
+      if (personal){
+        L.push(`    <a class="mn-item${s.active==='surveys'?' is-active':''}"><i data-icon="clipboard"></i> Your feedback</a>`);
+        L.push(`    <a class="mn-item${s.active==='feedback'?' is-active':''}"><i data-icon="refresh"></i> 360° Feedback</a>`);
+      } else {
+        L.push(`    <a class="mn-item" aria-expanded="${s.surveys}"><i data-icon="clipboard"></i> Surveys <i data-icon="chevron-${s.surveys?'up':'down'}" class="mn-chev"></i></a>`);
+        if (s.surveys){ const a=s.active==='surveys'?activeSub.surveys:null; L.push(`    <div class="mn-sub"><a class="mn-subitem${a==='All surveys'?' is-active':''}">All surveys</a><a class="mn-subitem${a==='Projects'?' is-active':''}">Projects</a></div>`); }
+        L.push(`    <a class="mn-item${s.active==='feedback'?' is-active':''}"><i data-icon="refresh"></i> 360° Feedback</a>`);
+        L.push(`    <a class="mn-item" aria-expanded="${s.org}"><i data-icon="globe"></i> Organization <i data-icon="chevron-${s.org?'up':'down'}" class="mn-chev"></i></a>`);
+        if (s.org) L.push('    <div class="mn-sub"> … </div>');
+      }
+      L.push('  </nav>');
+      L.push('  <div class="mn-foot"> … account menu … </div>');
+      L.push('</div>');
+      return L.join('\n');
+    }
+    function render(){const s=state();$preview.innerHTML=buildHtml(s);document.getElementById('pg-code').textContent=buildCode(s);if(window.Icons&&window.Icons.render)window.Icons.render($preview);}
+    ['pg-portal','pg-active','pg-exp-surveys','pg-exp-org'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('input',render);el.addEventListener('change',render);});
+    // Selecting a group as the active item auto-expands it with its first sub-item active.
+    document.getElementById('pg-active')?.addEventListener('change',ev=>{const v=ev.target.value;if(v==='surveys'||v==='org'){document.getElementById(v==='surveys'?'pg-exp-surveys':'pg-exp-org').checked=true;activeSub[v]=firstSub[v];render();}});
+    // Make the rendered nav directly clickable; the props controls stay in sync.
+    $preview.addEventListener('click', e=>{
+      const portal = e.target.closest('[data-action="portal"]');
+      if (portal){ e.stopPropagation(); pgPortalMenu.hidden ? pgOpenPortal(portal) : pgCloseMenus(); return; }
+      const user = e.target.closest('.mn-user');
+      if (user){ e.stopPropagation(); pgUserMenu.hidden ? pgOpenUser(user) : pgCloseMenus(); return; }
+      const subEl = e.target.closest('.mn-subitem');
+      if (subEl){ const g=subEl.dataset.subgroup; activeSub[g]=subEl.dataset.sub; document.getElementById('pg-active').value=g; render(); return; }
+      const it = e.target.closest('.mn-item');
+      if (it && it.dataset.key){
+        const group=it.dataset.group;
+        if (group){
+          // Group headers only expand/collapse — never become active themselves.
+          const cb=document.getElementById(group==='surveys'?'pg-exp-surveys':'pg-exp-org');
+          const willExpand=!cb.checked; cb.checked=willExpand;
+          if (willExpand){ activeSub[group]=firstSub[group]; document.getElementById('pg-active').value=group; } // first sub-item active by default
+        } else {
+          document.getElementById('pg-active').value=it.dataset.key;
+        }
+        render();
+      }
+    });
+    // ── Portal & account dropdowns (the documented Dropdown Menu component) ──
+    document.body.insertAdjacentHTML('beforeend',
+      '<div class="menu" id="pgPortalMenu" role="menu" hidden style="position:fixed;z-index:1000;max-height:none;overflow:visible;">'
+      + '<div class="menu-header">Switch my role</div>'
+      + '<div class="menu-item" data-portal="coordinator"><span class="pi-logo pi-logo-coordinator"></span><div class="menu-item-body"><span class="menu-item-title">Coordinator</span></div><i data-icon="check" class="menu-item-check"></i></div>'
+      + '<div class="menu-item" data-portal="personal"><span class="pi-logo pi-logo-personal"></span><div class="menu-item-body"><span class="menu-item-title">Personal</span></div><i data-icon="check" class="menu-item-check"></i></div>'
+      + '</div>'
+      + '<div class="menu" id="pgUserMenu" role="menu" hidden style="position:fixed;z-index:1000;max-height:none;overflow:visible;">'
+      + '<div class="menu-item"><i data-icon="building" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Switch organization</span></div></div>'
+      + '<div class="menu-item"><i data-icon="gift" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Preview features</span></div></div>'
+      + '<div class="menu-item"><i data-icon="sun" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Appearance</span><span class="menu-item-sub">Light</span></div></div>'
+      + '<div class="menu-item"><i data-icon="globe" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Change language</span></div></div>'
+      + '<div class="menu-item"><i data-icon="cookie" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Cookie settings</span></div></div>'
+      + '<div class="menu-divider"></div>'
+      + '<div class="menu-item"><i data-icon="log-out" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Log out</span></div></div>'
+      + '</div>');
+    const pgPortalMenu = document.getElementById('pgPortalMenu');
+    const pgUserMenu = document.getElementById('pgUserMenu');
+    function pgCloseMenus(){ pgPortalMenu.hidden = true; pgUserMenu.hidden = true; }
+    function pgOpenPortal(btn){
+      pgCloseMenus();
+      const cur = state().portal;
+      pgPortalMenu.querySelectorAll('.menu-item').forEach(mi=>{
+        const seld = mi.dataset.portal===cur;
+        mi.classList.toggle('is-selected', seld);
+        mi.querySelector('.menu-item-check').style.visibility = seld ? 'visible' : 'hidden';
+      });
+      const r = btn.getBoundingClientRect();
+      pgPortalMenu.style.left = r.left+'px'; pgPortalMenu.style.top = (r.bottom+8)+'px'; pgPortalMenu.style.width = '240px';
+      pgPortalMenu.hidden = false;
+      if (window.Icons && window.Icons.render) window.Icons.render(pgPortalMenu);
+    }
+    function pgOpenUser(btn){
+      pgCloseMenus();
+      const r = btn.getBoundingClientRect();
+      pgUserMenu.style.left = r.left+'px'; pgUserMenu.style.bottom = (window.innerHeight-r.top+8)+'px'; pgUserMenu.style.width = '240px';
+      pgUserMenu.hidden = false;
+      if (window.Icons && window.Icons.render) window.Icons.render(pgUserMenu);
+    }
+    pgPortalMenu.addEventListener('click', e=>{
+      const mi = e.target.closest('.menu-item'); if (!mi) return;
+      document.getElementById('pg-portal').value = mi.dataset.portal;
+      document.getElementById('pg-active').value = 'home';
+      document.getElementById('pg-exp-surveys').checked = false;
+      document.getElementById('pg-exp-org').checked = false;
+      pgCloseMenus(); render();
+    });
+    document.addEventListener('click', e=>{
+      if (!pgPortalMenu.hidden && !pgPortalMenu.contains(e.target) && !e.target.closest('[data-action="portal"]')) pgCloseMenus();
+      if (!pgUserMenu.hidden && !pgUserMenu.contains(e.target) && !e.target.closest('.mn-user')) pgCloseMenus();
+    });
+    document.addEventListener('keydown', e=>{ if (e.key==='Escape') pgCloseMenus(); });
+
+    document.getElementById('pg-reset')?.addEventListener('click',()=>{document.getElementById('pg-portal').value=defaults.portal;document.getElementById('pg-active').value=defaults.active;document.getElementById('pg-exp-surveys').checked=defaults.surveys;document.getElementById('pg-exp-org').checked=defaults.org;activeSub.surveys='All surveys';activeSub.org='Employees';pgCloseMenus();render();});
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+    render();
+  })();
+</script>
+</body>
+</html>

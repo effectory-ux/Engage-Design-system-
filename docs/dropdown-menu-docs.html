@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dropdown Menu — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Dropdown Menu — a floating list of actions/options ── */
+    .menu { background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); box-shadow: var(--sh-popovers); padding: 8px; width: max-content; min-width: 220px; max-width: 320px; font-family: 'Poppins', sans-serif; font-size: 14px; }
+    .menu-header { padding: 6px 10px 10px; font-size: 14px; font-weight: 600; color: var(--content-base); }
+    .menu-group-lbl { font-size: 11px; /* font-scale-exempt: group label */ font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--content-subtle); padding: 8px 10px 4px; }
+    .menu-divider { height: 1px; background: var(--border-base); margin: 4px 0; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: var(--radius-md); cursor: pointer; color: var(--content-base); line-height: 20px; }
+    .menu-item:hover, .menu-item.is-hover { background: var(--bg-base-hover); }
+    .menu-item.is-disabled { color: var(--content-disabled); cursor: not-allowed; }
+    .menu-item.is-disabled .menu-item-icon, .menu-item.is-disabled .menu-item-title { color: inherit; }
+    .menu-item-icon { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; color: var(--content-subtle); flex-shrink: 0; }
+    .menu-item-icon.size-24 { width: 24px; height: 24px; }
+    .menu-item-icon.size-32 { width: 32px; height: 32px; }
+    .menu-item-body { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 2px; }
+    .menu-item-title { font-weight: 500; font-size: 14px; line-height: 1.6; color: var(--content-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .menu-item-title:only-child { font-weight: 400; }
+    .menu-item-sub { font-weight: 400; font-size: 12px; line-height: 1.6; color: var(--content-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .menu-chevron { width: 16px; height: 16px; flex-shrink: 0; display: flex; color: var(--content-subtle); }
+    .menu-label { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: var(--radius-full); background: var(--bg-info); color: #fff; font-size: 12px; font-weight: 600; }
+
+    /* avatar used inside menu items */
+    .av { display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-full); font-family: 'Poppins', sans-serif; font-weight: 600; flex-shrink: 0; }
+    .av-32 { width: 32px; height: 32px; font-size: 12px; }
+    .av-yellow    { background: var(--bg-accent-yellow-subtle);    color: var(--content-accent-yellow); }
+    .av-blue      { background: var(--bg-accent-blue-subtle);      color: var(--content-accent-blue); }
+    .av-green     { background: var(--bg-accent-green-subtle);     color: var(--content-accent-green); }
+    .av-orange    { background: var(--bg-accent-orange-subtle);    color: var(--content-accent-orange); }
+    .av-turquoise { background: var(--bg-accent-turquoise-subtle); color: var(--content-accent-turquoise); }
+    .av-red       { background: var(--bg-accent-red-subtle);       color: var(--content-accent-red); }
+
+    /* trigger button (the Button component) */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: var(--radius-base); border: 1px solid transparent; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .btn-secondary { background: var(--bg-base); border-color: var(--border-action); color: var(--content-secondary); box-shadow: var(--sh-action); }
+    .btn i[data-icon] { width: 16px; height: 16px; display: flex; }
+
+    .anatomy-fig { position: relative; background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 40px; margin-bottom: 24px; display: flex; justify-content: center; }
+    .anatomy-fig .menu { pointer-events: none; }
+    .ana-num { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--content-base); color: var(--bg-base); font-size: 9px; /* font-scale-exempt: anatomy number badge */ font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 3; }
+    .dd-card .dd-prev { flex: 1; }
+    /* playground popover + per-item config */
+    #pg-menu, #pg-submenu { position: fixed; z-index: 1000; }
+    #pg-menu[hidden], #pg-submenu[hidden] { display: none; }
+    .pg-item { border: 1px solid var(--border-base); border-radius: var(--radius-md); padding: 4px 12px 8px; margin-top: 10px; }
+    .pg-item-top { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 4px; }
+    .pg-item-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--content-subtle); }
+    .pg-item-del { border: 0; background: none; cursor: pointer; color: var(--content-secondary); font-size: 12px; font-family: inherit; padding: 2px 4px; border-radius: var(--radius-sm); }
+    .pg-item-del:hover { background: var(--bg-base-hover); color: var(--content-base); }
+    .pg-add { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; border: 1px dashed var(--border-action); background: var(--bg-base); color: var(--content-secondary); font-family: inherit; font-size: 14px; font-weight: 500; padding: 8px 12px; border-radius: var(--radius-base); cursor: pointer; width: 100%; justify-content: center; }
+    .pg-add:hover { border-color: var(--border-action-hover); color: var(--content-base); background: var(--bg-base-hover); }
+    .pg-add[disabled] { opacity: .5; cursor: not-allowed; }
+    .pg-input { width: 100%; height: 32px; padding: 0 10px; border: 1px solid var(--border-action); border-radius: var(--radius-base); font-family: inherit; font-size: 14px; color: var(--content-base); background: var(--bg-base); }
+    .pg-input:focus { outline: none; border-color: var(--border-brand); }
+    .pg-item .pg-row-ctrl { flex: 1; min-width: 0; }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Dropdown Menu</h1>
+      <p class="page-desc">A floating list of actions or options, opened from a trigger. Use it for a compact set of commands or choices that don't need to stay on screen.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">A menu is a floating surface holding rows. Each row has a label, optionally an icon or avatar, and an optional trailing element; an optional header and group labels organise longer lists.</p>
+          <div class="anatomy-fig">
+            <div class="menu">
+              <div class="menu-header">Choose option</div>
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div>
+              <div class="menu-divider"></div>
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div><i data-icon="chevron-right" class="menu-chevron"></i></div>
+            </div>
+            <div class="ana-num" style="left:24%; top:10%;">1</div>
+            <div class="ana-num" style="left:24%; top:25%;">2</div>
+            <div class="ana-num" style="left:24%; top:45%;">3</div>
+            <div class="ana-num" style="left:24%; top:62%;">4</div>
+            <div class="ana-num" style="right:24%; top:80%;">5</div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Surface</span> — A floating panel raised with the popover shadow, anchored to its trigger. It grows with its content up to a max-width (~320px); longer titles and subtitles then truncate with an ellipsis.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Header</span> — Optional title introducing the menu.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Item</span> — A row: a label with an optional leading icon or avatar.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Divider</span> — Separates groups of items; a group label can head each group.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">5</div><div><span class="anatomy-term">Trailing</span> — Optional end element: a label/tag, a checkmark (selected), or a chevron (submenu).</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Use a dropdown menu for a short list of actions or options tied to a trigger. For a few always-visible options use a Segmented control or Tabs; for a long, searchable list use a Select.</p>
+
+          <h3 class="text-l4">Keep it to a focused set</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px;">
+                <div class="menu" style="width:220px; pointer-events:none;">
+                  <div class="menu-item"><i data-icon="edit" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Rename</span></div></div>
+                  <div class="menu-item"><i data-icon="copy" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Duplicate</span></div></div>
+                  <div class="menu-item"><i data-icon="trash" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Delete</span></div></div>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                A handful of clear actions for the item in context.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px;">
+                <div class="menu" style="width:220px; pointer-events:none; max-height:150px; overflow:hidden;">
+                  <div class="menu-item"><div class="menu-item-body"><span class="menu-item-title">Netherlands</span></div></div>
+                  <div class="menu-item"><div class="menu-item-body"><span class="menu-item-title">Germany</span></div></div>
+                  <div class="menu-item"><div class="menu-item-body"><span class="menu-item-title">Belgium</span></div></div>
+                  <div class="menu-item"><div class="menu-item-body"><span class="menu-item-title">France</span></div></div>
+                  <div class="menu-item"><div class="menu-item-body"><span class="menu-item-title">Spain</span></div></div>
+                </div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Use it as a long pick-list — that's a Select (with search).
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">Items support several layouts; mix them as the content needs.</p>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="menu" style="width:240px;"><div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div></div></div>
+              <div class="variant-row-desc"><strong>Icon + label</strong> — The default row: a leading icon and a single-line label.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="menu" style="width:240px;"><div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span><span class="menu-item-sub">Subtitle</span></div></div></div></div>
+              <div class="variant-row-desc"><strong>With subtitle</strong> — A second line for extra context under the label.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="menu" style="width:240px;"><div class="menu-item"><div class="av av-32 av-yellow">JT</div><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div></div></div>
+              <div class="variant-row-desc"><strong>With avatar</strong> — A person or entity row uses an avatar instead of an icon.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="menu" style="width:240px;"><div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div><span class="menu-label">label</span></div></div></div>
+              <div class="variant-row-desc"><strong>With label</strong> — A trailing tag flags status (e.g. <em>beta</em>, <em>new</em>).</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="menu" style="width:240px;"><div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div><i data-icon="chevron-right" class="menu-chevron"></i></div></div></div>
+              <div class="variant-row-desc"><strong>Submenu</strong> — A trailing chevron opens a nested menu.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="menu" style="width:240px;">
+                <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">16px</span></div></div>
+                <div class="menu-item"><i data-icon="box" class="menu-item-icon size-24"></i><div class="menu-item-body"><span class="menu-item-title">24px</span></div></div>
+                <div class="menu-item"><i data-icon="box" class="menu-item-icon size-32"></i><div class="menu-item-body"><span class="menu-item-title">32px</span></div></div>
+              </div></div>
+              <div class="variant-row-desc"><strong>Icon size</strong> — Items use a 16px icon by default. Step up to 24px or 32px when the icon carries more meaning — a brand mark, product logo, or a richer item with a subtitle. Keep one size consistent within a single menu.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="states">
+          <h2 class="text-l3">States</h2>
+          <p class="section-lead">Items respond to interaction. A dropdown never keeps a "selected" item — if a choice needs to persist, that's a <a class="link-inline" href="select-docs.html">Select</a>.</p>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Default</span><div class="menu" style="width:200px; pointer-events:none;"><div class="menu-item" tabindex="-1"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div></div></div>
+            <div class="state-col"><span class="state-lbl">Hover</span><div class="menu" style="width:200px; pointer-events:none;"><div class="menu-item is-hover" tabindex="-1"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div></div></div>
+          </div>
+          <div class="dev-gap">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Figma gap</span>
+              <span class="dev-gap-text">There's no disabled state for dropdown items in Figma — design only covers Default and Hover. A disabled style does exist in code; see the Developer tab.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="content-guidelines">
+          <h2 class="text-l3">Content guidelines</h2>
+          <p class="section-lead">Menu items are scanned quickly — keep labels short and action-oriented.</p>
+          <div class="cg-rule">
+            <h3 class="text-l4">Start action items with a verb</h3>
+            <p>For a menu of commands, lead with the verb ("Rename", "Duplicate"). For a choice menu, use plain nouns.</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px;"><div class="menu" style="width:200px; pointer-events:none;"><div class="menu-item"><i data-icon="edit" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Rename</span></div></div><div class="menu-item"><i data-icon="trash" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Delete</span></div></div></div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Verbs — clear what each does.</div>
+              </div>
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px;"><div class="menu" style="width:200px; pointer-events:none;"><div class="menu-item"><i data-icon="edit" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Name</span></div></div><div class="menu-item"><i data-icon="trash" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Removal of this item</span></div></div></div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Vague nouns / long phrases.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">The surface floats on the base background with the popover shadow.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code> · <code>--border-base</code></td><td>Surface + border</td><td>#ffffff · #e1e4e8</td></tr>
+              <tr><td><code>--sh-popovers</code></td><td>Surface shadow</td><td>0 2px 12px rgba(25,39,67,.08)</td></tr>
+              <tr><td><code>--radius-md</code></td><td>Surface &amp; item radius</td><td>8px</td></tr>
+              <tr><td><code>--bg-base-hover</code></td><td>Item hover</td><td>—</td></tr>
+              <tr><td><code>--content-base</code> · <code>--content-secondary</code> · <code>--content-subtle</code></td><td>Title / subtitle / icon &amp; group label</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">A menu must be operable and announced as a menu.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Roles.</strong> The surface is <code>role="menu"</code>, items <code>role="menuitem"</code> (or <code>menuitemcheckbox</code> for selectable ones).</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Keyboard.</strong> Open with <kbd>Enter</kbd>/<kbd>Space</kbd>/arrow, move with arrows, choose with <kbd>Enter</kbd>, close with <kbd>Escape</kbd> — focus returns to the trigger.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Trigger link.</strong> The trigger has <code>aria-haspopup="menu"</code> and <code>aria-expanded</code> reflecting open state.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Icon-only items.</strong> Always include a text label; don't rely on the icon alone.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="skeleton-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Skeleton</span></a>
+          <a class="pag-card right" href="popover-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Popover</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#states">States</a>
+          <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Configure each item on its own — leading icon or avatar, subtitle, and trailing label or submenu — then open the menu from its trigger. A submenu item opens a nested menu on click. The code reflects your setup.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="padding:40px; justify-content:center;"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">header</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-header"><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">icon size</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-iconsize"><option value="16">16px</option><option value="24">24px</option><option value="32">32px</option></select></div></div>
+                <div id="pg-items"></div>
+                <button class="pg-add" id="pg-add">+ Add item</button>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">The dropdown is Angular Material's <code>mat-menu</code>, opened from a trigger with <code>matMenuTriggerFor</code>. Items are <code>button mat-menu-item</code> (or <code>a mat-menu-item</code> for links).</p>
+
+          <h3 class="text-l4">Basic</h3>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;button</span> <span class="ca">mat-button</span> <span class="ca">[matMenuTriggerFor]</span>=<span class="cv">"menu"</span><span class="ct">&gt;</span>Open dropdown<span class="ct">&lt;/button&gt;</span>
+
+<span class="ct">&lt;mat-menu</span> <span class="ca">#menu</span>=<span class="cv">"matMenu"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">mat-menu-item</span> <span class="ca">disableRipple</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;eff-mat-icon</span> <span class="ca">class</span>=<span class="cv">"icon"</span> <span class="ca">[iconName]</span>=<span class="cv">"'user'"</span><span class="ct">/&gt;</span>
+    <span class="ct">&lt;span&gt;</span>Open profile<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/button&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">mat-menu-item</span> <span class="ca">disableRipple</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;eff-mat-icon</span> <span class="ca">class</span>=<span class="cv">"icon"</span> <span class="ca">[iconName]</span>=<span class="cv">"'log-out'"</span><span class="ct">/&gt;</span>
+    <span class="ct">&lt;span&gt;</span>Log out<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/button&gt;</span>
+<span class="ct">&lt;/mat-menu&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Link items</h3>
+          <p>Use an anchor with <code>mat-menu-item</code> and the <code>icon-before</code> class for items that navigate.</p>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;a</span> <span class="ca">mat-menu-item</span> <span class="ca">class</span>=<span class="cv">"icon-before"</span> <span class="ca">href</span>=<span class="cv">"https://support.effectory.com"</span> <span class="ca">target</span>=<span class="cv">"_blank"</span> <span class="ca">rel</span>=<span class="cv">"noopener noreferrer"</span> <span class="ca">disableRipple</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;eff-mat-icon</span> <span class="ca">class</span>=<span class="cv">"extra-small-icon icon"</span> <span class="ca">[iconName]</span>=<span class="cv">"'external-link'"</span><span class="ct">/&gt;</span>
+  <span class="ct">&lt;span&gt;</span>Open support<span class="ct">&lt;/span&gt;</span>
+<span class="ct">&lt;/a&gt;</span></code></pre>
+          </div>
+
+          <div class="dev-gap">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Figma gap</span>
+              <span class="dev-gap-text">Material's <code>mat-menu</code> covers the simple list (icon + label). The richer item layouts below — <strong>subtitle</strong>, <strong>avatar</strong>, <strong>trailing label</strong>, <strong>header / group label</strong>, <strong>submenu</strong>, <strong>selected</strong> — are the design-system <code>.menu</code> item classes (as used in the Select / app dropdowns). Confirm the production markup for those with engineering.</span>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Item with subtitle</h3>
+          <div class="dev-preview" style="padding:24px;">
+            <div class="menu" style="width:240px;">
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span><span class="menu-item-sub">Subtitle</span></div></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;i</span> <span class="ca">data-icon</span>=<span class="cv">"box"</span> <span class="ca">class</span>=<span class="cv">"menu-item-icon"</span><span class="ct">&gt;&lt;/i&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item-body"</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;span</span> <span class="ca">class</span>=<span class="cv">"menu-item-title"</span><span class="ct">&gt;</span>Title<span class="ct">&lt;/span&gt;</span>
+    <span class="ct">&lt;span</span> <span class="ca">class</span>=<span class="cv">"menu-item-sub"</span><span class="ct">&gt;</span>Subtitle<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/div&gt;</span>
+<span class="ct">&lt;/div&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Item with avatar</h3>
+          <div class="dev-preview" style="padding:24px;">
+            <div class="menu" style="width:240px;">
+              <div class="menu-item"><div class="av av-32 av-yellow">JT</div><div class="menu-item-body"><span class="menu-item-title">Jente Tjepkema</span></div></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;span</span> <span class="ca">class</span>=<span class="cv">"av av-32 av-yellow"</span><span class="ct">&gt;</span>JT<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item-body"</span><span class="ct">&gt;&lt;span</span> <span class="ca">class</span>=<span class="cv">"menu-item-title"</span><span class="ct">&gt;</span>Jente Tjepkema<span class="ct">&lt;/span&gt;&lt;/div&gt;</span>
+<span class="ct">&lt;/div&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Icon size</h3>
+          <p>Icons are 16px by default. Add <code>size-24</code> or <code>size-32</code> on the icon for a larger glyph.</p>
+          <div class="dev-preview" style="padding:24px;">
+            <div class="menu" style="width:240px;">
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">16px</span></div></div>
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon size-24"></i><div class="menu-item-body"><span class="menu-item-title">24px</span></div></div>
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon size-32"></i><div class="menu-item-body"><span class="menu-item-title">32px</span></div></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="cc">&lt;!-- 16px (default) --&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">data-icon</span>=<span class="cv">"box"</span> <span class="ca">class</span>=<span class="cv">"menu-item-icon"</span><span class="ct">&gt;&lt;/i&gt;</span>
+<span class="cc">&lt;!-- 24px --&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">data-icon</span>=<span class="cv">"box"</span> <span class="ca">class</span>=<span class="cv">"menu-item-icon size-24"</span><span class="ct">&gt;&lt;/i&gt;</span>
+<span class="cc">&lt;!-- 32px --&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">data-icon</span>=<span class="cv">"box"</span> <span class="ca">class</span>=<span class="cv">"menu-item-icon size-32"</span><span class="ct">&gt;&lt;/i&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Item with label</h3>
+          <div class="dev-preview" style="padding:24px;">
+            <div class="menu" style="width:240px;">
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div><span class="menu-label">beta</span></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;i</span> <span class="ca">data-icon</span>=<span class="cv">"box"</span> <span class="ca">class</span>=<span class="cv">"menu-item-icon"</span><span class="ct">&gt;&lt;/i&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item-body"</span><span class="ct">&gt;&lt;span</span> <span class="ca">class</span>=<span class="cv">"menu-item-title"</span><span class="ct">&gt;</span>Title<span class="ct">&lt;/span&gt;&lt;/div&gt;</span>
+  <span class="ct">&lt;span</span> <span class="ca">class</span>=<span class="cv">"menu-label"</span><span class="ct">&gt;</span>beta<span class="ct">&lt;/span&gt;</span>
+<span class="ct">&lt;/div&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Submenu</h3>
+          <p>A submenu item shows a trailing chevron; on hover it opens a nested menu beside the parent. In Angular Material, point the item's <code>matMenuTriggerFor</code> at a second <code>mat-menu</code>.</p>
+          <div class="dev-preview" style="padding:24px; align-items:flex-start; gap:4px;">
+            <div class="menu" style="width:220px;">
+              <div class="menu-item"><i data-icon="user" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Profile</span></div></div>
+              <div class="menu-item is-hover"><i data-icon="share" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Share</span></div><i data-icon="chevron-right" class="menu-chevron"></i></div>
+            </div>
+            <div class="menu" style="width:190px; margin-top:48px;">
+              <div class="menu-item"><i data-icon="link" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Copy link</span></div></div>
+              <div class="menu-item"><i data-icon="mail" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Email</span></div></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;mat-menu</span> <span class="ca">#menu</span>=<span class="cv">"matMenu"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">mat-menu-item</span> <span class="ca">disableRipple</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;eff-mat-icon</span> <span class="ca">class</span>=<span class="cv">"icon"</span> <span class="ca">[iconName]</span>=<span class="cv">"'user'"</span><span class="ct">/&gt;</span><span class="ct">&lt;span&gt;</span>Profile<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/button&gt;</span>
+  <span class="cc">&lt;!-- opens the nested menu --&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">mat-menu-item</span> <span class="ca">[matMenuTriggerFor]</span>=<span class="cv">"share"</span> <span class="ca">disableRipple</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;eff-mat-icon</span> <span class="ca">class</span>=<span class="cv">"icon"</span> <span class="ca">[iconName]</span>=<span class="cv">"'share'"</span><span class="ct">/&gt;</span><span class="ct">&lt;span&gt;</span>Share<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/button&gt;</span>
+<span class="ct">&lt;/mat-menu&gt;</span>
+
+<span class="ct">&lt;mat-menu</span> <span class="ca">#share</span>=<span class="cv">"matMenu"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">mat-menu-item</span> <span class="ca">disableRipple</span><span class="ct">&gt;&lt;span&gt;</span>Copy link<span class="ct">&lt;/span&gt;&lt;/button&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">mat-menu-item</span> <span class="ca">disableRipple</span><span class="ct">&gt;&lt;span&gt;</span>Email<span class="ct">&lt;/span&gt;&lt;/button&gt;</span>
+<span class="ct">&lt;/mat-menu&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Header &amp; grouped items</h3>
+          <div class="dev-preview" style="padding:24px;">
+            <div class="menu" style="width:240px;">
+              <div class="menu-header">Choose option</div>
+              <div class="menu-group-lbl">Group</div>
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div>
+              <div class="menu-divider"></div>
+              <div class="menu-item"><i data-icon="box" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">Title</span></div></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-header"</span><span class="ct">&gt;</span>Choose option<span class="ct">&lt;/div&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-group-lbl"</span><span class="ct">&gt;</span>Group<span class="ct">&lt;/div&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item"</span><span class="ct">&gt;</span>…<span class="ct">&lt;/div&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-divider"</span><span class="ct">&gt;&lt;/div&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"menu-item"</span><span class="ct">&gt;</span>…<span class="ct">&lt;/div&gt;</span>
+<span class="ct">&lt;/div&gt;</span></code></pre>
+          </div>
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Class reference</h2>
+          <p class="section-lead">Prototype classes for building the menu surface and rows (<code>components.css</code>).</p>
+          <table class="token-table">
+            <thead><tr><th>Class</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>.menu</code></td><td>The floating surface (border, popover shadow, 8px radius).</td></tr>
+              <tr><td><code>.menu-header</code></td><td>Optional title row at the top.</td></tr>
+              <tr><td><code>.menu-group-lbl</code></td><td>Uppercase section heading splitting items into groups.</td></tr>
+              <tr><td><code>.menu-divider</code></td><td>Hairline separator between groups.</td></tr>
+              <tr><td><code>.menu-item</code></td><td>A row. States: <code>.is-hover</code>, <code>.is-disabled</code>.</td></tr>
+              <tr><td><code>.menu-item-icon</code></td><td>Leading 16px icon — add <code>size-24</code> / <code>size-32</code> for 24/32px (or use an <code>.av</code> avatar instead).</td></tr>
+              <tr><td><code>.menu-item-body</code> → <code>.menu-item-title</code> / <code>.menu-item-sub</code></td><td>Label and optional subtitle.</td></tr>
+              <tr><td><code>.menu-chevron</code> · <code>.menu-label</code></td><td>Trailing submenu chevron or a status label.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The menu surface and rows are themed with these tokens.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code> · <code>--border-base</code></td><td>Surface fill + border</td></tr>
+              <tr><td><code>--sh-popovers</code></td><td>Surface shadow</td></tr>
+              <tr><td><code>--bg-base-hover</code> · <code>--bg-brand-subtle</code></td><td>Item hover / selected</td></tr>
+              <tr><td><code>--content-base</code> · <code>--content-secondary</code> · <code>--content-subtle</code></td><td>Title / subtitle / icon &amp; group label</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead"><code>mat-menu</code> wires up the menu roles and keyboard model; keep these in mind.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Roles + keyboard.</strong> Material sets <code>menu</code>/<code>menuitem</code>, <code>aria-haspopup</code>, arrow-key navigation and Escape-to-close by default.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Labels.</strong> Every item needs visible text; an icon alone isn't enough.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Links vs buttons.</strong> Use <code>a mat-menu-item</code> for navigation, <code>button mat-menu-item</code> for actions.</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-usage">Usage</a>
+          <a class="toc-link" href="#dev-props">Class reference</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+
+    const AV_COLORS = ['av-blue','av-turquoise','av-green','av-orange','av-red','av-yellow'];
+    const ICONS = ['user','users','share','gear','globe','bell','mail','link'];
+    const MAX_ITEMS = 6;
+    function defItem(i){ return { label:'New item', sub:'', icon: ICONS[i % ICONS.length], leading:'icon', trailing:'none' }; }
+    const DEFAULTS = [
+      { label:'Profile',   sub:'Personal account', icon:'user',  leading:'icon',   trailing:'none' },
+      { label:'Workspace', sub:'Acme Inc',         icon:'users', leading:'avatar', trailing:'none' },
+      { label:'Share',     sub:'',                 icon:'share', leading:'icon',   trailing:'submenu' },
+      { label:'Settings',  sub:'',                 icon:'gear',  leading:'icon',   trailing:'label' }
+    ];
+    const SUBMENU = [ { icon:'link', label:'Copy link' }, { icon:'mail', label:'Email' } ];
+    const cfg = { header:false, iconSize:'16', items: DEFAULTS.map(d=>({...d})) };
+
+    function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    // Two-letter initials: first letters of the first two words, else first two letters.
+    function initials(s){
+      const w = (s||'').trim().split(/\s+/).filter(Boolean);
+      if (w.length >= 2) return (w[0][0]+w[1][0]).toUpperCase();
+      return ((w[0]||'?').slice(0,2)).toUpperCase();
+    }
+    function avColor(i){ return AV_COLORS[i % AV_COLORS.length]; }
+    function sizeCls(){ return cfg.iconSize==='16' ? '' : ' size'+'-'+cfg.iconSize; }
+
+    function leadingHtml(it,i){
+      if (it.leading==='icon')   return `<i data-icon="${it.icon}" class="menu-item-icon${sizeCls()}"></i>`;
+      if (it.leading==='avatar') return `<span class="av av-32 ${avColor(i)}">${esc(initials(it.label))}</span>`;
+      return '';
+    }
+    function bodyHtml(it){
+      const sub = it.sub.trim() ? `<span class="menu-item-sub">${esc(it.sub)}</span>` : '';
+      return `<div class="menu-item-body"><span class="menu-item-title">${esc(it.label)}</span>${sub}</div>`;
+    }
+    function trailingHtml(it){
+      if (it.trailing==='label')   return `<span class="menu-label">new</span>`;
+      if (it.trailing==='submenu') return `<i data-icon="chevron-right" class="menu-chevron"></i>`;
+      return '';
+    }
+    function buildMenu(){
+      const head = cfg.header ? `<div class="menu-header">Choose option</div>` : '';
+      const rows = cfg.items.map((it,i)=>`<div class="menu-item" data-i="${i}"${it.trailing==='submenu'?' data-submenu="1"':''}>${leadingHtml(it,i)}${bodyHtml(it)}${trailingHtml(it)}</div>`).join('');
+      return `<div class="menu">${head}${rows}</div>`;
+    }
+    function buildSubmenu(){
+      return `<div class="menu" style="width:190px;">${SUBMENU.map(s=>`<div class="menu-item"><i data-icon="${s.icon}" class="menu-item-icon"></i><div class="menu-item-body"><span class="menu-item-title">${s.label}</span></div></div>`).join('')}</div>`;
+    }
+
+    function ind(it,i){
+      const lead = it.leading==='icon' ? `  <i data-icon="${it.icon}" class="menu-item-icon${sizeCls()}"></i>\n`
+                 : it.leading==='avatar' ? `  <span class="av av-32 ${avColor(i)}">${esc(initials(it.label))}</span>\n` : '';
+      const sub = it.sub.trim() ? `\n    <span class="menu-item-sub">${esc(it.sub)}</span>` : '';
+      const trail = it.trailing==='label' ? `\n  <span class="menu-label">new</span>`
+                  : it.trailing==='submenu' ? `\n  <i data-icon="chevron-right" class="menu-chevron"></i>` : '';
+      return `<div class="menu-item">\n${lead}  <div class="menu-item-body"><span class="menu-item-title">${esc(it.label)}</span>${sub}</div>${trail}\n</div>`;
+    }
+    function buildCode(){
+      const L = ['<div class="menu">'];
+      if (cfg.header) L.push('  <div class="menu-header">Choose option</div>');
+      cfg.items.forEach((it,i)=>{ ind(it,i).split('\n').forEach(l=>L.push('  '+l)); });
+      L.push('</div>');
+      return L.join('\n');
+    }
+
+    // ── floating popovers ──
+    const menu = document.createElement('div'); menu.id='pg-menu'; menu.hidden=true; document.body.appendChild(menu);
+    const sub  = document.createElement('div'); sub.id='pg-submenu'; sub.hidden=true; document.body.appendChild(sub);
+    function escClose(e){ if (e.key==='Escape') closeMenu(); }
+    function closeSub(){ sub.hidden=true; sub.innerHTML=''; menu.querySelectorAll('.menu-item.is-hover').forEach(el=>el.classList.remove('is-hover')); }
+    function openMenu(btn){
+      menu.innerHTML = buildMenu(); menu.hidden=false;
+      if (window.Icons && window.Icons.render) window.Icons.render(menu);
+      const r = btn.getBoundingClientRect();
+      menu.style.left = r.left+'px'; menu.style.top = (r.bottom+6)+'px';
+      btn.setAttribute('aria-expanded','true');
+      document.addEventListener('keydown', escClose);
+    }
+    function refreshMenu(){
+      if (menu.hidden) return;
+      closeSub();
+      menu.innerHTML = buildMenu();
+      if (window.Icons && window.Icons.render) window.Icons.render(menu);
+    }
+    function closeMenu(){ closeSub(); menu.hidden=true; menu.innerHTML=''; document.removeEventListener('keydown', escClose); const b=document.getElementById('pg-trigger'); if(b) b.setAttribute('aria-expanded','false'); }
+    function openSub(itemEl){
+      sub.innerHTML = buildSubmenu(); sub.hidden=false;
+      if (window.Icons && window.Icons.render) window.Icons.render(sub);
+      const r = itemEl.getBoundingClientRect();
+      sub.style.left = (r.right+2)+'px'; sub.style.top = r.top+'px';
+      itemEl.classList.add('is-hover');
+    }
+    menu.addEventListener('click', e=>{
+      const item = e.target.closest('.menu-item'); if(!item) return;
+      if (item.dataset.submenu){ sub.hidden ? openSub(item) : closeSub(); }
+      else closeMenu();
+    });
+    sub.addEventListener('click', ()=>closeMenu());
+
+    // ── per-item config controls ──
+    function controlsHtml(){
+      return cfg.items.map((it,i)=>`
+        <div class="pg-item">
+          <div class="pg-item-top"><span class="pg-item-name">Item ${i+1}</span>${cfg.items.length>1?`<button type="button" class="pg-item-del" data-del="${i}">Remove</button>`:''}</div>
+          <div class="pg-row"><div class="pg-row-name">title</div><div class="pg-row-ctrl"><input class="pg-input" type="text" data-i="${i}" data-k="label" value="${esc(it.label)}"></div></div>
+          <div class="pg-row"><div class="pg-row-name">subtitle</div><div class="pg-row-ctrl"><input class="pg-input" type="text" data-i="${i}" data-k="sub" placeholder="optional" value="${esc(it.sub)}"></div></div>
+          <div class="pg-row"><div class="pg-row-name">leading</div><div class="pg-row-ctrl"><select class="pg-select" data-i="${i}" data-k="leading">
+            <option value="icon">Icon</option><option value="avatar">Avatar</option><option value="none">None</option></select></div></div>
+          <div class="pg-row"><div class="pg-row-name">trailing</div><div class="pg-row-ctrl"><select class="pg-select" data-i="${i}" data-k="trailing">
+            <option value="none">None</option><option value="label">Label</option><option value="submenu">Submenu</option></select></div></div>
+        </div>`).join('');
+    }
+    function renderControls(){
+      const box = document.getElementById('pg-items');
+      box.innerHTML = controlsHtml();
+      // set <select> values (value attr doesn't pre-select)
+      box.querySelectorAll('select').forEach(el=>{ el.value = cfg.items[+el.dataset.i][el.dataset.k]; });
+      document.getElementById('pg-add').disabled = cfg.items.length >= MAX_ITEMS;
+    }
+    function syncGlobals(){
+      document.getElementById('pg-header').checked = cfg.header;
+      document.getElementById('pg-iconsize').value = cfg.iconSize;
+    }
+    function paintCode(){ document.getElementById('pg-code').textContent = buildCode(); }
+    function update(){ paintCode(); refreshMenu(); }
+
+    function renderTrigger(){
+      $preview.innerHTML = '<button class="btn btn-secondary" id="pg-trigger" aria-haspopup="menu" aria-expanded="false">Open dropdown <i data-icon="chevron-down"></i></button>';
+      if (window.Icons && window.Icons.render) window.Icons.render($preview);
+    }
+
+    // events — text typing updates live without re-rendering controls (keeps focus)
+    const itemsBox = document.getElementById('pg-items');
+    itemsBox.addEventListener('input', e=>{
+      const el = e.target; if (el.dataset.i===undefined) return;
+      cfg.items[+el.dataset.i][el.dataset.k] = el.value; update();
+    });
+    itemsBox.addEventListener('change', e=>{
+      const el = e.target; if (el.tagName==='SELECT' && el.dataset.i!==undefined){
+        cfg.items[+el.dataset.i][el.dataset.k] = el.value; update();
+      }
+    });
+    itemsBox.addEventListener('click', e=>{
+      const del = e.target.closest('[data-del]'); if(!del) return;
+      cfg.items.splice(+del.dataset.del, 1); renderControls(); update();
+    });
+    document.getElementById('pg-add').addEventListener('click', ()=>{
+      if (cfg.items.length >= MAX_ITEMS) return;
+      cfg.items.push(defItem(cfg.items.length)); renderControls(); update();
+    });
+    document.getElementById('pg-header').addEventListener('change', e=>{ cfg.header=e.target.checked; update(); });
+    document.getElementById('pg-iconsize').addEventListener('change', e=>{ cfg.iconSize=e.target.value; update(); });
+
+    $preview.addEventListener('click', e=>{ if (e.target.closest('#pg-trigger')) { menu.hidden ? openMenu(document.getElementById('pg-trigger')) : closeMenu(); } });
+    document.addEventListener('click', e=>{ if (!menu.hidden && !menu.contains(e.target) && !sub.contains(e.target) && !e.target.closest('#pg-trigger')) closeMenu(); });
+
+    document.getElementById('pg-reset')?.addEventListener('click',()=>{
+      cfg.header=false; cfg.iconSize='16'; cfg.items = DEFAULTS.map(d=>({...d}));
+      closeMenu(); syncGlobals(); renderControls(); paintCode();
+    });
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+
+    syncGlobals();
+    renderControls();
+    renderTrigger();
+    paintCode();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tabs — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Tabs — switch between sections of the same view ── */
+    .tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--border-base); font-family: 'Poppins', sans-serif; }
+    .tab { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 10px 0 14px; font-size: 14px; font-weight: 500; line-height: 1.6; color: var(--content-secondary); background: none; border: none; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .tab:hover, .tab.is-hover { color: var(--content-base); }
+    .tab.is-active { color: var(--content-base); }
+    .tab::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 4px; border-radius: var(--radius-full); background: transparent; }
+    .tab.is-active::after { background: var(--content-brand-secondary); }
+    .tab.is-disabled { color: var(--content-disabled); cursor: not-allowed; }
+    .tab i[data-icon] { width: 16px; height: 16px; display: flex; }
+    .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-full); background: var(--bg-info); color: #fff; font-size: 12px; font-weight: 500; line-height: 1; }
+
+    /* demo helpers */
+    .tab-content { padding-top: 20px; font-size: 14px; line-height: 1.5; color: var(--content-secondary); }
+
+    .dd-card .dd-prev { flex: 1; }
+    .states-row .tabs { border-bottom: none; }
+    .pg-preview .tab-demo { width: 100%; border: 0; padding: 0; background: transparent; }
+
+    .anatomy-fig { position: relative; background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 40px; margin-bottom: 24px; display: flex; justify-content: center; }
+    .ana-num { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--content-base); color: var(--bg-base); font-size: 9px; /* font-scale-exempt: anatomy number badge */ font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 3; }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Tabs</h1>
+      <p class="page-desc">Switch between sections of the same view without leaving the page. Tabs keep related content in one place and surface one section at a time.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">A row of tab labels sits above the content; the active tab is marked with a brand-coloured indicator and shows its panel below.</p>
+          <div class="anatomy-fig">
+            <div style="width:100%; max-width:520px;">
+              <div class="tabs" style="pointer-events:none;">
+                <span class="tab is-active"><i data-icon="home"></i> Overview</span>
+                <span class="tab"><i data-icon="message"></i> Open answers</span>
+                <span class="tab"><i data-icon="pie-chart"></i> Reports</span>
+              </div>
+              <div class="tab-content" style="pointer-events:none;">The active tab's content appears here.</div>
+            </div>
+            <div class="ana-num" style="left:8%; top:24%;">1</div>
+            <div class="ana-num" style="left:8%; top:40%;">2</div>
+            <div class="ana-num" style="left:38%; top:40%;">3</div>
+            <div class="ana-num" style="left:8%; top:64%;">4</div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Tab</span> — A label (optionally with an icon) for one section. Keep labels short.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Active indicator</span> — A 4px rounded brand-coloured bar marking the selected tab.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Track</span> — The hairline separating the tab row from the content.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Panel</span> — The content of the active tab. Only one panel is shown at a time.</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Use tabs to split one view's content into a few peer sections. Don't use them for steps in a flow (use a Stepper) or for navigating to different pages (use the navigation).</p>
+
+          <h3 class="text-l4">Peer sections of one view</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px 28px;">
+                <div class="tabs" style="pointer-events:none;"><span class="tab is-active">Overview</span><span class="tab">Open answers</span><span class="tab">Reports</span></div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                Group related sections the user can switch between freely.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px 28px;">
+                <div class="tabs" style="pointer-events:none;"><span class="tab is-active">Step 1</span><span class="tab">Step 2</span><span class="tab">Step 3</span></div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Sequence steps with tabs — an ordered flow belongs in a Stepper.
+              </div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Keep the set small</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px 28px;">
+                <div class="tabs" style="pointer-events:none;"><span class="tab is-active">Overview</span><span class="tab">Scores</span><span class="tab">Reports</span></div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                A handful of tabs that fit on one line.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px 28px; overflow:hidden;">
+                <div class="tabs" style="pointer-events:none; flex-wrap:nowrap;"><span class="tab is-active">Overview</span><span class="tab">Scores</span><span class="tab">Reports</span><span class="tab">Trends</span><span class="tab">Segments</span><span class="tab">Admins</span><span class="tab">Settings</span></div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Cram in many tabs that overflow — rethink the structure.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">Each tab label can carry an optional leading icon.</p>
+
+          <h3 class="text-l4">Label</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="tabs"><span class="tab is-active">Overview</span><span class="tab">Open answers</span><span class="tab">Reports</span></div>
+              </div>
+              <div class="variant-row-desc"><strong>Text</strong> — A plain text label. The default; clearest for most cases.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="tabs"><span class="tab is-active"><i data-icon="home"></i> Overview</span><span class="tab"><i data-icon="message"></i> Open answers</span><span class="tab"><i data-icon="pie-chart"></i> Reports</span></div>
+              </div>
+              <div class="variant-row-desc"><strong>Icon + text</strong> — A leading icon adds quick recognition. Use icons consistently — either all tabs have one or none do.</div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Counter</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="tabs"><span class="tab is-active">Open answers <span class="tab-count">12</span></span><span class="tab">Reports</span></div>
+              </div>
+              <div class="variant-row-desc"><strong>With counter</strong> — A tab can show a count badge (e.g. items to review) before or after the label. Use it for an actionable, changing number — not a static total.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="states">
+          <h2 class="text-l3">States</h2>
+          <p class="section-lead">A tab reflects whether it's selected, hovered, or unavailable.</p>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Default</span><div class="tabs" style="pointer-events:none; gap:0;"><span class="tab" tabindex="-1">Open answers</span></div></div>
+            <div class="state-col"><span class="state-lbl">Hover</span><div class="tabs" style="pointer-events:none; gap:0;"><span class="tab is-hover" tabindex="-1">Open answers</span></div></div>
+            <div class="state-col"><span class="state-lbl">Active</span><div class="tabs" style="pointer-events:none; gap:0;"><span class="tab is-active" tabindex="-1">Open answers</span></div></div>
+            <div class="state-col"><span class="state-lbl">Disabled</span><div class="tabs" style="pointer-events:none; gap:0;"><span class="tab is-disabled" tabindex="-1">Open answers</span></div></div>
+          </div>
+        </section>
+
+        <section class="section" id="content-guidelines">
+          <h2 class="text-l3">Content guidelines</h2>
+          <p class="section-lead">Tab labels are scanned at a glance — keep them short and parallel.</p>
+
+          <div class="cg-rule">
+            <h3 class="text-l4">Short, noun-based labels</h3>
+            <p>One or two words naming the section. Use sentence case and keep the labels parallel in form.</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px 28px;"><div class="tabs" style="pointer-events:none;"><span class="tab is-active">Overview</span><span class="tab">Open answers</span><span class="tab">Reports</span></div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Short and parallel.</div>
+              </div>
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px 28px;"><div class="tabs" style="pointer-events:none;"><span class="tab is-active">See the overview</span><span class="tab">Answers</span><span class="tab">Generate a report</span></div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Long, inconsistent phrasing.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">An inactive tab is secondary text; the active one is base text with a brand underline.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--content-secondary</code></td><td>Inactive tab label</td><td>rgba(25,39,67,.80)</td></tr>
+              <tr><td><code>--content-base</code></td><td>Active / hovered label</td><td>#192743</td></tr>
+              <tr><td><code>--content-brand-secondary</code></td><td>Active indicator (underline)</td><td>#0c827f</td></tr>
+              <tr><td><code>--border-base</code></td><td>Track hairline</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--content-subtle</code></td><td>Disabled label</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:14px; color:var(--content-secondary);">Typography: Poppins Medium, 14px (<code>body-14-M</code>).</p>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Tabs need the right roles and keyboard support so assistive tech announces and operates them as tabs.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Roles.</strong> The tab row is <code>role="tablist"</code>, each tab <code>role="tab"</code>, each panel <code>role="tabpanel"</code>; link them with <code>aria-controls</code> / <code>aria-labelledby</code>.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Selected state.</strong> The active tab carries <code>aria-selected="true"</code> — not just the visual underline.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Keyboard.</strong> Arrow keys move between tabs; only the active tab is in the tab order (<code>tabindex</code> roving).</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Don't rely on colour alone.</strong> The underline plus selected state convey the active tab — colour isn't the only signal.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Disabled tabs.</strong> Mark them <code>aria-disabled</code> and skip them in keyboard navigation.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="link-inline-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Link Inline</span></a>
+          <a class="pag-card right" href="breadcrumb-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Breadcrumb</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#states">States</a>
+          <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Configure the tabs and see them update — the snippet uses the Angular Material <code>mat-tab-group</code> with the <code>tabs</code> class.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="padding:28px 32px; justify-content:flex-start; align-items:flex-start;"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">icons</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-icons"><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">counter</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-counter"><span class="pg-toggle-track"></span></label></div></div>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Use Angular Material's <code>mat-tab-group</code> with <code>class="tabs"</code>. Each section is a <code>mat-tab</code>; its content is projected inside.</p>
+
+          <h3 class="text-l4">Basic</h3>
+          <div class="dev-preview" style="padding:24px 28px; justify-content:flex-start; align-items:flex-start;">
+            <div style="width:100%;"><div class="tabs"><span class="tab is-active">Overview</span><span class="tab">Open answers</span><span class="tab">Reports</span></div><div class="tab-content">Content of the active tab.</div></div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;mat-tab-group</span> <span class="ca">class</span>=<span class="cv">"tabs"</span> <span class="ca">mat-align-tabs</span>=<span class="cv">"start"</span> <span class="ca">disableRipple</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;mat-tab</span> <span class="ca">label</span>=<span class="cv">"Overview"</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"content"</span><span class="ct">&gt;</span> … <span class="ct">&lt;/div&gt;</span>
+  <span class="ct">&lt;/mat-tab&gt;</span>
+  <span class="ct">&lt;mat-tab</span> <span class="ca">label</span>=<span class="cv">"Open answers"</span><span class="ct">&gt;</span> … <span class="ct">&lt;/mat-tab&gt;</span>
+  <span class="ct">&lt;mat-tab</span> <span class="ca">label</span>=<span class="cv">"Reports"</span><span class="ct">&gt;</span> … <span class="ct">&lt;/mat-tab&gt;</span>
+<span class="ct">&lt;/mat-tab-group&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Icon label</h3>
+          <p>For an icon beside the label, use a <code>mat-tab-label</code> template with an <code>eff-mat-icon</code>.</p>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;mat-tab&gt;</span>
+  <span class="ct">&lt;ng-template</span> <span class="ca">mat-tab-label</span><span class="ct">&gt;</span>
+    <span class="ct">&lt;eff-mat-icon</span> <span class="ca">[iconName]</span>=<span class="cv">"'pie-chart'"</span> <span class="ca">class</span>=<span class="cv">"tab-icon"</span><span class="ct">/&gt;</span>
+    <span class="ct">&lt;span&gt;</span>Reports<span class="ct">&lt;/span&gt;</span>
+  <span class="ct">&lt;/ng-template&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"content"</span><span class="ct">&gt;</span> … <span class="ct">&lt;/div&gt;</span>
+<span class="ct">&lt;/mat-tab&gt;</span></code></pre>
+          </div>
+
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Inputs</h2>
+          <p class="section-lead">The component is Angular Material's <code>mat-tab-group</code> / <code>mat-tab</code>, styled with the <code>tabs</code> class.</p>
+          <table class="token-table">
+            <thead><tr><th>Input</th><th>On</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>class="tabs"</code></td><td>mat-tab-group</td><td>Applies the design-system tab styling.</td></tr>
+              <tr><td><code>mat-align-tabs</code></td><td>mat-tab-group</td><td><code>start</code> | <code>center</code> | <code>end</code> — alignment of the tab row.</td></tr>
+              <tr><td><code>disableRipple</code></td><td>mat-tab-group</td><td>Turn off the Material ripple (the design system doesn't use it).</td></tr>
+              <tr><td><code>[selectedIndex]</code> · <code>(selectedTabChange)</code></td><td>mat-tab-group</td><td>Control / observe the active tab.</td></tr>
+              <tr><td><code>label</code></td><td>mat-tab</td><td>The tab's text label (or use a <code>mat-tab-label</code> template for an icon).</td></tr>
+              <tr><td><code>disabled</code></td><td>mat-tab</td><td>Disable a single tab.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The <code>tabs</code> class themes the Material group with these tokens.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--content-secondary</code> · <code>--content-base</code></td><td>Inactive / active label</td></tr>
+              <tr><td><code>--content-brand-secondary</code></td><td>Active indicator</td></tr>
+              <tr><td><code>--border-base</code></td><td>Track hairline</td></tr>
+              <tr><td><code>--content-subtle</code></td><td>Disabled label</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead"><code>mat-tab-group</code> wires up the tab roles and keyboard model; keep these in mind.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Roles + keyboard.</strong> Material sets <code>tablist</code>/<code>tab</code>/<code>tabpanel</code>, <code>aria-selected</code> and arrow-key navigation by default.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label icons.</strong> If a tab is icon-only, give it an accessible label; prefer icon + text.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Disabled.</strong> Use <code>disabled</code> on <code>mat-tab</code> — it's skipped in keyboard navigation.</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-usage">Usage</a>
+          <a class="toc-link" href="#dev-props">Inputs</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+    const defaults = { icons: false, counter: false };
+    const TABS = [ { label:'Overview', icon:'home' }, { label:'Open answers', icon:'message', count: 12 }, { label:'Reports', icon:'pie-chart' } ];
+    let active = 0;
+    function state(){ return { icons: document.getElementById('pg-icons').checked, counter: document.getElementById('pg-counter').checked }; }
+    function buildHtml(s){
+      const tabs = TABS.map((t,i)=>{
+        const ic = s.icons ? `<i data-icon="${t.icon}"></i> ` : '';
+        const ct = (s.counter && t.count) ? ` <span class="tab-count">${t.count}</span>` : '';
+        return `<span class="tab${i===active?' is-active':''}" data-i="${i}">${ic}${t.label}${ct}</span>`;
+      }).join('');
+      return `<div style="width:100%;"><div class="tabs">${tabs}</div><div class="tab-content">Content of "${TABS[active].label}".</div></div>`;
+    }
+    function buildCode(s){
+      const L = [];
+      L.push('<mat-tab-group class="tabs" mat-align-tabs="start" disableRipple>');
+      TABS.forEach(t=>{
+        const hasIcon = s.icons, hasCount = s.counter && t.count;
+        if (hasIcon || hasCount){
+          L.push('  <mat-tab>');
+          L.push('    <ng-template mat-tab-label>');
+          if (hasIcon) L.push(`      <eff-mat-icon [iconName]="'${t.icon}'" class="tab-icon"/>`);
+          L.push(`      <span>${t.label}</span>`);
+          if (hasCount) L.push(`      <span class="tab-count">${t.count}</span>`);
+          L.push('    </ng-template>');
+          L.push('    <div class="content"> … </div>');
+          L.push('  </mat-tab>');
+        } else {
+          L.push(`  <mat-tab label="${t.label}"><div class="content"> … </div></mat-tab>`);
+        }
+      });
+      L.push('</mat-tab-group>');
+      return L.join('\n');
+    }
+    function render(){const s=state();$preview.innerHTML=buildHtml(s);document.getElementById('pg-code').textContent=buildCode(s);if(window.Icons&&window.Icons.render)window.Icons.render($preview);}
+    ['pg-icons','pg-counter'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('input',render);el.addEventListener('change',render);});
+    $preview.addEventListener('click', e=>{ const t=e.target.closest('.tab'); if (t && t.dataset.i!==undefined){ active=+t.dataset.i; render(); } });
+    document.getElementById('pg-reset')?.addEventListener('click',()=>{document.getElementById('pg-icons').checked=defaults.icons;document.getElementById('pg-counter').checked=defaults.counter;active=0;render();});
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+    render();
+  })();
+</script>
+</body>
+</html>
