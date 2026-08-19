@@ -33,3 +33,9 @@ jobs:
       # tokens — so nothing catches it except looking.
       - name: docs pages and stylesheets resolve
         run: ./tools/check-docs-assets.py
+
+      # skill-manifest.json is what the org skill fetches to find screens and the
+      # reference. It is generated from the registry, so a stale commit would point
+      # the whole org at the wrong set.
+      - name: skill-manifest.json is current
+        run: ./tools/build-manifest.py --check

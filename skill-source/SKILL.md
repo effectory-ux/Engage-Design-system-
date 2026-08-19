@@ -5,7 +5,7 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.16.0
+**Version:** 1.17.0
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
@@ -20,31 +20,46 @@ Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **desig
 
 ## Setup — eerste keer in een sessie
 
-De skill levert alle design-system bestanden mee:
-- `design-system-reference.md` — naast deze SKILL.md
-- `design-system-files/tokens.css`, `foundation.css`, `components.css`
-- `design-system-files/icons.js`
-- `design-system-files/serve.py`
-- `design-system-files/assets.tar.gz` — alle iconen én illustraties, ingepakt om bestandsaantal te beperken
+De skill haalt zijn eigen inhoud **live uit de repo** op. Wat in de bundel meekomt is een
+**koude-startkopie**: genoeg om zonder netwerk te werken, en het wordt bij de eerste geslaagde fetch
+bijgewerkt.
 
 **Voor elke bouwsessie:**
 
-1. Laad de reference (zit naast deze SKILL.md):
-   ```
-   Read("design-system-reference.md")
-   ```
-
-2. Kopieer de design-system bestanden naar de werkdirectory en pak iconen + illustraties uit:
+1. Ververs de skill-inhoud en lees daarna de reference:
    ```bash
-   cp design-system-files/tokens.css .
-   cp design-system-files/foundation.css .
-   cp design-system-files/components.css .
-   cp design-system-files/icons.js .
-   cp design-system-files/serve.py .
+   ./ds-skill.sh sync
+   ```
+   ```
+   Read(".ds-cache/design-system-reference.md")
+   ```
+   Meldt het script `(offline — using cached copy)`, zeg dat dan één keer tegen de gebruiker en ga
+   door; die kopie is compleet, alleen mogelijk iets ouder.
+
+2. Zet de design-system bestanden in de werkdirectory:
+   ```bash
+   cp design-system-files/tokens.css design-system-files/foundation.css \
+      design-system-files/components.css design-system-files/icons.js \
+      design-system-files/serve.py .
    mkdir -p assets && tar -xzf design-system-files/assets.tar.gz -C assets/
    ```
-   Sla deze stap over als de bestanden al bestaan (check of `tokens.css`, `assets/icons/` en `assets/illustrations/` al aanwezig zijn).
+   Sla dit over als `tokens.css`, `assets/icons/` en `assets/illustrations/` er al staan. Wil je de
+   **actuele** CSS uit de repo in plaats van de meegeleverde, gebruik dan `ds-update.sh` — zie het
+   blok hieronder.
 
+3. Heb je een referentiescherm nodig, haal dat **op het moment zelf** op — niet alle vijftien vooraf:
+   ```bash
+   ./ds-skill.sh screen <slug>          # bv. create-survey-dialog
+   ```
+   Lees daarna `.ds-cache/reference-prototypes/<slug>.md` en kopieer de `.html` naar `prototypes/`.
+
+`./ds-skill.sh status` toont wat er gecached is en hoe oud het is.
+
+**Waarom zo.** Schermen en de reference veranderen vaak; de zip in de org-instellingen kan daar niet
+op wachten. Door ze op te halen is een nieuw scherm toevoegen een **commit in de repo**, en hoeft de
+zip alleen opnieuw geüpload te worden als de **regels in deze SKILL.md** zelf wijzigen. Elke
+geslaagde fetch schrijft naar `.ds-cache/`, dus valt GitHub weg dan werk je door met de laatste goede
+versie — een netwerkprobleem maakt het hoogstens iets ouder, nooit stuk.
 
 ### Design system updates — `auto` of `manual`
 

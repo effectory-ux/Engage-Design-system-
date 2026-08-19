@@ -1,6 +1,50 @@
 {
-  "count": 1042,
+  "count": 1048,
   "entries": [
+    {
+      "hash": "48b3209",
+      "author": "Jamal van Rooijen",
+      "date": "2026-08-19",
+      "subject": "Let the org skill update itself from the repo (v1.17.0)",
+      "pages": []
+    },
+    {
+      "hash": "5570212",
+      "author": "Jamal van Rooijen",
+      "date": "2026-08-19",
+      "subject": "Render the nav from a per-tab cache so page switches stop flickering",
+      "pages": []
+    },
+    {
+      "hash": "db87a05",
+      "author": "Jamal van Rooijen",
+      "date": "2026-08-19",
+      "subject": "Restore the icons and cursors nav.js loads, and guard JS-built paths",
+      "pages": []
+    },
+    {
+      "hash": "340a515",
+      "author": "Jamal van Rooijen",
+      "date": "2026-08-19",
+      "subject": "Stop the content jumping on load, and centre the introduction page",
+      "pages": [
+        "introduction-docs.html"
+      ]
+    },
+    {
+      "hash": "43efcfd",
+      "author": "Jamal van Rooijen",
+      "date": "2026-08-19",
+      "subject": "Fix the docs site losing every design token after the restructure",
+      "pages": []
+    },
+    {
+      "hash": "92b7548",
+      "author": "Jamal van Rooijen",
+      "date": "2026-08-19",
+      "subject": "Name the two new screens for what they are, and make them findable (v1.16.0)",
+      "pages": []
+    },
     {
       "hash": "04a6162",
       "author": "Jamal van Rooijen",

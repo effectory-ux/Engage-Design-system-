@@ -16,6 +16,11 @@ Laad voor elke bouwsessie eerst:
 Read(".claude/skills/effectory-design-system/design-system-reference.md")
 ```
 
+> Dit is de **project**-skill: hij leest de reference en de referentieschermen rechtstreeks uit deze
+> repo, dus die zijn per definitie actueel. De **org**-skill (`skill-source/`) haalt dezelfde
+> bestanden op via `ds-skill.sh` en cachet ze in `.ds-cache/`, omdat de bundel daar niet meebeweegt
+> met de repo. Wijzig je de regels hieronder, werk ze dan in beide bij.
+
 
 ### Design system updates — `auto` of `manual`
 

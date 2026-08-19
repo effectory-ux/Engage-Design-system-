@@ -54,6 +54,10 @@ cp "$ROOT/VERSION" "$SKILL_SRC/VERSION"
 # Keep the **Version:** line in SKILL.md in sync with the VERSION file
 sed -i.bak "s/^\*\*Version:\*\*.*/**Version:** $VER/" "$SKILL_SRC/SKILL.md" && rm -f "$SKILL_SRC/SKILL.md.bak"
 
+cp "$ROOT/tools/ds-skill.sh" "$SKILL_SRC/ds-skill.sh"
+chmod +x "$SKILL_SRC/ds-skill.sh"
+cp "$ROOT/skill-manifest.json" "$SKILL_SRC/skill-manifest.json"
+
 echo "→ Syncing reference doc"
 cp "$PROJECT_SKILL/design-system-reference.md" "$SKILL_SRC/design-system-reference.md"
 

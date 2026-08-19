@@ -1,0 +1,275 @@
+{
+  "version": "1.17.0",
+  "repo": "effectory-ux/Engage-Design-system-",
+  "raw": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main",
+  "reference": {
+    "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/design-system-reference.md",
+    "sha": "125a34fd3215",
+    "bytes": 83401
+  },
+  "designSystem": {
+    "tokens.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/tokens.css",
+    "foundation.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/foundation.css",
+    "components.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/components.css",
+    "icons.js": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/icons.js"
+  },
+  "screens": [
+    {
+      "slug": "action-planner",
+      "name": "Resultaten-dashboard — Action Planner",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/action-planner.html",
+        "sha": "e78081639123",
+        "bytes": 484601
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/action-planner.md",
+        "sha": "8f76acd2869e",
+        "bytes": 3314
+      }
+    },
+    {
+      "slug": "all-surveys",
+      "name": "Surveys / All surveys pagina (Coordinator)",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/all-surveys.html",
+        "sha": "3f8d450c8ddc",
+        "bytes": 30447
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/all-surveys.md",
+        "sha": "68947f6d1600",
+        "bytes": 5390
+      }
+    },
+    {
+      "slug": "create-survey-dialog",
+      "name": "Template selection dialog — \"Choose a survey template\"",
+      "triggers": [
+        "template selection dialog",
+        "template picker",
+        "templatekiezer",
+        "\"kies een template\"",
+        "survey template kiezen",
+        "choose a survey template",
+        "create survey dialog/modal/popup",
+        "nieuwe survey aanmaken",
+        "survey aanmaken vanaf een template",
+        "welke templates zijn er",
+        "template overzicht in de dialog",
+        "start from scratch",
+        "\"Let's get started\"-dialog",
+        "survey een naam geven",
+        "project kiezen bij een nieuwe survey"
+      ],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/create-survey-dialog.html",
+        "sha": "51a547ee03f6",
+        "bytes": 88730
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/create-survey-dialog.md",
+        "sha": "5ef8ad4935a7",
+        "bytes": 13931
+      }
+    },
+    {
+      "slug": "dashboard-cards",
+      "name": "Resultaten-dashboard — kaart-bibliotheek",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/dashboard-cards.html",
+        "sha": "1701cae05926",
+        "bytes": 484599
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/dashboard-cards.md",
+        "sha": "0c3825d98f83",
+        "bytes": 1898
+      }
+    },
+    {
+      "slug": "effectiveness-focus",
+      "name": "Resultaten-dashboard — Focus View",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/effectiveness-focus.html",
+        "sha": "bc0217d58528",
+        "bytes": 484598
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/effectiveness-focus.md",
+        "sha": "2ffd28946e7b",
+        "bytes": 3057
+      }
+    },
+    {
+      "slug": "effectiveness-overview",
+      "name": "Resultaten-dashboard — Overview",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/effectiveness-overview.html",
+        "sha": "e1f5d4fb7139",
+        "bytes": 484599
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/effectiveness-overview.md",
+        "sha": "2ceae2200f1b",
+        "bytes": 4106
+      }
+    },
+    {
+      "slug": "effectiveness-panel",
+      "name": "Effectiveness matrix side panel",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/effectiveness-panel.html",
+        "sha": "4c689ad54e99",
+        "bytes": 484653
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/effectiveness-panel.md",
+        "sha": "584308b87a0c",
+        "bytes": 2259
+      }
+    },
+    {
+      "slug": "engagement-panel",
+      "name": "Engagement side panel",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/engagement-panel.html",
+        "sha": "140dcc897dda",
+        "bytes": 484644
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/engagement-panel.md",
+        "sha": "901b954d0a40",
+        "bytes": 1691
+      }
+    },
+    {
+      "slug": "enps-panel",
+      "name": "eNPS side panel",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/enps-panel.html",
+        "sha": "5dfcc11c244f",
+        "bytes": 484638
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/enps-panel.md",
+        "sha": "8641872772f7",
+        "bytes": 2678
+      }
+    },
+    {
+      "slug": "homepage",
+      "name": "My Effectory homepage (Coordinator)",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/homepage.html",
+        "sha": "525a36af63d2",
+        "bytes": 26129
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/homepage.md",
+        "sha": "07f5ed4c727d",
+        "bytes": 6336
+      }
+    },
+    {
+      "slug": "projects",
+      "name": "Surveys / Projects pagina (Coordinator)",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/projects.html",
+        "sha": "5ae7732973e3",
+        "bytes": 22776
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/projects.md",
+        "sha": "cab4cc24ffd9",
+        "bytes": 4308
+      }
+    },
+    {
+      "slug": "reports",
+      "name": "Reports pagina",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/reports.html",
+        "sha": "60bf5ae64cff",
+        "bytes": 33121
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/reports.md",
+        "sha": "f90b80f47553",
+        "bytes": 3284
+      }
+    },
+    {
+      "slug": "scores",
+      "name": "Resultaten-dashboard — Scores",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/scores.html",
+        "sha": "53d1f574a595",
+        "bytes": 56445
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/scores.md",
+        "sha": "ebed4eceee20",
+        "bytes": 3667
+      }
+    },
+    {
+      "slug": "survey-settings-questionnaire",
+      "name": "CYOS template questionnaire page — Questions-stap",
+      "triggers": [
+        "CYOS",
+        "create your own survey",
+        "CYOS questionnaire page",
+        "questions-stap",
+        "questions step",
+        "vragenlijst van een survey",
+        "vragenoverzicht",
+        "questionnaire page/overview",
+        "survey settings",
+        "survey-instellingen",
+        "de stappen na het aanmaken van een survey",
+        "survey stepper",
+        "welke vragen zitten in deze template",
+        "template-vragen bekijken",
+        "survey configureren/opzetten"
+      ],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/survey-settings-questionnaire.html",
+        "sha": "f74e9a72d8d0",
+        "bytes": 30825
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/survey-settings-questionnaire.md",
+        "sha": "d82638d86cb1",
+        "bytes": 8997
+      }
+    },
+    {
+      "slug": "themes",
+      "name": "Resultaten-dashboard — Themes",
+      "triggers": [],
+      "html": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/themes.html",
+        "sha": "e3f57c38879d",
+        "bytes": 27665
+      },
+      "md": {
+        "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/reference-prototypes/themes.md",
+        "sha": "0e28da767b3b",
+        "bytes": 2302
+      }
+    }
+  ]
+}
