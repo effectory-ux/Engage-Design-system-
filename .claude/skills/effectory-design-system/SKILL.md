@@ -186,9 +186,11 @@ Nooit `tokens.css` handmatig bewerken — ook niet even, ook niet "alleen in dit
 en gebruiken.
 
 Moet een tokenwaarde echt anders, dan is dat een wijziging in het design system en niet in je prototype.
-Meld het en verzin geen eigen waarde. **Figma is niet de bron voor tokens**: de waardes in `tokens.css`
-zijn afgestemd op de live dev-styleguide, en op punten waar Figma daarvan afwijkt heeft de styleguide het
-laatste woord.
+Meld het en verzin geen eigen waarde.
+
+**Het design system is de bron.** Wat in `tokens.css` staat, geldt — niet Figma, niet de dev-styleguide.
+Wijken die af, dan is dat iets om op te lossen door ze bij te werken, niet door `tokens.css` te
+"corrigeren" naar wat er in Figma staat.
 
 ### 7. Prototype is een productscherm
 Een prototype ziet eruit als een echte pagina in de app — niet als een docs-pagina.

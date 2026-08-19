@@ -4,11 +4,12 @@ Reads the Figma variables export and generates:
   - tokens.css        — CSS custom properties for all modes
   - colors-tokens.js  — JS token data for the dynamic colors page
 
-FIGMA IS NO LONGER THE SOURCE OF TRUTH FOR TOKENS. tokens.css was reconciled by
-hand against the live dev styleguide on 2026-07-29 (commit 888c966, 164/164 on
-the light theme) because Figma's values were wrong. Writing from a Figma export
-would undo that, so this script REPORTS by default and only writes when you pass
---write and mean it.
+THE DESIGN SYSTEM IS THE SOURCE OF TRUTH FOR TOKENS — not Figma, not the dev
+styleguide. The committed tokens.css is what holds; keeping Figma and the
+styleguide in line with it is a manual job. tokens.css was last reconciled by
+hand on 2026-07-29 (commit 888c966, 164/164 on the light theme) because Figma's
+values were wrong. Writing from a Figma export would undo that, so this script
+REPORTS by default and only writes when you pass --write and mean it.
 
 Usage:
   ./build-tokens.py [export.json]           compare the export against what is
@@ -41,8 +42,8 @@ if not os.path.exists(SRC):
     print('    · pass the path:  ./build-tokens.py ~/Downloads/variables.json, or')
     print('    · set FIGMA_VARIABLES=/path/to/export')
     print('')
-    print('  Note: Figma is not the source of truth for tokens. This script only')
-    print('  writes when you pass --write.')
+    print('  Note: the design system is the source of truth for tokens. This script')
+    print('  only writes when you pass --write.')
     sys.exit(1)
 
 
@@ -345,9 +346,9 @@ if not WRITE:
     if all(up_to_date):
         print('The export and the committed files agree. Nothing to do.')
     else:
-        print('Figma is NOT the source of truth for tokens — the committed files are,')
-        print('reconciled against the live dev styleguide. A difference here does not')
-        print('mean the committed files are wrong; it usually means Figma is behind.')
+        print('The design system is the source of truth for tokens — the committed')
+        print('files are. A difference here is information, not an instruction: it')
+        print('usually means Figma needs updating, not tokens.css.')
         print('')
         print('Only if you are certain the export is the correct newer version:')
         print('  ./build-tokens.py ' + (positional[0] if positional else '<export>') + ' --write')
