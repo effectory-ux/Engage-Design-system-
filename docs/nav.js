@@ -32,14 +32,60 @@
   })();
 
   // Resolve nav.html relative to this script's location
-  var scriptSrc = document.querySelector('script[src$="nav.js"]');
+  // Match on the filename with any ?v= cache-buster stripped — src$="nav.js" misses
+  // the pages that link nav.js?v=…, which then resolved a different base and a
+  // different cache key, so those pages kept refetching.
+  var scriptSrc = [].filter.call(document.querySelectorAll('script[src]'), function (el) {
+    return el.getAttribute('src').split('?')[0].replace(/^.*\//, '') === 'nav.js';
+  })[0];
   var base = scriptSrc
     ? scriptSrc.src.replace(/nav\.js(\?.*)?$/, '')
     : '';
 
-  fetch(base + 'nav.html')
-    .then(function (r) { return r.text(); })
-    .then(function (html) {
+  // The nav is identical on every page, so re-fetching it on each navigation just
+  // repaints the same markup — the sidebar blinks empty and fills again on every
+  // page switch. Cache it for the tab and render straight from that; only the very
+  // first page of a session pays for the request.
+  // Keyed on location only. Pages are inconsistent about the ?v= build stamp on this
+  // script — some carry it, some do not — so folding it into the key would split the
+  // cache in two and still refetch on the switch between them. sessionStorage is
+  // per-tab and dies with it, so the worst case is a tab left open across a deploy
+  // showing the previous nav until it is reopened. For a navigation list that is a
+  // fair trade for never blinking again.
+  var CACHE_KEY = 'nav.html@' + base;
+
+  function readCache() {
+    try { return sessionStorage.getItem(CACHE_KEY); } catch (e) { return null; }
+  }
+  function writeCache(html) {
+    try { sessionStorage.setItem(CACHE_KEY, html); } catch (e) { /* private mode / quota */ }
+  }
+
+  // Placeholders may sit before or after this script depending on the page, so
+  // render now if they already exist and otherwise as soon as the DOM is ready.
+  function whenPlaceholdersExist(fn) {
+    if (document.getElementById('sidebar-placeholder') || document.querySelector('.sidebar')) fn();
+    else if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
+    else fn();
+  }
+
+  var cached = readCache();
+  if (cached) {
+    whenPlaceholdersExist(function () { render(cached); });
+  } else {
+    fetch(base + 'nav.html')
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
+        writeCache(html);
+        whenPlaceholdersExist(function () { render(html); });
+      })
+      .catch(function (err) {
+        console.warn('[nav.js] Could not load nav.html:', err);
+      });
+  }
+
+  function render(html) {
+    {
       var wrapper = document.createElement('div');
       wrapper.innerHTML = html;
 
@@ -138,10 +184,8 @@
 
       // ── Changelog: fetch data and render (async) ──
       renderChangelog();
-    })
-    .catch(function (err) {
-      console.warn('[nav.js] Could not load nav.html:', err);
-    });
+    }
+  }
 
   // Map a *-docs.html filename to its sidebar label (falls back to a
   // prettified filename when the page isn't in the nav).
