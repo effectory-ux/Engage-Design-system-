@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey settings - My Effectory</title>
+  <base href="../" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="foundation.css" />
+  <link rel="stylesheet" href="components.css" />
+  <style>
+    body { background: var(--bg-interface-body); }
+
+    /* This screen has NO main navigation — the CYOS flow replaces the app shell with
+       its own header + stepper and a footer action bar. Content column is 1000px. */
+    .cyos { display: flex; flex-direction: column; min-height: 100vh; }
+    .cyos-main { flex: 1; padding: var(--spacing-extra-loose) var(--spacing-loose) 120px; }
+    .cyos-inner { max-width: 1000px; margin-inline: auto; }
+
+    /* ── Header ──
+       65px, white, hairline bottom border. Logo is the design-system Effectory mark
+       (assets/illustrations/logo/effectory-logo.svg — the same artwork .mn-logo uses). */
+    .cyos-head { display: flex; align-items: center; height: 65px; padding: var(--spacing-base-tight) var(--spacing-base); background: var(--bg-base); border-bottom: 1px solid var(--border-base); }
+    .cyos-logo { width: 40px; height: 40px; flex-shrink: 0; margin-right: var(--spacing-base); }
+    .cyos-name-group { display: flex; align-items: center; gap: var(--spacing-tight); min-width: 0; }
+    .cyos-name-group i[data-icon] { width: 16px; height: 16px; display: flex; flex-shrink: 0; color: var(--content-secondary); }
+    .cyos-survey-name { margin: 0; color: var(--content-base); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cyos-head-actions { margin-left: auto; display: flex; align-items: center; gap: var(--spacing-tight); }
+
+    /* ── Stepper ──
+       Each step is a 28px circle that overlaps a 44px icon tile by 4px. The circle
+       carries the step number while pending and a check once done; its 2px white
+       border is what makes it read as sitting on top of the tile. */
+    .cyos-steps { display: flex; align-items: center; justify-content: center; padding: var(--spacing-base-tight) var(--spacing-base); border-bottom: 1px solid var(--border-base); overflow-x: auto; }
+    .cyos-step { display: flex; align-items: center; gap: var(--spacing-base-tight); padding: var(--spacing-extra-tight) var(--spacing-base); border: none; background: transparent; border-radius: var(--radius-base); font-family: inherit; text-align: left; cursor: pointer; }
+    .cyos-step:hover { background: var(--bg-base-hover); }
+    .cyos-step-badge { flex-shrink: 0; display: flex; align-items: center; }
+    .cyos-step-circle { position: relative; z-index: 2; width: 28px; height: 28px; margin-right: -4px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-base); border-radius: var(--radius-full); background: var(--bg-secondary-hover); color: var(--content-secondary); font-size: 14px; font-weight: 500; }
+    .cyos-step-circle i { width: 16px; height: 16px; display: flex; }
+    .cyos-step-tile { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: var(--bg-secondary-hover); color: var(--content-secondary); }
+    .cyos-step-tile i { width: 24px; height: 24px; display: flex; }
+    /* done, but not the step you're on: positive fill + white check */
+    .cyos-step.is-done .cyos-step-circle { background: var(--bg-positive); color: var(--content-on-brand-base); border-color: var(--bg-base); }
+    /* the step you're on: brand-selected fill on both, brand-secondary icon */
+    .cyos-step.is-active .cyos-step-circle,
+    .cyos-step.is-active .cyos-step-tile { background: var(--bg-brand-subtle-selected); }
+    .cyos-step.is-active .cyos-step-circle { color: var(--content-brand-secondary); }
+    .cyos-step.is-active .cyos-step-tile { color: var(--content-brand-secondary); }
+    .cyos-step-body { min-width: 0; }
+    .cyos-step-title { margin: 0; color: var(--content-secondary); }
+    .cyos-step.is-active .cyos-step-title { color: var(--content-base); }
+    .cyos-step-sub { margin: 0; color: var(--content-secondary); }
+    .cyos-step-sep { display: flex; align-items: center; color: var(--content-subtle); }
+    .cyos-step-sep i { width: 16px; height: 16px; display: flex; }
+
+    /* ── Template card ── */
+    .cyos-title { margin: 0 0 var(--spacing-loose); color: var(--content-base); }
+    .tmpl-card { padding: var(--spacing-loose); margin-bottom: var(--spacing-extra-loose); }
+    .tmpl-card-top { display: flex; align-items: center; gap: var(--spacing-base); }
+    .tmpl-card-top img { width: 64px; height: 64px; flex-shrink: 0; }
+    .tmpl-card-name { margin: 0; color: var(--content-base); }
+    .tmpl-card-meta { margin: var(--spacing-extra-tight) 0 0; color: var(--content-secondary); }
+    /* the "locked" strip under the card — a standard template can't be edited here */
+    .tmpl-locked { margin-top: var(--spacing-base); padding: var(--spacing-base-tight) var(--spacing-base); background: var(--bg-secondary); border-radius: var(--radius-base); color: var(--content-secondary); text-align: center; }
+
+    /* ── Questionnaire (same block as the template preview dialog) ── */
+    .q-head { display: flex; align-items: center; gap: var(--spacing-base-tight); margin-bottom: var(--spacing-base-tight); }
+    .q-head h2 { margin: 0; color: var(--content-base); }
+    .q-count { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 var(--spacing-tight); background: var(--bg-tertiary); color: var(--content-base); border-radius: var(--radius-full); font-size: 12px; font-weight: 600; }
+    .q-topic + .q-topic { margin-top: var(--spacing-extra-loose); }
+    .q-list { background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); overflow: hidden; }
+    .q-row { display: flex; align-items: center; gap: var(--spacing-super-loose); padding: var(--spacing-base) var(--spacing-loose); border-bottom: 1px solid var(--border-base); }
+    .q-row:last-child { border-bottom: none; }
+    .q-text { flex: 1; min-width: 0; color: var(--content-base); }
+    .q-scale { flex-shrink: 0; display: flex; align-items: center; gap: var(--spacing-tight); width: 168px; color: var(--content-base); }
+    .q-scale-icon { flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); }
+    .q-scale-icon i { width: 16px; height: 16px; display: flex; }
+    .q-scale-icon.is-scale  { background: var(--bg-brand-subtle);         color: var(--content-accent-turquoise); }
+    .q-scale-icon.is-choice { background: var(--bg-accent-yellow-subtle); color: var(--content-accent-yellow); }
+    .q-scale-icon.is-open   { background: var(--bg-accent-orange-subtle); color: var(--content-accent-orange); }
+    .q-scale-icon.is-nps    { background: var(--bg-accent-blue-subtle);   color: var(--content-accent-blue); }
+    .q-scale-icon.is-yesno  { background: var(--bg-accent-green-subtle);  color: var(--content-accent-green); }
+    .q-list .tag.is-standard { flex-shrink: 0; background: var(--bg-brand-subtle); color: var(--content-accent-turquoise); }
+
+    /* ── Footer action bar ── */
+    .cyos-foot { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: flex; align-items: center; justify-content: flex-end; gap: var(--spacing-base-tight); padding: var(--spacing-base) var(--spacing-loose); background: var(--bg-base); border-top: 1px solid var(--border-base); box-shadow: var(--sh-footer); }
+
+    @media (max-width: 900px) {
+      .cyos-steps { justify-content: flex-start; }
+      .cyos-step-sub { display: none; }
+      .q-scale { width: auto; }
+      .q-scale span:last-child { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cyos">
+
+  <!-- HEADER -->
+  <header class="cyos-head">
+    <img class="cyos-logo" src="assets/illustrations/logo/effectory-logo.svg" alt="Effectory" />
+    <div class="cyos-name-group">
+      <span class="tag is-draft">Draft</span>
+      <i data-icon="clipboard"></i>
+      <p class="text-medium text-w500 cyos-survey-name" id="surveyName">Test Template View</p>
+      <button class="btn btn-tertiary"><i data-icon="edit"></i> Edit name</button>
+    </div>
+    <div class="cyos-head-actions">
+      <a class="btn btn-tertiary" href="#">Help articles <i data-icon="external-link"></i></a>
+      <button class="btn btn-tertiary"><i data-icon="globe"></i> English</button>
+    </div>
+  </header>
+
+  <!-- STEPPER — rendered from STEPS in the script -->
+  <nav class="cyos-steps" id="steps" aria-label="Survey setup"></nav>
+
+  <!-- CONTENT -->
+  <main class="cyos-main">
+    <div class="cyos-inner">
+      <h1 class="text-l3 cyos-title">Questions</h1>
+
+      <div class="card card-elevated tmpl-card">
+        <div class="tmpl-card-top">
+          <img id="tmplImg" src="assets/illustrations/templates/sf-template.svg" alt="" />
+          <div>
+            <h2 class="text-l4 tmpl-card-name" id="tmplName">Strategic Fitness Model</h2>
+            <p class="text-medium tmpl-card-meta" id="tmplMeta">Standard template · 22 questions · 4 minutes</p>
+          </div>
+        </div>
+        <div class="text-medium tmpl-locked">You are not able to change or edit questions in this template</div>
+      </div>
+
+      <div id="questionnaire"></div>
+    </div>
+  </main>
+
+  <!-- FOOTER ACTIONS -->
+  <div class="cyos-foot">
+    <button class="btn btn-secondary" data-saveclose>Save &amp; Close</button>
+    <button class="btn btn-primary">Next Step <i data-icon="arrow-right"></i></button>
+    <button class="btn btn-primary is-disabled" disabled>Review &amp; Plan <i data-icon="send"></i></button>
+  </div>
+
+</div>
+
+<script src="icons.js"></script>
+<script>
+  /* Questionnaire per template — question sections from the IP-safe Effectory content
+     library (realistic-content skill, data.safe.json). Counts match the meta line on
+     each template. Shape: template name -> [[section, [[question, scaleKind], …]], …] */
+  var QUESTIONNAIRES = {
+    "Strategic Fitness Model": [
+      ["Direction setting", [
+        ["Where the organisation says it's going inspires me","scale"],
+        ["I'm behind where the organisation is heading","scale"],
+        ["Staff here are dealt with in an even-handed way","scale"]
+      ]],
+      ["Adaptive leadership", [
+        ["My team knows how it can help the wider organisation succeed","scale"],
+        ["My team is a constant source of good improvement ideas","scale"],
+        ["My manager steers us through change capably","scale"],
+        ["I trust my manager's judgement","scale"],
+        ["The way things are done here is a good fit for me","scale"]
+      ]],
+      ["Employee enablement", [
+        ["It's clear to me what I'm meant to deliver","scale"],
+        ["What I'm asked to do plays to what I'm good at","scale"],
+        ["Helpful feedback on my performance comes my way often","scale"],
+        ["Good work of mine gets noticed","scale"]
+      ]],
+      ["Systems & structure", [
+        ["Strong results tend to pay off here","scale"],
+        ["Across the organisation, work is structured in a well-organised way","scale"],
+        ["I'm kitted out with the tools and systems my job calls for","scale"],
+        ["Teamwork within my group works well","scale"],
+        ["There are plenty of ways to grow on offer here","scale"],
+        ["The information I rely on is easy to track down","scale"]
+      ]],
+      ["Engagement", [
+        ["Day to day, I find my work enjoyable","scale"],
+        ["My work leaves me energised","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["Being part of this organisation makes me proud","scale"]
+      ]]
+    ],
+    "World-class workplace Scan": [
+      ["Job satisfaction", [
+        ["Day to day, I find my work enjoyable","scale"],
+        ["My role lets me play to my strengths","scale"],
+        ["My work leaves me energised","scale"],
+        ["How would you rate the amount on your plate?","scale"]
+      ]],
+      ["Working conditions", [
+        ["Across the organisation, work is structured in a well-organised way","scale"],
+        ["I'm kitted out with the tools and systems my job calls for","scale"]
+      ]],
+      ["Company culture", [
+        ["As an employer, this place suits me well","scale"],
+        ["Being part of this organisation makes me proud","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["The organisation makes me feel my work matters","scale"],
+        ["Staff ideas actually feed improvements here","scale"],
+        ["Where the organisation says it's going inspires me","scale"]
+      ]],
+      ["eNPS", [
+        ["Would you point a friend towards us as a place to work?","nps"]
+      ]],
+      ["Improvement areas", [
+        ["Where do you think the organisation has room to do better?","open"],
+        ["Where could the organisation step up? Add a short note and one practical suggestion","open"]
+      ]]
+    ],
+    "Diversity, Equity & Inclusion (DEI)": [
+      ["Psychological safety", [
+        ["Owning up to a slip-up feels safe here","scale"],
+        ["I can speak my mind here without worrying about repercussions","scale"],
+        ["I'm comfortable raising behaviour issues directly with teammates","scale"],
+        ["I'm comfortable challenging my manager on how they act","scale"],
+        ["I know how to report unwanted behaviour here","yesno"],
+        ["Over the past year, colleagues have behaved towards me in unwanted ways (e.g. verbal aggression, physical abuse, sexual harassment, bullying, discrimination)","scale"],
+        ["What kind of unwanted behaviour did you run into?","choice"],
+        ["Who was the unwanted behaviour coming from?","choice"],
+        ["Did you flag this behaviour to a manager, confidential adviser or HR?","yesno"],
+        ["What stopped you reporting this to a manager, confidential adviser or HR?","open"],
+        ["The support I got after reporting this was satisfactory","yesno"],
+        ["What would have made it better?","open"]
+      ]],
+      ["Trust", [
+        ["Staff and management keep the lines of communication open here","scale"],
+        ["Leadership here is open and straight with us about big developments","scale"],
+        ["I know what our DEI goals and approach are","scale"],
+        ["Leadership is genuinely committed to advancing DEI here","scale"],
+        ["We're kept posted on how the DEI strategy and goals are progressing","scale"]
+      ]],
+      ["Belonging", [
+        ["I can be genuine with everyone I work alongside","scale"],
+        ["The people right around me take me as I am","scale"],
+        ["My teammates make my contribution feel it counts","scale"],
+        ["I sense my manager appreciates what I bring","scale"],
+        ["Do you feel you have to keep parts of who you are under wraps at work?","yesno"],
+        ["Which parts of your identity have you had to downplay or conceal?","choice"]
+      ]],
+      ["Valuing differences", [
+        ["My manager makes room for differing views in the team","scale"],
+        ["I'm treated respectfully by my manager","scale"],
+        ["Differing views are genuinely respected here","scale"],
+        ["Staff ideas actually feed improvements here","scale"]
+      ]],
+      ["Inclusive decision-making", [
+        ["Ideas and suggestions get a fair look in my team","scale"],
+        ["I get enough chances to weigh in on the things that matter here","scale"],
+        ["Teammates pass on everything I need to do my job properly","scale"],
+        ["My manager keeps me posted on what matters","scale"]
+      ]],
+      ["Fairness", [
+        ["Around me, people get equal respect whatever their background or personal characteristics","scale"],
+        ["Doing well here earns recognition and reward","scale"],
+        ["I get a fair deal here","scale"],
+        ["It's clear how hiring decisions are made here","scale"],
+        ["It's clear how pay and rewards are decided here","scale"],
+        ["It's clear how promotions are decided here","scale"],
+        ["I'm given fair chances to grow, both professionally and personally","scale"],
+        ["My manager actively pushes me to grow","scale"]
+      ]],
+      ["Diversity", [
+        ["Our managers are as diverse a group as the rest of the workforce","scale"],
+        ["My manager plays an active role in building and promoting diversity within my team","scale"],
+        ["Diversity is something this organisation actively celebrates","scale"]
+      ]],
+      ["Closing", [
+        ["Which DEI topics should our HR policy prioritise? (pick the two that matter most to you)","choice"],
+        ["Anything else you'd like to say on this?","open"]
+      ]]
+    ],
+    "Smart Organization Scan - Pulse": [
+      ["Engagement", [
+        ["Being part of this organisation makes me proud","scale"],
+        ["Day to day, I find my work enjoyable","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["My work leaves me energised","scale"]
+      ]],
+      ["Acting on feedback", [
+        ["Off the back of our feedback results, my team has actively made changes","scale"],
+        ["Speaking up here visibly leads to things getting better","scale"]
+      ]],
+      ["eNPS", [
+        ["Would you point a friend towards us as a place to work?","nps"]
+      ]],
+      ["Retention", [
+        ["Over the last quarter I've acted on finding a new job, or intend to shortly","scale"],
+        ["Staying on here for another year or two appeals to me","scale"]
+      ]]
+    ],
+    "Smart Organization Scan - Survey": [
+      ["Job satisfaction", [
+        ["Day to day, I find my work enjoyable","scale"]
+      ]],
+      ["Tools & resources", [
+        ["I'm kitted out with the tools and systems my job calls for","scale"],
+        ["The information I rely on is easy to track down","scale"]
+      ]],
+      ["Role & contribution", [
+        ["What I'm asked to do plays to what I'm good at","scale"],
+        ["It's clear to me what I'm meant to deliver","scale"]
+      ]],
+      ["Workload & wellbeing", [
+        ["My job and personal life sit in healthy balance","scale"],
+        ["My work leaves me energised","scale"]
+      ]],
+      ["Team effectiveness", [
+        ["My team knows how it can help the wider organisation succeed","scale"],
+        ["Teamwork within my group works well","scale"],
+        ["My team is a regular source of good improvement ideas","scale"]
+      ]],
+      ["Manager support", [
+        ["I trust my manager's judgement","scale"],
+        ["Helpful feedback on my performance comes my way often","scale"],
+        ["My manager steers us through change capably","scale"]
+      ]],
+      ["Strategy & goals", [
+        ["I'm behind where the organisation is heading","scale"],
+        ["Where the organisation says it's going inspires me","scale"]
+      ]],
+      ["Senior leadership", [
+        ["I have faith in the people running the organisation","scale"]
+      ]],
+      ["Cross-team communication", [
+        ["Across the organisation, work is structured in a well-organised way","scale"]
+      ]],
+      ["Company culture", [
+        ["As an employer, this place suits me well","scale"],
+        ["Being part of this organisation makes me proud","scale"],
+        ["This place feels like somewhere I belong","scale"],
+        ["The organisation makes me feel my work matters","scale"],
+        ["The way things are done here is a good fit for me","scale"],
+        ["Staff here are dealt with in an even-handed way","scale"],
+        ["Strong results tend to pay off here","scale"],
+        ["Good work of mine gets noticed","scale"]
+      ]],
+      ["Acting on feedback", [
+        ["Staff ideas actually feed improvements here","scale"]
+      ]],
+      ["Learning & growth", [
+        ["There are plenty of ways to grow on offer here","scale"],
+        ["Over the last quarter I've acted on finding a new job, or intend to shortly","scale"],
+        ["Staying on here for another year or two appeals to me","scale"]
+      ]],
+      ["eNPS", [
+        ["Would you point a friend towards us as a place to work?","scale"]
+      ]],
+      ["Pride & highlights", [
+        ["What about the organisation gives you the most pride?","choice"],
+        ["What's behind that pride? A short description will do","open"]
+      ]],
+      ["Improvement areas", [
+        ["Where do you think the organisation has room to do better?","choice"],
+        ["Where could the organisation step up? Add a short note and one practical suggestion","open"]
+      ]]
+    ],
+    "Psychological Risk Assessment": [
+      ["Workload & wellbeing", [
+        ["The amount I'm asked to handle sits at a reasonable level","scale"],
+        ["My job and personal life sit in healthy balance","scale"]
+      ]],
+      ["Manager support", [
+        ["I trust my manager's judgement","scale"]
+      ]],
+      ["Job satisfaction", [
+        ["I'm given enough authority to make decisions","scale"],
+        ["Day to day, I find my work enjoyable","scale"]
+      ]],
+      ["Strategy & goals", [
+        ["I buy into the organisation's goals and strategy","scale"]
+      ]],
+      ["Cross-team communication", [
+        ["Across the organisation, work is structured in a well-organised way","scale"]
+      ]],
+      ["My workplace", [
+        ["My workspace ticks the boxes for a good environment (lighting, temperature, cleanliness, noise, and so on)","scale"],
+        ["Where I work, people trust, respect and back each other","scale"],
+        ["Where I work, the what and why of changes are explained clearly and early","scale"]
+      ]]
+    ],
+    "ESG Scan": [
+      ["Social pillar", [
+        ["My job and personal life sit in healthy balance","scale"],
+        ["My physical workspace meets my needs","scale"],
+        ["The safety rules for my workplace are spelled out clearly","scale"],
+        ["I can show up as my real self here","scale"],
+        ["Building an inclusive culture is something the organisation takes seriously","scale"],
+        ["Around me, people get equal respect whatever their background or personal characteristics","scale"],
+        ["The way my pay is decided feels fair","scale"],
+        ["There are plenty of ways to grow on offer here","scale"],
+        ["Staying on here for another year or two appeals to me","scale"],
+        ["Which of our ESG efforts are you proudest of?","open"]
+      ]],
+      ["Governance pillar", [
+        ["I'm behind where the organisation is heading","scale"],
+        ["Leadership keeps the whole organisation in the loop regularly, on things like goals and changes","scale"],
+        ["Those at the top are in touch with day-to-day realities","scale"],
+        ["How decisions get made here is well defined","scale"],
+        ["My team is a regular source of good improvement ideas","scale"],
+        ["Staff ideas actually feed improvements here","scale"],
+        ["My manager encourages me to put forward ideas and run with them","scale"],
+        ["I can speak my mind here without worrying about repercussions","scale"],
+        ["I have faith in the people running the organisation","scale"],
+        ["My manager trusts me to do my work in the best way I can","scale"],
+        ["Staff and management talk to each other openly here","scale"]
+      ]],
+      ["Environment & sustainability", [
+        ["I'm conscious of the mark the organisation leaves on the environment","scale"],
+        ["The organisation has written down its greener ways of working (processes, policies)","scale"],
+        ["My manager stresses the importance of sustainability in decisions and behaviour","scale"],
+        ["The organisation gets its message across well on sustainability topics","scale"],
+        ["My team actively hunts for ways to shrink our footprint and work more sustainably day to day","scale"],
+        ["We build our products and services with the environment in mind","scale"],
+        ["Sustainability shows up in the goals we're set","scale"],
+        ["Our benefits (e.g. commuting allowance) are set up to nudge us towards sustainable choices","scale"],
+        ["In my part of the business, we weigh up how sustainable our suppliers and providers are when we decide","scale"],
+        ["I'm nudged to put forward sustainability ideas","scale"]
+      ]]
+    ]
+  };
+
+  /* Template meta, mirroring create-survey-dialog.html */
+  var TEMPLATE_META = {
+    "Strategic Fitness Model": { img: "sf-template", meta: "Standard template \u00b7 22 questions \u00b7 4 minutes" },
+    "World-class workplace Scan": { img: "wcwp-template", meta: "Standard template \u00b7 15 questions \u00b7 3 minutes" },
+    "Diversity, Equity & Inclusion (DEI)": { img: "dei-template", meta: "Standard template \u00b7 44 questions \u00b7 8 minutes" },
+    "Smart Organization Scan - Pulse": { img: "sos-template", meta: "Standard template \u00b7 9 questions \u00b7 2 minutes" },
+    "Smart Organization Scan - Survey": { img: "sos-template", meta: "Standard template \u00b7 34 questions \u00b7 6 minutes" },
+    "Psychological Risk Assessment": { img: "psa-template", meta: "Standard template \u00b7 10 questions \u00b7 2 minutes" },
+    "ESG Scan": { img: "esg-template", meta: "Standard template \u00b7 31 questions \u00b7 7 minutes" }
+  };
+
+  /* Which survey this screen is showing. The create flow hands these over on the URL:
+     ?template=<template name>&name=<survey name>. Defaults keep the file useful on its own. */
+  var params = new URLSearchParams(location.search);
+  var templateName = params.get('template') || 'Strategic Fitness Model';
+  var surveyName = params.get('name') || 'Test Template View';
+  /* Where the create flow started, carried over by create-survey-dialog. "Save & Close"
+     drops the user back on that overview — All surveys, or the Projects overview when the
+     flow began inside a project (there is no project-detail reference screen yet). */
+  var RETURN_TO = params.get('context') === 'project'
+    ? 'prototypes/projects.html'
+    : 'prototypes/create-survey-dialog.html';
+  if (!QUESTIONNAIRES[templateName]) templateName = 'Strategic Fitness Model';
+  var meta = TEMPLATE_META[templateName];
+
+  var SCALE_TYPES = {
+    scale:  ['point-scale', '5-point scale'],
+    choice: ['check-square', 'Multiple choice'],
+    open:   ['text-entry', 'Open-ended question'],
+    nps:    ['net-promoter-score', '0\u201310 scale'],
+    yesno:  ['single-answer', 'Yes / No']
+  };
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* The four setup steps. Every step is optional and pre-filled, so "Layout & emails"
+     is done from the start; coming from a template the questions are already chosen
+     and fixed, so "Questions" is done too. Set done:false to see the pending state. */
+  var STEPS = [
+    { title: 'Questions',       icon: 'check-square', sub: '', done: true,  active: true },
+    { title: 'Participants',    icon: 'users',        sub: 'Select participants', done: false, active: false },
+    { title: 'Survey period',   icon: 'calendar',     sub: 'Select period',       done: false, active: false },
+    { title: 'Layout &amp; emails', icon: 'layout',   sub: 'Survey: Effectory default<br />Email: Effectory default', done: true, active: false }
+  ];
+
+  document.getElementById('steps').innerHTML = STEPS.map(function (st, i) {
+    var cls = 'cyos-step' + (st.active ? ' is-active' : '') + (st.done ? ' is-done' : '');
+    // done → check, otherwise the step number
+    var badge = st.done ? '<i data-icon="check"></i>' : (i + 1);
+    return (i ? '<span class="cyos-step-sep"><i data-icon="chevron-right"></i></span>' : '') +
+      '<button class="' + cls + '"' + (st.active ? ' aria-current="step"' : '') + '>' +
+        '<span class="cyos-step-badge">' +
+          '<span class="cyos-step-circle">' + badge + '</span>' +
+          '<span class="cyos-step-tile"><i data-icon="' + st.icon + '"></i></span>' +
+        '</span>' +
+        '<span class="cyos-step-body">' +
+          '<p class="text-l5 cyos-step-title">' + st.title + '</p>' +
+          (st.sub ? '<p class="text-small text-w500 cyos-step-sub">' + st.sub + '</p>' : '') +
+        '</span>' +
+      '</button>';
+  }).join('');
+
+  document.getElementById('surveyName').textContent = surveyName;
+  document.getElementById('tmplName').textContent = templateName;
+  document.getElementById('tmplMeta').textContent = meta.meta;
+  document.getElementById('tmplImg').src = 'assets/illustrations/templates/' + meta.img + '.svg';
+  document.title = 'Survey settings - ' + surveyName + ' - My Effectory';
+
+  // the Questions step summarises the template: "N questions \u00b7 N mins"
+  var counts = meta.meta.match(/(\d+)\s+questions.*?(\d+)\s+minutes/);
+  if (counts) {
+    var qStep = document.querySelector('.cyos-step .cyos-step-body');
+    var sub = document.createElement('p');
+    sub.className = 'text-small text-w500 cyos-step-sub';
+    sub.textContent = counts[1] + ' questions \u00b7 ' + counts[2] + ' mins';
+    qStep.appendChild(sub);
+  }
+
+  // Questionnaire — one card of rows per section, headed by the section + a count pill
+  document.getElementById('questionnaire').innerHTML = QUESTIONNAIRES[templateName].map(function (sec) {
+    return '<div class="q-topic">' +
+      '<div class="q-head">' +
+        '<h2 class="text-l5">' + esc(sec[0]) + '</h2>' +
+        '<span class="q-count">' + sec[1].length + '</span>' +
+      '</div>' +
+      '<div class="q-list">' +
+        sec[1].map(function (q) {
+          var t = SCALE_TYPES[q[1]] || SCALE_TYPES.scale;
+          return '<div class="q-row">' +
+            '<div class="text-medium text-w500 q-text">' + esc(q[0]) + '</div>' +
+            '<div class="text-medium q-scale">' +
+              '<span class="q-scale-icon is-' + q[1] + '"><i data-icon="' + t[0] + '"></i></span>' +
+              '<span>' + esc(t[1]) + '</span>' +
+            '</div>' +
+            '<span class="tag is-standard">Standard</span>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Save & Close — leave the survey as a draft and go back where you came from.
+  // Nothing is persisted; the draft already exists from the moment it was created.
+  document.querySelector('[data-saveclose]').addEventListener('click', function () {
+    location.href = RETURN_TO;
+  });
+
+  if (window.Icons) window.Icons.render();
+</script>
+</body>
+</html>
