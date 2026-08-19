@@ -1,4 +1,4 @@
-# Reference prototype — Create survey → Choose a survey template
+# Reference prototype — Template selection dialog ("Choose a survey template")
 
 Canonical implementation: [`create-survey-dialog.html`](create-survey-dialog.html) (in this folder).
 When the user asks for "the create survey dialog", "the template picker", "kies een survey-template"

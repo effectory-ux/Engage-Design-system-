@@ -1,4 +1,4 @@
-# Reference prototype — Survey settings, Questions step
+# Reference prototype — CYOS template questionnaire page (Questions step)
 
 Canonical implementation: [`survey-settings-questionnaire.html`](survey-settings-questionnaire.html)
 (in this folder). When the user asks for "the survey settings screen", "the questions step", "the CYOS
