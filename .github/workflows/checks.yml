@@ -27,3 +27,9 @@ jobs:
       # deliberately does not copy them, so nothing else keeps the two in step.
       - name: both skill copies carry the same content
         run: ./tools/check-skill-consistency.py
+
+      # A path inside a CSS file resolves next to that file, not next to the page
+      # including it. When one breaks the page still loads, it just renders without
+      # tokens — so nothing catches it except looking.
+      - name: docs pages and stylesheets resolve
+        run: ./tools/check-docs-assets.py
