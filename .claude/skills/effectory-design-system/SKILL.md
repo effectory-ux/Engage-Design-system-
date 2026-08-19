@@ -267,6 +267,21 @@ vragen. De gebruiker krijgt dan klikbare opties in plaats van een lap tekst, en 
 Voeg zélf geen "Other"-optie toe; die komt er automatisch bij, zodat de gebruiker altijd een eigen track
 of naam kan typen. Is de tool in deze omgeving niet beschikbaar, vraag het dan gewoon in tekst.
 
+**Vraag ook het scherm zo, als eerste stap.** Weet je nog niet wat iemand wil bouwen, stel die vraag dan
+óók met `AskUserQuestion` in plaats van als lap tekst. De gebruiker heeft dan altijd een invulveld bij de
+hand in plaats van een open vraag:
+
+| Vraag | Header | Opties |
+|---|---|---|
+| Welk scherm of welke flow wil je bouwen? | `Scherm` | Resultaten-dashboard · My Effectory pagina · Losse component-demo |
+
+De automatische "Other" is dat invulveld: daarin beschrijft de gebruiker een eigen scherm, en voor een
+nieuw scherm is dat gewoon het normale antwoord. Stel deze vraag **apart**, niet samen met de track en de
+naam — de naamvoorstellen uit regel 13 kun je pas doen als je weet wát je bouwt.
+
+**De zichtbaarheid hoort er niet bij.** Die vraag komt pas ná het bouwen (regel 15). Kondig hem vooraf
+dus ook niet aan.
+
 ---
 
 ### 13. Vraag hoe het prototype moet heten
@@ -382,7 +397,7 @@ dezelfde kaart.
 ## Workflow
 
 1. **Lees de reference** — laad `design-system-reference.md` volledig
-2. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
+2. **Begrijp de vraag** — welk scherm, welke componenten, welke flow? Vraag het scherm met `AskUserQuestion` (regel 12)
 3. **Vraag naam + track** — één `AskUserQuestion` met beide vragen (regel 12 en 13)
 4. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
