@@ -694,5 +694,7 @@ Het prototype-systeem (`.claude/skills/effectory-design-system/`) leunt op drie 
 - **Fundament gewijzigd** (spacing, radius of shadows in `:root` van `styles.css`)? Werk `foundation.css` overeenkomstig bij.
 - **Nieuwe of gewijzigde componenten, varianten, tokens of iconen?** Werk `.claude/skills/effectory-design-system/design-system-reference.md` bij.
 - **`tokens.css` is auto-gegenereerd** via `build-tokens.py` vanuit Figma — bewerk het **nooit** met de hand. Wijzig tokens in Figma en draai daarna `python3 build-tokens.py`.
+- **`SKILL.md` schrijf je hier, nooit in `effectory-design-documentation`.** Die repo heeft een kopie van de skill, maar die is stroomafwaarts: ververs hem vanuit deze repo, nooit andersom. Doe je het toch omgekeerd, dan bouwt `release-skill.sh` uit `skill-source/` en levert het team een oudere versie — dat ging op 19-08-2026 net goed omdat het toevallig opviel.
+- **Controleer beide skill-kopieën** met `./check-skill-consistency.py`: dezelfde regels, dezelfde referentieschermen, dezelfde `reference-prototypes/`-mappen, en geen verwijzing naar een regel die niet bestaat. Draait mee in `./sync-skill.sh`.
 - **Controleer de drift** met `./check-reference-drift.py`. Die vergelijkt de classes in `components.css` met wat er in de reference staat en faalt op een component die nergens in de reference voorkomt. `./sync-skill.sh` draait hem automatisch en breekt af als het misgaat (omzeilen: `SKIP_DRIFT_CHECK=1`).
 - Raken deze bestanden uit sync met de docs, dan bouwt het team prototypes met verouderde of ontbrekende componenten.

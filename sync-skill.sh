@@ -5,7 +5,10 @@
 # What it checks first:
 #   - check-reference-drift.py — fails the sync if components.css has a component
 #     that design-system-reference.md never mentions (the skill would refuse to
-#     use it). Bypass with SKIP_DRIFT_CHECK=1.
+#     use it).
+#   - check-skill-consistency.py — fails the sync if the two SKILL.md copies or
+#     the two reference-prototypes folders have drifted apart.
+#   Bypass both with SKIP_DRIFT_CHECK=1.
 #
 # What it syncs:
 #   - design-system-reference.md  (from .claude/skills/...)
@@ -23,14 +26,23 @@ PROJECT_SKILL="$ROOT/.claude/skills/effectory-design-system"
 SKILL_SRC="$ROOT/skill-source"
 BUNDLE="$SKILL_SRC/design-system-files"
 
-# The reference doc is hand-maintained, so components.css can gain a component
-# the reference never mentions — and the skill refuses to use what the reference
-# does not list. Catch that before it ships. Override with SKIP_DRIFT_CHECK=1.
+# Two hand-maintained things can silently rot, and both would ship:
+#   - components.css gaining a component the reference never mentions, which the
+#     skill then refuses to use
+#   - the two SKILL.md copies or the two reference-prototypes folders drifting
+# Catch both before the bundle is touched. Override with SKIP_DRIFT_CHECK=1.
 if [ "${SKIP_DRIFT_CHECK:-0}" != "1" ]; then
   if ! "$ROOT/check-reference-drift.py"; then
     echo ""
     echo "✗ Sync aborted: components.css and design-system-reference.md are out of sync."
     echo "  Fix the reference, or re-run with SKIP_DRIFT_CHECK=1 to sync anyway."
+    exit 1
+  fi
+  echo ""
+  if ! "$ROOT/check-skill-consistency.py"; then
+    echo ""
+    echo "✗ Sync aborted: the two skill copies do not carry the same content."
+    echo "  Fix them, or re-run with SKIP_DRIFT_CHECK=1 to sync anyway."
     exit 1
   fi
   echo ""
@@ -58,7 +70,8 @@ rm -rf "$BUNDLE/assets"
 echo ""
 echo "✓ skill-source/ in sync."
 echo ""
-echo "Reminder: if you edited the rules in SKILL.md, update them in BOTH places:"
+echo "Reminder: SKILL.md is written HERE, never in effectory-design-documentation."
+echo "That copy is downstream; refresh it from this one. Both places here:"
 echo "  - $PROJECT_SKILL/SKILL.md (project skill, used in Claude Code locally)"
 echo "  - $SKILL_SRC/SKILL.md (org skill, distributed to the team)"
 echo ""

@@ -78,6 +78,39 @@ Vraagt iemand expliciet om één specifiek tabblad (bijv. "scores pagina", "repo
 
 ---
 
+## Een scherm toevoegen als referentie
+
+Zegt iemand dat een scherm **in de skill** moet — met screenshots, een Figma-link of een af prototype —
+dan wordt het een referentie-prototype: vanaf dan bouwt niemand dat scherm nog opnieuw.
+
+**Vraag deze acht dingen vóór je iets aanmaakt.** Wat je niet vraagt, staat er straks niet in, en wat er
+niet in staat bestaat niet voor de skill. Gebruik `AskUserQuestion` waar de opties op te noemen zijn
+(vraag 4 en 8) en gewoon tekst voor de rest.
+
+| # | Vraag | Waar het antwoord landt |
+|---|---|---|
+| 1 | Hoe noem je dit scherm? | bestandsnaam, titel van het `.md` |
+| 2 | Waar zit het in de app, en wie ziet het (coordinator/manager/medewerker)? | *What the screen is*, en welke app-shell eromheen hoort |
+| 3 | **Hoe zou iemand hierom vragen? Drie tot vijf formuleringen, NL én EN.** | de registratie in `SKILL.md` — hier hangt het herkennen volledig van af |
+| 4 | Compleet scherm, tabblad, of side panel / dialog? | eigen bestand + URL, of onderdeel van een ander scherm (regel 14) |
+| 5 | Wat ligt vast en wat mag aangepast? | *Behaviour (the rules)* |
+| 6 | Welke states horen erbij (leeg, gevuld, geselecteerd, fout, laden)? | *Behaviour*, en wat je moet bouwen |
+| 7 | Wat is nep — verzonnen data, tabs die niet werken, een chart zonder library? | *Prototype-only (simulation, not production)* |
+| 8 | Is dit goedgekeurd, en door wie? | geen akkoord = geen referentie, maar een gewoon prototype |
+
+**Vraag 3 is de belangrijkste.** De skill herkent een scherm op intentie, niet op een exacte zin. Zonder
+die formuleringen wordt de referentie later niet gevonden en bouwt Claude alsnog iets nieuws — precies wat
+je wilde voorkomen.
+
+**Krijg je screenshots**, vraag er dan bij: is dit de eindstaat of een tussenversie, staat er echte tekst
+in of placeholders, zijn het meerdere schermen of meerdere states van hetzelfde scherm, en welke
+Figma-link hoort erbij.
+
+**Daarna, en pas daarna:** schrijf het `.md` in het vaste format (*What the screen is · Behaviour (the
+rules) · Components used · Prototype-only*), zet `.html` + `.md` in **beide** `reference-prototypes/`-mappen,
+registreer het scherm in **beide** `SKILL.md`-bestanden met de formuleringen uit vraag 3, en draai
+`./check-skill-consistency.py` voor je releaset. Die controleert of je alle vier de plekken gehad hebt.
+
 ## Scope
 
 | Bouwen | Niet bouwen |
