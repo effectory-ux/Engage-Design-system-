@@ -256,28 +256,23 @@ Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat
 het antwoord in de oplevering, zodat het prototype met de juiste `group` in
 [`prototypes.json`](https://github.com/effectory-ux/prototypes) van de projects-pagina kan.
 
-**Stel deze vraag met de `AskUserQuestion`-tool**, samen met de naam uit regel 13 — één aanroep met twee
-vragen. De gebruiker krijgt dan klikbare opties in plaats van een lap tekst, en het scheelt een heen-en-weer:
+**Stel deze vragen met de `AskUserQuestion`-tool — één aanroep, in deze volgorde.** De gebruiker krijgt
+klikbare opties met een invulveld in plaats van een lap tekst, en het scheelt drie keer heen en weer:
 
-| Vraag | Header | Opties |
-|---|---|---|
-| Bij welke track hoort dit prototype? | `Track` | Surveying · Leadership enablement · Reporting · Platform |
-| Hoe moet dit prototype heten? | `Naam` | 2–3 voorstellen op basis van het scherm |
+| # | Vraag | Header | Opties |
+|---|---|---|---|
+| 1 | Hoe moet dit prototype heten? | `Naam` | 2–3 voorstellen (zie hieronder) |
+| 2 | Welk scherm of welke flow wil je bouwen? | `Scherm` | Resultaten-dashboard · My Effectory pagina · Losse component-demo |
+| 3 | Bij welke track hoort dit prototype? | `Track` | Surveying · Leadership enablement · Reporting · Platform |
 
-Voeg zélf geen "Other"-optie toe; die komt er automatisch bij, zodat de gebruiker altijd een eigen track
-of naam kan typen. Is de tool in deze omgeving niet beschikbaar, vraag het dan gewoon in tekst.
+**De naam staat vooraan — vraag hem vóór het scherm, niet erna.** Baseer de voorstellen op wat de aanvraag
+al prijsgeeft ("een settings-pagina voor CSM results" → "CSM result settings"). Geeft de aanvraag weinig
+houvast, doe dan alsnog je beste gok: elke vraag heeft minstens twee opties nodig, en de gebruiker typt er
+toch overheen in het invulveld. Benoem het onderwerp, niet de plek waar het gesprek begon.
 
-**Vraag ook het scherm zo, als eerste stap.** Weet je nog niet wat iemand wil bouwen, stel die vraag dan
-óók met `AskUserQuestion` in plaats van als lap tekst. De gebruiker heeft dan altijd een invulveld bij de
-hand in plaats van een open vraag:
-
-| Vraag | Header | Opties |
-|---|---|---|
-| Welk scherm of welke flow wil je bouwen? | `Scherm` | Resultaten-dashboard · My Effectory pagina · Losse component-demo |
-
-De automatische "Other" is dat invulveld: daarin beschrijft de gebruiker een eigen scherm, en voor een
-nieuw scherm is dat gewoon het normale antwoord. Stel deze vraag **apart**, niet samen met de track en de
-naam — de naamvoorstellen uit regel 13 kun je pas doen als je weet wát je bouwt.
+Voeg zélf geen "Other"-optie toe. Die komt er automatisch bij en is meteen het invulveld waarin de
+gebruiker een eigen naam, scherm of track typt — voor een nieuw scherm is dat gewoon het normale antwoord.
+Is de tool in deze omgeving niet beschikbaar, vraag het dan in tekst, in dezelfde volgorde.
 
 **De zichtbaarheid hoort er niet bij.** Die vraag komt pas ná het bouwen (regel 15). Kondig hem vooraf
 dus ook niet aan.
@@ -293,9 +288,9 @@ hernoemen kost een nieuwe URL, en gedeelde links breken daarop.
   schermen, dan komt het scherm erachter (regel 14).
 - **Kaartnaam:** de naam zoals de gebruiker hem uitspreekt, op de kaart op de projects-pagina (regel 15).
 
-Weet de gebruiker het nog niet, doe dan een voorstel op basis van het scherm en laat het bevestigen.
-Benoem het onderwerp, niet de plek waar het toevallig begon: "CSM result settings" zegt meer dan
-"results overview". Vraag dit met `AskUserQuestion`, in dezelfde aanroep als de track (regel 12).
+Weet de gebruiker het nog niet, doe dan een voorstel en laat het bevestigen. Benoem het onderwerp, niet
+de plek waar het toevallig begon: "CSM result settings" zegt meer dan "results overview". Dit is de
+**eerste** vraag van de `AskUserQuestion`-aanroep uit regel 12, vóór het scherm en de track.
 
 ---
 
@@ -397,8 +392,8 @@ dezelfde kaart.
 ## Workflow
 
 1. **Lees de reference** — laad `design-system-reference.md` volledig
-2. **Begrijp de vraag** — welk scherm, welke componenten, welke flow? Vraag het scherm met `AskUserQuestion` (regel 12)
-3. **Vraag naam + track** — één `AskUserQuestion` met beide vragen (regel 12 en 13)
+2. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
+3. **Vraag naam, scherm en track** — één `AskUserQuestion`, naam eerst (regel 12 en 13)
 4. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
 5. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
