@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skeleton — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Skeleton — placeholder shapes that mimic content while it loads ── */
+    @keyframes skeleton-pulse { 0%, 100% { background-color: var(--border-base); } 50% { background-color: var(--bg-base-pressed); } }
+    .skeleton { background-color: var(--border-base); border-radius: var(--radius-base); animation: skeleton-pulse 1s ease-in infinite; }
+    .skeleton-text   { height: 12px; border-radius: var(--radius-sm); }
+    .skeleton-title  { height: 20px; border-radius: var(--radius-sm); }
+    .skeleton-circle { border-radius: var(--radius-full); flex-shrink: 0; }
+    .skeleton-block  { border-radius: var(--radius-md); }
+    @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+
+    /* composition demo */
+    .sk-card { width: 320px; max-width: 100%; padding: 20px; border: 1px solid var(--border-base); border-radius: var(--radius-lg); background: var(--bg-base); }
+    .sk-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .sk-lines { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+    .anatomy-fig { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 40px; margin-bottom: 24px; display: flex; justify-content: center; }
+    .anatomy-fig .sk-card { background: var(--bg-base); }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Skeleton</h1>
+      <p class="page-desc">Placeholder shapes that mimic the layout of content while it loads. They set expectations and make a screen feel faster than a spinner when you know what's coming.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">Simple shapes — lines, circles and blocks — arranged in the same layout as the content they stand in for, with a soft pulse.</p>
+          <div class="anatomy-fig">
+            <div class="sk-card" aria-hidden="true">
+              <div class="sk-row">
+                <div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div>
+                <div class="sk-lines">
+                  <div class="skeleton skeleton-title" style="width:55%;"></div>
+                  <div class="skeleton skeleton-text" style="width:35%;"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-block" style="height:120px; margin-bottom:16px;"></div>
+              <div class="skeleton skeleton-text" style="width:100%; margin-bottom:8px;"></div>
+              <div class="skeleton skeleton-text" style="width:80%;"></div>
+            </div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Line</span> — A placeholder for a line of text; the last line is usually shorter.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Circle</span> — Stands in for an avatar or round icon.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Block</span> — A larger area for an image, thumbnail or chart.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Pulse</span> — A soft pulse between two greys that signals the screen is loading, not frozen.</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Use a skeleton when you know the layout that's coming — lists, cards, tables, a profile header. For a short or unpredictable wait, a Loading spinner is simpler; for measurable progress, a Progress Bar.</p>
+
+          <h3 class="text-l4">Mirror the real layout</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px;">
+                <div style="width:240px;" aria-hidden="true">
+                  <div class="skeleton skeleton-title" style="width:60%; margin-bottom:12px;"></div>
+                  <div class="skeleton skeleton-text" style="width:100%; margin-bottom:8px;"></div>
+                  <div class="skeleton skeleton-text" style="width:90%; margin-bottom:8px;"></div>
+                  <div class="skeleton skeleton-text" style="width:70%;"></div>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                Shapes that match the headings and text that will load.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px;">
+                <div aria-hidden="true"><div class="skeleton skeleton-circle" style="width:80px;height:80px;"></div></div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                A lone shape that doesn't reflect the real layout — use a spinner instead.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">Compose a skeleton from a few primitive shapes; size them to match the content.</p>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn" style="padding:24px;"><div class="skeleton skeleton-text" style="width:180px;"></div></div>
+              <div class="variant-row-desc"><strong>Line</strong> — A text line (12px tall). Vary the width per line; make the last one shorter for a natural look.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn" style="padding:24px;"><div class="skeleton skeleton-title" style="width:180px;"></div></div>
+              <div class="variant-row-desc"><strong>Title</strong> — A taller line (20px) for headings.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn" style="padding:24px;"><div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div></div>
+              <div class="variant-row-desc"><strong>Circle</strong> — For an avatar or round icon; match the avatar size (e.g. 32 / 40px).</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn" style="padding:24px;"><div class="skeleton skeleton-block" style="width:200px;height:96px;"></div></div>
+              <div class="variant-row-desc"><strong>Block</strong> — A rectangle for images, thumbnails or charts; set its width and height.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="states">
+          <h2 class="text-l3">States</h2>
+          <p class="section-lead">A skeleton has one state — loading — and is then replaced by the real content.</p>
+          <div class="states-row">
+            <div class="state-col"><span class="state-lbl">Loading</span><div style="width:200px;" aria-hidden="true"><div class="skeleton skeleton-text" style="width:100%; margin-bottom:8px;"></div><div class="skeleton skeleton-text" style="width:70%;"></div></div></div>
+            <div class="state-col"><span class="state-lbl">Loaded</span><div style="width:200px; font-size:14px; color:var(--content-base); line-height:1.6;">The real content takes the same space the skeleton held.</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">A neutral placeholder fill with a lighter shimmer sweep.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--border-base</code></td><td>Placeholder fill (rest)</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--bg-base-pressed</code></td><td>Pulse highlight</td><td>#f1f2f4</td></tr>
+              <tr><td><code>--radius-sm</code></td><td>Text line radius</td><td>4px</td></tr>
+              <tr><td><code>--radius-md</code></td><td>Block radius</td><td>8px</td></tr>
+              <tr><td><code>--radius-full</code></td><td>Circle</td><td>999px</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:14px; color:var(--content-secondary);">Pulse: the fill eases between <code>--border-base</code> and <code>--bg-base-pressed</code> every ~1s — matching the styleguide's table loader. Honours <code>prefers-reduced-motion</code> (static fill).</p>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Skeletons are decorative — the loading state is what needs to be announced.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Hide the shapes.</strong> Mark skeletons <code>aria-hidden="true"</code> so screen readers don't read empty placeholders.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Announce loading.</strong> Set <code>aria-busy="true"</code> on the region and expose a status (e.g. a visually-hidden "Loading") so the wait is perceivable.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Swap, don't shift.</strong> The skeleton should occupy the same space as the real content to avoid layout jumps when it loads.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Respect reduced motion.</strong> The shimmer stops under <code>prefers-reduced-motion</code>; the static placeholder still communicates loading.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="progress-bar-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Progress Bar</span></a>
+          <a class="pag-card right" href="table-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Table</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#states">States</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Build a card skeleton from the primitive shapes.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="padding:40px; justify-content:center;"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">avatar</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-avatar" checked><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">image</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-image" checked><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">text lines</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-lines"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></div></div>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Compose skeletons from the <code>.skeleton</code> base plus a shape modifier; size each shape with inline width/height to match the real content.</p>
+
+          <h3 class="text-l4">Shapes</h3>
+          <div class="dev-preview" style="padding:24px; flex-direction:column; gap:12px; align-items:flex-start;">
+            <div class="skeleton skeleton-text" style="width:200px;"></div>
+            <div class="skeleton skeleton-title" style="width:160px;"></div>
+            <div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div>
+            <div class="skeleton skeleton-block" style="width:220px;height:80px;"></div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-text"</span> <span class="ca">style</span>=<span class="cv">"width:200px"</span><span class="ct">&gt;&lt;/div&gt;</span>
+<span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-title"</span> <span class="ca">style</span>=<span class="cv">"width:160px"</span><span class="ct">&gt;&lt;/div&gt;</span>
+<span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-circle"</span> <span class="ca">style</span>=<span class="cv">"width:40px;height:40px"</span><span class="ct">&gt;&lt;/div&gt;</span>
+<span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-block"</span> <span class="ca">style</span>=<span class="cv">"width:220px;height:80px"</span><span class="ct">&gt;&lt;/div&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Card skeleton</h3>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">aria-busy</span>=<span class="cv">"true"</span> <span class="ca">aria-label</span>=<span class="cv">"Loading"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-circle"</span> <span class="ca">style</span>=<span class="cv">"width:40px;height:40px"</span><span class="ct">&gt;&lt;/div&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-text"</span> <span class="ca">style</span>=<span class="cv">"width:80%"</span><span class="ct">&gt;&lt;/div&gt;</span>
+  <span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"skeleton skeleton-text"</span> <span class="ca">style</span>=<span class="cv">"width:60%"</span><span class="ct">&gt;&lt;/div&gt;</span>
+<span class="ct">&lt;/div&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Table loading</h3>
+          <p>In a <code>mat-table</code>, the styleguide fills each cell with a pulsing <code>.loading-bar</code> (full-width, ~12px tall, 8px radius) — the same pulse as the skeleton above.</p>
+          <div class="dev-preview" style="padding:24px; flex-direction:column; gap:14px; align-items:stretch;">
+            <div class="skeleton skeleton-text" style="width:100%;height:12px;"></div>
+            <div class="skeleton skeleton-text" style="width:100%;height:12px;"></div>
+            <div class="skeleton skeleton-text" style="width:100%;height:12px;"></div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="cc">&lt;!-- one per cell while the row loads --&gt;</span>
+<span class="ct">&lt;td&gt;&lt;span</span> <span class="ca">class</span>=<span class="cv">"loading-bar"</span><span class="ct">&gt;&lt;/span&gt;&lt;/td&gt;</span></code></pre>
+          </div>
+
+          <div class="dev-gap">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Confirm the Angular API</span>
+              <span class="dev-gap-text">The styleguide uses a pulsing <code>.loading-bar</code> for table loading, but has no general skeleton component for arbitrary layouts (cards, headers, lists). The <code>.skeleton</code> classes here are the design-system pattern; align on a shared <code>.loading-bar</code> / <code>eff-skeleton</code> approach with engineering before building.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Class reference</h2>
+          <p class="section-lead">Prototype classes for skeleton shapes (<code>components.css</code>).</p>
+          <table class="token-table">
+            <thead><tr><th>Class</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>.skeleton</code></td><td>Base placeholder fill + shimmer. Combine with a shape class.</td></tr>
+              <tr><td><code>.skeleton-text</code></td><td>Text line (12px tall). Set width inline.</td></tr>
+              <tr><td><code>.skeleton-title</code></td><td>Heading line (20px tall).</td></tr>
+              <tr><td><code>.skeleton-circle</code></td><td>Round (avatar/icon). Set width &amp; height inline.</td></tr>
+              <tr><td><code>.skeleton-block</code></td><td>Rectangle (image/chart). Set width &amp; height inline.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The placeholder is themed with these tokens.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--border-base</code></td><td>Placeholder fill (rest)</td></tr>
+              <tr><td><code>--bg-base-pressed</code></td><td>Pulse highlight</td></tr>
+              <tr><td><code>--radius-sm</code> · <code>--radius-md</code> · <code>--radius-full</code></td><td>Line / block / circle radius</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Hide the shapes; announce the loading state.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>aria-hidden.</strong> Put <code>aria-hidden="true"</code> on skeleton shapes.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>aria-busy.</strong> Set <code>aria-busy="true"</code> on the loading region; remove it (and the skeletons) when content arrives.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>No layout shift.</strong> Match the skeleton's size to the content it replaces.</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-usage">Usage</a>
+          <a class="toc-link" href="#dev-props">Class reference</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+    const defaults = { avatar: true, image: true, lines: '3' };
+    const WIDTHS = ['90%', '100%', '75%', '60%'];
+    function state(){ return { avatar: document.getElementById('pg-avatar').checked, image: document.getElementById('pg-image').checked, lines: +document.getElementById('pg-lines').value }; }
+    function build(s){
+      let h = '<div class="sk-card" aria-busy="true" aria-label="Loading">';
+      if (s.avatar) {
+        h += '<div class="sk-row"><div class="skeleton skeleton-circle" style="width:40px;height:40px;"></div><div class="sk-lines"><div class="skeleton skeleton-title" style="width:55%;"></div><div class="skeleton skeleton-text" style="width:35%;"></div></div></div>';
+      }
+      if (s.image) h += '<div class="skeleton skeleton-block" style="height:120px;margin-bottom:16px;"></div>';
+      for (let i = 0; i < s.lines; i++) {
+        h += `<div class="skeleton skeleton-text" style="width:${WIDTHS[i % WIDTHS.length]};${i < s.lines - 1 ? 'margin-bottom:8px;' : ''}"></div>`;
+      }
+      return h + '</div>';
+    }
+    function buildCode(s){
+      const L = ['<div class="sk-card" aria-busy="true" aria-label="Loading">'];
+      if (s.avatar) {
+        L.push('  <div class="sk-row">');
+        L.push('    <div class="skeleton skeleton-circle" style="width:40px;height:40px"></div>');
+        L.push('    <div class="sk-lines">');
+        L.push('      <div class="skeleton skeleton-title" style="width:55%"></div>');
+        L.push('      <div class="skeleton skeleton-text" style="width:35%"></div>');
+        L.push('    </div>');
+        L.push('  </div>');
+      }
+      if (s.image) L.push('  <div class="skeleton skeleton-block" style="height:120px"></div>');
+      for (let i = 0; i < s.lines; i++) L.push(`  <div class="skeleton skeleton-text" style="width:${WIDTHS[i % WIDTHS.length]}"></div>`);
+      L.push('</div>');
+      return L.join('\n');
+    }
+    function render(){
+      const s = state();
+      $preview.innerHTML = build(s);
+      document.getElementById('pg-code').textContent = buildCode(s);
+    }
+    ['pg-avatar','pg-image','pg-lines'].forEach(id=>document.getElementById(id).addEventListener('change', render));
+    document.getElementById('pg-reset')?.addEventListener('click',()=>{ document.getElementById('pg-avatar').checked=defaults.avatar; document.getElementById('pg-image').checked=defaults.image; document.getElementById('pg-lines').value=defaults.lines; render(); });
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+    render();
+  })();
+</script>
+</body>
+</html>

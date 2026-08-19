@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Announcement Card — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Announcement — floating, non-blocking feature card ── */
+    .announcement {
+      position: relative;
+      width: 260px; max-width: 260px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-base);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--sh-dialogs);
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+    }
+    /* full-bleed illustration (eff-tooltip-dialog [svgUrl]); coloured placeholder shown when no image */
+    .ann-media { height: 168px; background: var(--bg-brand); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.85); }
+    .ann-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ann-media-ph { display: flex; width: 40px; height: 40px; opacity: .5; }
+    .ann-body { padding: 20px; }
+    /* scoped to beat the global `.content p` rule (specificity) */
+    .announcement .ann-title { font-size: 16px; font-weight: 600; line-height: 1.5; margin: 0 0 8px; color: var(--content-base); } /* text-l5 */
+    .announcement .ann-text  { font-size: 14px; font-weight: 400; line-height: 1.6; margin: 0; color: var(--content-secondary); }
+    /* actions stack full-width (primary CTA only; dismiss is now an icon button over the illustration) */
+    .ann-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .ann-actions .btn { width: 100%; }
+    /* dismiss: small secondary icon button pinned top-right over the illustration */
+    .ann-close { position: absolute; top: 12px; right: 12px; z-index: 2; }
+    /* when there's no illustration the close sits over the body — keep the title clear of it
+       (covers both: no media element at all, and a present-but-collapsed media element) */
+    .ann-close + .ann-body .ann-title,
+    .ann-media.is-collapsed + .ann-body .ann-title { padding-right: 28px; }
+
+    /* canonical button set (matches the Button page) */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: var(--radius-base); border: 1px solid transparent; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all .1s; text-decoration: none; }
+    .btn-primary { background: var(--bg-brand); border-color: var(--border-brand); color: var(--content-on-brand-base); box-shadow: var(--sh-action); }
+    .btn-primary:hover, .btn-primary.is-hover { background: var(--bg-brand-hover); border-color: var(--bg-brand-pressed); }
+    .btn-primary:active, .btn-primary.is-pressed { background: var(--bg-brand-pressed); border-color: var(--border-brand-pressed); }
+    /* tertiary (ghost) dismiss */
+    .btn-tertiary { background: transparent; border-color: transparent; color: var(--content-secondary); }
+    .btn-tertiary:hover, .btn-tertiary.is-hover { background: var(--bg-base-hover); color: var(--content-base); }
+
+    /* ── stacked: real cards behind the front one (card deck) ── */
+    .ann-deck { position: relative; width: 260px; }
+    .ann-deck .announcement { transition: transform .42s cubic-bezier(.3,.1,.3,1), opacity .42s ease; }
+    .ann-front { position: relative; z-index: 5; }
+    /* cards behind sit progressively higher (gaps 12 → 10 → 8 → 6px) — same opacity, depth comes from the offset + scale */
+    .ann-b1 { position: absolute; inset: 0; z-index: 4; transform: translateY(-12px) scale(.95); transform-origin: top center; pointer-events: none; }
+    .ann-b2 { position: absolute; inset: 0; z-index: 3; transform: translateY(-22px) scale(.90); transform-origin: top center; pointer-events: none; }
+    .ann-b3 { position: absolute; inset: 0; z-index: 2; transform: translateY(-30px) scale(.85); transform-origin: top center; pointer-events: none; }
+    .ann-b4 { position: absolute; inset: 0; z-index: 1; transform: translateY(-36px) scale(.80); transform-origin: top center; pointer-events: none; }
+    /* advancing — every layer promotes one step at once, all motion downward */
+    .ann-front.is-leaving { transform: translateY(150px); opacity: 0; pointer-events: none; }
+    .ann-b1.is-promoting  { transform: translateY(0) scale(1); }
+    .ann-b2.is-promoting  { transform: translateY(-12px) scale(.95); }
+    .ann-b3.is-promoting  { transform: translateY(-22px) scale(.90); }
+    .ann-b4.is-promoting  { transform: translateY(-30px) scale(.85); }
+    @media (prefers-reduced-motion: reduce) { .ann-deck .announcement { transition: none; } }
+
+    .anatomy-fig { position: relative; background: var(--bg-secondary); border-radius: 12px; padding: 48px 40px; margin-bottom: 24px; display: flex; justify-content: center; }
+    .anatomy-fig .announcement { pointer-events: none; }
+    .ann-prev { display: flex; justify-content: center; align-items: center; padding: 28px 24px; flex: 1; }
+    .variant-row { grid-template-columns: minmax(340px, 1.2fr) 1fr; }
+    .variant-row-btn { padding: 36px 32px 44px; }
+    /* framed preview for the colour swatches */
+    .colour-frame { display: flex; flex-wrap: wrap; gap: 16px; background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 32px; margin: 18px 0 28px; }
+    /* per-card config groups in the developer playground */
+    .pg-cardgroup-hd { padding: 12px var(--spacing-loose) 6px; font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--content-subtle); border-top: 1px solid var(--border-base); }
+    .pg-row.is-hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="badge badge-beta">Beta</span>
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Announcement Card</h1>
+      <p class="page-desc">A small floating card that announces a new feature or update. It stays out of the way — the page underneath remains usable — and the user dismisses it when they're done. For a full-screen, multi-step release tour, see the <a class="link-inline" href="announcement-dialog-docs.html">Announcement Dialog</a>.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">A compact card with a full-bleed illustration, a title, a body, and two stacked full-width actions.</p>
+          <div class="anatomy-fig">
+            <div class="announcement" style="pointer-events:none;">
+              <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+              <div class="ann-media"><i data-icon="image" class="ann-media-ph"></i></div>
+              <div class="ann-body">
+                <p class="ann-title">Dynamic reporting is here!</p>
+                <p class="ann-text">A new look, new features, and even more functionality to explore.</p>
+                <div class="ann-actions">
+                  <button class="btn btn-primary">Learn more</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Illustration</span> — A full-bleed image at the top. Optional, but it's what sets this apart from a plain notification.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Title</span> — A short, bold headline that names the new thing.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Body</span> — One or two sentences explaining the value.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Call-to-action</span> — A full-width primary button that takes the user to the feature.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">5</div><div><span class="anatomy-term">Dismiss</span> — A small icon button in the top-right corner, over the illustration, that puts the card away.</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Use an announcement to surface something new without interrupting. The page stays usable and it waits until the user is ready.</p>
+
+          <h3 class="text-l4">Announce, don't alert</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="ann-prev">
+                <div class="announcement" style="pointer-events:none; width:260px;">
+                  <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+                  <div class="ann-media" style="height:120px;"><i data-icon="image" class="ann-media-ph"></i></div>
+                  <div class="ann-body">
+                    <p class="ann-title">Meet the new dashboard</p>
+                    <p class="ann-text">See all your surveys in one place.</p>
+                    <div class="ann-actions"><button class="btn btn-primary">Explore</button></div>
+                  </div>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                Announce a new or improved feature people can explore at their own pace.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="ann-prev">
+                <div class="announcement" style="pointer-events:none; width:260px;">
+                  <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+                  <div class="ann-body">
+                    <p class="ann-title">Your session will expire in 60s</p>
+                    <p class="ann-text">Save your work now to avoid losing changes.</p>
+                    <div class="ann-actions"><button class="btn btn-primary">Stay signed in</button></div>
+                  </div>
+                </div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Use it for time-sensitive or system messages — that's a toast or a dialog.
+              </div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Queue several, don't pile them up</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="ann-prev">
+                <div class="ann-deck" style="pointer-events:none;">
+                  <div class="announcement ann-b1" style="width:260px;"><div class="ann-media" style="height:90px; background:var(--bg-info);"></div><div class="ann-body" style="padding:14px 16px 16px;"><p class="ann-title" style="font-size:14px;">Bulk export</p></div></div>
+                  <div class="announcement ann-front" style="width:260px;"><button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button><div class="ann-media" style="height:90px; background:var(--bg-brand);"></div><div class="ann-body" style="padding:14px 16px 16px;"><p class="ann-title" style="font-size:14px;">Comments are live</p><p class="ann-text" style="font-size:12px;">Leave feedback on any question.</p><div class="ann-actions"><button class="btn btn-primary">Learn more</button></div></div></div>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                Stack them into one deck and show a single card at a time.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="ann-prev" style="flex-direction:column; flex-wrap:nowrap; gap:10px;">
+                <div class="announcement" style="pointer-events:none; width:220px;"><div class="ann-body" style="padding:12px 16px;"><p class="ann-title" style="font-size:14px;">New: integrations</p></div></div>
+                <div class="announcement" style="pointer-events:none; width:220px;"><div class="ann-body" style="padding:12px 16px;"><p class="ann-title" style="font-size:14px;">New: dashboard</p></div></div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Show multiple cards at once — they compete and get ignored.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">Pick a colour to match the message, choose whether to show an illustration, and queue several as a deck.</p>
+
+          <h3 class="text-l4">Colour</h3>
+          <p>The card comes in a small set of colours drawn from the design-system palette tokens. <strong>Default</strong> is a white card with the brand (teal) button; the others tint the card background (<code>--bg-*-subtle</code>), the illustration (<code>--bg-*-base</code>) and the call-to-action. They're purely decorative colour choices — an announcement carries no error or status meaning, so pick whichever fits the moment.</p>
+          <div class="colour-frame">
+            <div class="announcement" style="width:210px; pointer-events:none;"><div class="ann-body"><p class="ann-title">Default</p><p class="ann-text">A fresh update worth a look.</p><div class="ann-actions"><button class="btn btn-primary">Learn more</button></div></div></div>
+            <div class="announcement" style="width:210px; pointer-events:none; background:var(--bg-info-subtle);"><div class="ann-body"><p class="ann-title">Blue</p><p class="ann-text">A fresh update worth a look.</p><div class="ann-actions"><button class="btn btn-primary" style="--bg-brand:var(--bg-info);--border-brand:var(--border-info-hover);">Learn more</button></div></div></div>
+            <div class="announcement" style="width:210px; pointer-events:none; background:var(--bg-positive-subtle);"><div class="ann-body"><p class="ann-title">Green</p><p class="ann-text">A fresh update worth a look.</p><div class="ann-actions"><button class="btn btn-primary" style="--bg-brand:var(--bg-positive);--border-brand:var(--border-positive-hover);">Learn more</button></div></div></div>
+            <div class="announcement" style="width:210px; pointer-events:none; background:var(--bg-warning-subtle);"><div class="ann-body"><p class="ann-title">Orange</p><p class="ann-text">A fresh update worth a look.</p><div class="ann-actions"><button class="btn btn-primary" style="--bg-brand:var(--bg-warning);--border-brand:var(--border-warning);--content-on-brand-base:var(--content-base);">Learn more</button></div></div></div>
+            <div class="announcement" style="width:210px; pointer-events:none; background:var(--bg-negative-subtle);"><div class="ann-body"><p class="ann-title">Red</p><p class="ann-text">A fresh update worth a look.</p><div class="ann-actions"><button class="btn btn-primary" style="--bg-brand:var(--bg-negative);--border-brand:var(--border-negative-hover);">Learn more</button></div></div></div>
+          </div>
+
+          <h3 class="text-l4">Layout</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="announcement" style="width:260px;">
+                  <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+                  <div class="ann-media" style="height:130px;"><i data-icon="image" class="ann-media-ph"></i></div>
+                  <div class="ann-body">
+                    <p class="ann-title">Dynamic reporting is here!</p>
+                    <p class="ann-text">A new look, new features, and more to explore.</p>
+                    <div class="ann-actions"><button class="btn btn-primary">Learn more</button></div>
+                  </div>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>With illustration</strong> — A full-bleed image sits at the top. Use it for visual launches where the imagery sells the feature.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="announcement" style="width:260px;">
+                  <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+                  <div class="ann-body">
+                    <p class="ann-title">Filters moved to the toolbar</p>
+                    <p class="ann-text">Your filters now live in the toolbar so they're easier to reach.</p>
+                    <div class="ann-actions"><button class="btn btn-primary">Show me</button></div>
+                  </div>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Text only</strong> — No illustration. Use it for smaller updates where an image would add noise rather than value.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="ann-deck" style="width:260px; pointer-events:none;">
+                  <div class="announcement ann-b4" style="width:260px;"><div class="ann-media" style="height:130px; background:var(--bg-negative);"></div></div>
+                  <div class="announcement ann-b3" style="width:260px;"><div class="ann-media" style="height:130px; background:var(--bg-info);"></div></div>
+                  <div class="announcement ann-b2" style="width:260px;"><div class="ann-media" style="height:130px; background:var(--bg-warning);"></div></div>
+                  <div class="announcement ann-b1" style="width:260px;"><div class="ann-media" style="height:130px; background:var(--bg-positive);"></div></div>
+                  <div class="announcement ann-front" style="width:260px;">
+                    <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+                    <div class="ann-media" style="height:130px; background:var(--bg-brand);"></div>
+                    <div class="ann-body">
+                      <p class="ann-title">Dynamic reporting is here!</p>
+                      <p class="ann-text">A new look, new features, and more to explore.</p>
+                      <div class="ann-actions"><button class="btn btn-primary">Learn more</button></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Stacked</strong> — When several teams have something to promote on the same page, queue the announcements as a deck: the cards behind peek out so the user sees there's more. Dismissing the front card reveals the next — it drops away and the next rises into its place.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="content-guidelines">
+          <h2 class="text-l3">Content guidelines</h2>
+          <p class="section-lead">Lead with the benefit, keep it to a sentence, and make the button say where it goes.</p>
+
+          <div class="cg-rule">
+            <h3 class="text-l4">Say what's new and why it matters</h3>
+            <p>The title names the feature; the body gives the reason to care in one short sentence.</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="ann-prev"><div class="announcement" style="pointer-events:none; width:260px;"><button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button><div class="ann-body"><p class="ann-title">Export your results</p><p class="ann-text">Download every response as a spreadsheet in one click.</p><div class="ann-actions"><button class="btn btn-primary">Learn more</button></div></div></div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Clear headline, one benefit-led sentence.</div>
+              </div>
+              <div class="dd-card">
+                <div class="ann-prev"><div class="announcement" style="pointer-events:none; width:260px;"><button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button><div class="ann-body"><p class="ann-title">Update</p><p class="ann-text">We've shipped a number of changes across the product that we think you're going to love, so take a look whenever you get the chance.</p><div class="ann-actions"><button class="btn btn-primary">Learn more</button></div></div></div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Vague title and a long, unfocused body.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cg-rule">
+            <h3 class="text-l4">Make the button name the destination</h3>
+            <p>The primary action should describe where it leads, not just say "OK".</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="ann-prev"><div class="announcement" style="pointer-events:none; width:260px;"><button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button><div class="ann-body"><p class="ann-title">Meet the new dashboard</p><p class="ann-text">See all your surveys in one place.</p><div class="ann-actions"><button class="btn btn-primary">View dashboard</button></div></div></div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>An action verb + the destination.</div>
+              </div>
+              <div class="dd-card">
+                <div class="ann-prev"><div class="announcement" style="pointer-events:none; width:260px;"><button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button><div class="ann-body"><p class="ann-title">Meet the new dashboard</p><p class="ann-text">See all your surveys in one place.</p><div class="ann-actions"><button class="btn btn-primary">OK</button></div></div></div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>A generic label that says nothing about what happens.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">A light surface with a full-bleed illustration and a brand-coloured call-to-action.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code></td><td>Card surface</td><td>#ffffff</td></tr>
+              <tr><td><code>--border-base</code></td><td>Card border</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--sh-dialogs</code></td><td>Card shadow (floating elevation)</td><td>0 4px 12px rgba(25,39,67,.08)</td></tr>
+              <tr><td><code>--bg-tertiary</code></td><td>Illustration placeholder background</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--content-base</code></td><td>Title text</td><td>#192743</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Body text + dismiss button</td><td>rgba(25,39,67,.8)</td></tr>
+              <tr><td><code>--bg-brand</code></td><td>Call-to-action fill</td><td>#0a9d99</td></tr>
+              <tr><td><code>--border-brand</code></td><td>Call-to-action border</td><td>#0c827f</td></tr>
+              <tr><td><code>--content-on-brand-base</code></td><td>Call-to-action text</td><td>#ffffff</td></tr>
+              <tr><td><code>--radius-lg</code></td><td>Card corner radius</td><td>12px</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:13.5px; color:var(--content-secondary);">Typography: title <code>text-l5</code> (16/SemiBold), body <code>body-14</code> (14/Regular). Layout: full-bleed media, 20px body padding.</p>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">An announcement is non-modal — it must never trap the user or steal focus.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Don't steal focus.</strong> Unlike a dialog or spotlight, it appears without moving focus, so the user can keep working uninterrupted.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Announce politely.</strong> Place it in a live region with <code>aria-live="polite"</code> (or a labelled <code>role="region"</code>) so screen-reader users hear it without being interrupted.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label the dismiss.</strong> The close control is an icon-only button, so give it an accessible name ("Close") and make sure it's keyboard-reachable and large enough to hit comfortably.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>No auto-dismiss.</strong> It stays until the user acts, so nobody misses it or has to read against a timer.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>The illustration is decorative.</strong> It carries no information, so hide it from assistive tech (empty <code>alt</code> / <code>aria-hidden</code>).</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="spotlight-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Spotlight</span></a>
+          <a class="pag-card right" href="announcement-dialog-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Announcement Dialog</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">🧩</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">One component, two patterns</span>
+            <span class="dev-gap-text">In code, <code>&lt;eff-tooltip-dialog&gt;</code> backs two design-system components. <strong>Announcement</strong> (this page) is the <code>with-svg</code> mode — a floating feature card with an illustration (<code>[svgUrl]</code>); in the styleguide it's <strong>Tooltips → "display tooltip with-svg"</strong>. The <a class="link-inline" href="spotlight-docs.html">Spotlight</a> is the same component in its anchored coach-mark / <em>tour</em> mode. Same inputs, different configuration.</span>
+          </div>
+        </div>
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Configure each card and preview it. Set <em>cards</em> &gt; 1 to queue a deck — every card has its own colour, illustration, title and CTA; click a button to advance.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="min-height:460px; padding:48px 24px 56px;"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">cards <span style="display:block;font-size:12px;color:var(--content-secondary);font-weight:400;"># queued in the deck</span></div><div class="pg-row-ctrl">
+                  <select class="pg-select" id="pg-stack"><option value="1" selected>1 (single)</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+                </div></div>
+                <div id="pg-cards"></div>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Toggle the dialog from a signal and anchor it to a target element. The <code>with-svg</code> class plus <code>[svgUrl]</code> gives it the illustration.</p>
+          <div class="dev-gap">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Figma gap — dismiss is now an icon button</span>
+              <span class="dev-gap-text">The design dismisses the card with a small secondary <strong>icon button</strong> in the top-right corner of the illustration (shown in the preview). The current <code>&lt;eff-tooltip-dialog&gt;</code> only exposes a text dismiss link via <code>[dialogLinkButtonText]</code> (kept in the snippet below). Confirm with engineering whether to add a top-right icon-close to the component before relying on this in code.</span>
+            </div>
+          </div>
+          <div class="dev-preview" style="padding:40px 24px;">
+            <div class="announcement" style="width:260px;">
+              <button class="ann-close ib ib-24 ib-secondary" aria-label="Close"><i data-icon="cross"></i></button>
+              <div class="ann-media" style="height:130px;"><i data-icon="image" class="ann-media-ph"></i></div>
+              <div class="ann-body"><p class="ann-title">Dynamic reporting is here!</p><p class="ann-text">A new look, new features, and more to explore.</p><div class="ann-actions"><button class="btn btn-primary">Learn more</button></div></div>
+            </div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+<pre><code><span class="cc">&lt;!-- trigger --&gt;</span>
+<span class="ct">&lt;button</span> <span class="ca">#svgTarget</span> <span class="ca">class</span>=<span class="cv">"secondary"</span> <span class="ca">(click)</span>=<span class="cv">"showAnnouncement.set(true)"</span><span class="ct">&gt;</span>
+  Show announcement
+<span class="ct">&lt;/button&gt;</span>
+
+<span class="cc">&lt;!-- announcement (with illustration) --&gt;</span>
+<span class="ct">&lt;eff-tooltip-dialog</span>
+  <span class="ca">*ngIf</span>=<span class="cv">"showAnnouncement()"</span>
+  <span class="ca">class</span>=<span class="cv">"with-svg"</span>
+  <span class="ca">[targetElement]</span>=<span class="cv">"svgTarget"</span>
+  <span class="ca">[svgUrl]</span>=<span class="cv">"'../assets/img/home-illustration.svg'"</span>
+  <span class="ca">[dialogTitle]</span>=<span class="cv">"'Dynamic reporting is here!'"</span>
+  <span class="ca">[dialogSubtitle]</span>=<span class="cv">"'A new look, new features, and more to explore.'"</span>
+  <span class="ca">[dialogButtonText]</span>=<span class="cv">"'Learn more'"</span>
+  <span class="ca">[dialogLinkButtonText]</span>=<span class="cv">"'Close'"</span>
+  <span class="ca">[dialogPositionToTarget]</span>=<span class="cv">"'after'"</span>
+  <span class="ca">(dialogClosedOutput)</span>=<span class="cv">"showAnnouncement.set(false)"</span><span class="ct">&gt;</span>
+<span class="ct">&lt;/eff-tooltip-dialog&gt;</span></code></pre>
+          </div>
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Inputs</h2>
+          <p class="section-lead">Key inputs on <code>eff-tooltip-dialog</code> for the announcement (<code>with-svg</code>) configuration.</p>
+          <table class="token-table">
+            <thead><tr><th>Input</th><th>Type</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>[svgUrl]</code></td><td>string</td><td>URL of the illustration shown at the top. Pair with <code>class="with-svg"</code>.</td></tr>
+              <tr><td><code>[dialogTitle]</code></td><td>string</td><td>Headline.</td></tr>
+              <tr><td><code>[dialogSubtitle]</code></td><td>string</td><td>Body copy.</td></tr>
+              <tr><td><code>[dialogButtonText]</code></td><td>string</td><td>Primary button label (the call-to-action).</td></tr>
+              <tr><td><code>[dialogLinkButtonText]</code></td><td>string</td><td>The low-emphasis dismiss button label ("Close").</td></tr>
+              <tr><td><code>[targetElement]</code></td><td>ElementRef</td><td>The element the dialog anchors to.</td></tr>
+              <tr><td><code>[dialogPositionToTarget]</code></td><td>'after' · 'before' · 'above' · 'below'</td><td>Placement relative to the target.</td></tr>
+              <tr><td><code>[dialogWidth]</code></td><td>number</td><td>Card width.</td></tr>
+              <tr><td><code>[addOutlineToTargetElement]</code> · <code>[addHighlightToTargetElement]</code></td><td>boolean</td><td>Optionally outline / highlight the target element.</td></tr>
+              <tr><td><code>(dialogClosedOutput)</code></td><td>EventEmitter</td><td>Fires when the dialog is closed — flip your signal back to <code>false</code>.</td></tr>
+            </tbody>
+          </table>
+
+          <div class="dev-gap" style="margin-top:20px;">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Stacking is app-orchestrated</span>
+              <span class="dev-gap-text">The <strong>deck</strong> (queueing announcements from different teams and revealing the next on close) is your app's job: keep an ordered list and show one <code>&lt;eff-tooltip-dialog&gt;</code> at a time, advancing the index when it closes. The card-deck visual (peeking cards + the promote animation) isn't a built-in option in the styleguide example — confirm with engineering whether to add it to the component or build it in the host.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">See the Design tab for the full list. Highlights below.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code> · <code>--border-base</code> · <code>--sh-dialogs</code></td><td>Card surface, border, floating shadow</td></tr>
+              <tr><td><code>--bg-tertiary</code></td><td>Illustration placeholder background</td></tr>
+              <tr><td><code>--bg-brand</code> · <code>--border-brand</code> · <code>--content-on-brand-base</code></td><td>Call-to-action button</td></tr>
+              <tr><td><code>--radius-lg</code></td><td>Card radius</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Treat it as a non-modal, polite live region.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>aria-live="polite"</strong> (or a labelled <code>role="region"</code>) so it's announced without interrupting; never move focus to it on open.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Icon-only dismiss needs a label</strong> — give the close button an <code>aria-label="Close"</code>; both it and the call-to-action are keyboard-reachable.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Decorative illustration</strong> is hidden from assistive tech (<code>aria-hidden</code> / empty <code>alt</code>).</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-usage">Usage</a>
+          <a class="toc-link" href="#dev-props">Inputs</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+    const PH = '<i data-icon="image" class="ann-media-ph"></i>';
+    // colour options — values from the design-system palette tokens; Default = white card + brand (teal) button
+    const THEMES = {
+      default: { label:'Default', surface:'var(--bg-base)',           illu:'var(--bg-brand)' },
+      blue:    { label:'Blue',    surface:'var(--bg-info-subtle)',     illu:'var(--bg-info)',     btnBg:'var(--bg-info)',     btnBorder:'var(--border-info-hover)',     btnOn:'#fff' },
+      green:   { label:'Green',   surface:'var(--bg-positive-subtle)', illu:'var(--bg-positive)', btnBg:'var(--bg-positive)', btnBorder:'var(--border-positive-hover)', btnOn:'#fff' },
+      orange:  { label:'Orange',  surface:'var(--bg-warning-subtle)',  illu:'var(--bg-warning)',  btnBg:'var(--bg-warning)',  btnBorder:'var(--border-warning)',        btnOn:'var(--content-base)' },
+      red:     { label:'Red',     surface:'var(--bg-negative-subtle)', illu:'var(--bg-negative)', btnBg:'var(--bg-negative)', btnBorder:'var(--border-negative-hover)', btnOn:'#fff' },
+    };
+    const THEME_ORDER = ['default','blue','green','orange','red'];
+    const themeOf = c => THEMES[c.color] || THEMES.default;
+    const DEFAULT_CARDS = [
+      { color:'default', media:true,  title:'Dynamic reporting is here!', body:'A new look, new features, and even more to explore.', cta:true,  ctaLabel:'Learn more' },
+      { color:'blue',    media:false, title:'Comments are now live',      body:'Leave feedback right on any question, in real time.',     cta:true,  ctaLabel:'Learn more' },
+      { color:'green',   media:false, title:'Bulk export is ready',       body:'Download every response as a spreadsheet in one click.',  cta:true,  ctaLabel:'Get the file' },
+      { color:'orange',  media:true,  title:'Topics & Ideas',             body:'See the themes your employees suggest most often.',       cta:false, ctaLabel:'Learn more' },
+      { color:'red',     media:true,  title:'Schedule recurring pulses',  body:'Set a cadence once and let surveys go out on autopilot.', cta:true,  ctaLabel:'Set up' },
+    ];
+    let CARDS = DEFAULT_CARDS.map(c => ({...c}));
+    let idx = 0;
+    const FALL_MS = 420;
+    const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const aq = s => String(s).replace(/'/g,"\\'");
+    const count = () => parseInt(document.getElementById('pg-stack').value,10) || 1;
+
+    // ── per-card config groups ──
+    function cardForm(){
+      const n = count();
+      let h = '';
+      for (let i=0;i<n;i++){ const c = CARDS[i];
+        h += `<div class="pg-cardgroup" data-cardgroup="${i}">
+          <div class="pg-cardgroup-hd">Card ${i+1}</div>
+          <div class="pg-row"><div class="pg-row-name">colour</div><div class="pg-row-ctrl"><select class="pg-select" data-card="${i}" data-f="color">${THEME_ORDER.map(k=>`<option value="${k}" ${c.color===k?'selected':''}>${THEMES[k].label}</option>`).join('')}</select></div></div>
+          <div class="pg-row"><div class="pg-row-name">illustration</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" data-card="${i}" data-f="media" ${c.media?'checked':''}><span class="pg-toggle-track"></span></label></div></div>
+          <div class="pg-row"><div class="pg-row-name">title</div><div class="pg-row-ctrl"><input class="pg-input" type="text" data-card="${i}" data-f="title" value="${esc(c.title)}"></div></div>
+          <div class="pg-row"><div class="pg-row-name">message</div><div class="pg-row-ctrl"><input class="pg-input" type="text" data-card="${i}" data-f="body" value="${esc(c.body)}"></div></div>
+          <div class="pg-row"><div class="pg-row-name">call-to-action</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" data-card="${i}" data-f="cta" ${c.cta?'checked':''}><span class="pg-toggle-track"></span></label></div></div>
+          <div class="pg-row cta-l ${c.cta?'':'is-hidden'}"><div class="pg-row-name">button label</div><div class="pg-row-ctrl"><input class="pg-input" type="text" data-card="${i}" data-f="ctaLabel" value="${esc(c.ctaLabel)}"></div></div>
+        </div>`;
+      }
+      const wrap = document.getElementById('pg-cards');
+      wrap.innerHTML = h;
+      if (window.Icons && window.Icons.render) window.Icons.render(wrap);
+    }
+    function onCardEdit(e){
+      const t = e.target; if (t.dataset.card === undefined) return;
+      const i = +t.dataset.card, f = t.dataset.f;
+      if (f === 'media' || f === 'cta'){ CARDS[i][f] = t.checked;
+        if (f === 'cta') t.closest('.pg-cardgroup').querySelector('.cta-l').classList.toggle('is-hidden', !t.checked);
+      } else CARDS[i][f] = t.value;
+      render();
+    }
+    document.getElementById('pg-cards').addEventListener('input', onCardEdit);
+    document.getElementById('pg-cards').addEventListener('change', onCardEdit);
+
+    // ── preview ──
+    function media(c){
+      if (!c.media) return '';
+      return `<div class="ann-media" style="background:${themeOf(c).illu}; color:rgba(255,255,255,.92);">${PH}</div>`;
+    }
+    function inner(c){
+      const th = themeOf(c);
+      // Default → plain brand (teal) button; colours retint the primary button via its own tokens
+      const btnStyle = th.btnBg ? `--bg-brand:${th.btnBg};--bg-brand-hover:${th.btnBorder};--bg-brand-pressed:${th.btnBorder};--border-brand:${th.btnBorder};--border-brand-pressed:${th.btnBorder};--content-on-brand-base:${th.btnOn};` : '';
+      const cta = c.cta ? `<button class="btn btn-primary" data-next style="${btnStyle}">${esc(c.ctaLabel)||'Learn more'}</button>` : '';
+      const actions = cta ? `<div class="ann-actions">${cta}</div>` : '';
+      const close = `<button class="ann-close ib ib-24 ib-secondary" data-next aria-label="Close"><i data-icon="cross"></i></button>`;
+      return `${close}${media(c)}<div class="ann-body"><p class="ann-title">${esc(c.title)}</p><p class="ann-text">${esc(c.body)}</p>${actions}</div>`;
+    }
+    const cardEl = (c, cls) => `<div class="announcement ${cls}" style="width:260px; background:${themeOf(c).surface};">${inner(c)}</div>`;
+    function render(){
+      const total = count();
+      if (total <= 1) {
+        $preview.innerHTML = cardEl(CARDS[0], '');
+      } else if (idx >= total) {
+        $preview.innerHTML = `<div style="width:260px; text-align:center; font-family:'Poppins',sans-serif; font-size:14px; color:var(--content-secondary); padding:32px 0;">You're all caught up ✓<button id="pg-replay" style="display:block; margin:10px auto 0; background:none; border:none; color:var(--content-brand); font:inherit; cursor:pointer; text-decoration:underline;">Replay</button></div>`;
+        document.getElementById('pg-replay').onclick = () => { idx = 0; render(); };
+      } else {
+        const layers = [];
+        if (idx + 4 < total) layers.push(cardEl(CARDS[idx+4], 'ann-b4'));
+        if (idx + 3 < total) layers.push(cardEl(CARDS[idx+3], 'ann-b3'));
+        if (idx + 2 < total) layers.push(cardEl(CARDS[idx+2], 'ann-b2'));
+        if (idx + 1 < total) layers.push(cardEl(CARDS[idx+1], 'ann-b1'));
+        layers.push(cardEl(CARDS[idx], 'ann-front'));
+        $preview.innerHTML = `<div class="ann-deck" style="width:260px;">${layers.join('')}</div>`;
+      }
+      document.getElementById('pg-code').textContent = code();
+      if (window.Icons && window.Icons.render) window.Icons.render($preview);
+    }
+    function code(){
+      const c = CARDS[0], total = count();
+      const L = [];
+      L.push('<eff-tooltip-dialog');
+      L.push('  *ngIf="showAnnouncement()"');
+      if (c.media) L.push('  class="with-svg"');
+      L.push('  [targetElement]="svgTarget"');
+      if (c.media) L.push("  [svgUrl]=\"'../assets/img/home-illustration.svg'\"");
+      L.push(`  [dialogTitle]="'${aq(c.title)}'"`);
+      L.push(`  [dialogSubtitle]="'${aq(c.body)}'"`);
+      if (c.cta) L.push(`  [dialogButtonText]="'${aq(c.ctaLabel||'Learn more')}'"`);
+      L.push("  [dialogLinkButtonText]=\"'Close'\"");
+      L.push("  [dialogPositionToTarget]=\"'after'\"");
+      L.push('  (dialogClosedOutput)="showAnnouncement.set(false)">');
+      L.push('</eff-tooltip-dialog>');
+      const notes = [];
+      if (c.color !== 'default') notes.push(`<!-- '${c.color}' is a colour preset applied via host styling — not an input on eff-tooltip-dialog -->`);
+      if (total > 1) notes.push(`<!-- ${total} queued; your app shows one at a time and advances on close. Snippet shows the first card. -->`);
+      return notes.length ? notes.join('\n') + '\n' + L.join('\n') : L.join('\n');
+    }
+    // measure how tall a given card renders at 260px (off-screen), so the deck height can animate
+    function measure(c){
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;';
+      probe.innerHTML = `<div class="ann-deck" style="width:260px;">${cardEl(c, 'ann-front')}</div>`;
+      $preview.appendChild(probe);
+      const h = probe.querySelector('.ann-front').offsetHeight;
+      probe.remove();
+      return h;
+    }
+    // advance the deck: glide the deck height to the next card, drop the front, promote the rest
+    function advance(){
+      const deck = $preview.querySelector('.ann-deck');
+      const front = $preview.querySelector('.ann-front');
+      if (!front || !deck || front.classList.contains('is-leaving')) return;
+      const next = idx + 1;
+      if (next < count()){
+        const h0 = deck.offsetHeight, h1 = measure(CARDS[next]);
+        if (h1 && h1 !== h0){ deck.style.height = h0+'px'; deck.getBoundingClientRect(); deck.style.transition = 'height '+FALL_MS+'ms cubic-bezier(.3,.1,.3,1)'; deck.style.height = h1+'px'; }
+      }
+      front.classList.add('is-leaving');
+      ['ann-b1','ann-b2','ann-b3','ann-b4'].forEach(c => { const el = $preview.querySelector('.'+c); if (el) el.classList.add('is-promoting'); });
+      setTimeout(() => { idx += 1; render(); }, FALL_MS);
+    }
+    $preview.addEventListener('click', (e) => {
+      if (!e.target.closest('[data-next]')) return;
+      if (count() > 1) advance(); // page through the deck
+    });
+    document.getElementById('pg-stack').addEventListener('change', () => { idx = 0; cardForm(); render(); });
+    document.getElementById('pg-reset')?.addEventListener('click', () => { idx = 0; CARDS = DEFAULT_CARDS.map(c=>({...c})); document.getElementById('pg-stack').value = '1'; cardForm(); render(); });
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+    document.querySelectorAll('.dev-copy-btn').forEach(b=>{ if(b.id==='pg-copy')return; b.addEventListener('click',()=>{const c=b.parentElement.querySelector('code');if(c)navigator.clipboard.writeText(c.textContent);}); });
+    cardForm(); render();
+  })();
+</script>
+</body>
+</html>

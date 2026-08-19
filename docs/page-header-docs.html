@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Header — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ══════════════ Page Header — the title block at the top of a view ══════════════ */
+    .ph { width: 100%; background: var(--bg-base); font-family: 'Poppins', sans-serif; }
+    .ph-row { display: flex; align-items: center; gap: 24px; padding-bottom: 24px; }
+    .ph-left { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+    .ph-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--content-brand); padding: 4px 0; }
+    .ph-title { font-size: 26px; line-height: 1.3; font-weight: 600; color: var(--content-base); margin: 0; }
+    .ph-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 4px 0; font-size: 14px; line-height: 1.6; color: var(--content-secondary); }
+    .ph-meta strong { font-weight: 500; }
+    .ph-meta-block { font-size: 14px; line-height: 1.6; color: var(--content-secondary); padding: 4px 0; }
+    .ph-meta-block p { margin: 0 0 12px; }
+    .ph-meta-block p:last-child { margin: 0; }
+    /* inline link (the design-system Link Button at body size) */
+    .ph-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: var(--content-brand-secondary); text-decoration: none; cursor: pointer; }
+    .ph-link i[data-icon] { width: 14px; height: 14px; display: flex; }
+    .ph-sep { width: 1px; height: 16px; background: var(--border-base); }
+    /* date range */
+    .ph-range { display: inline-flex; align-items: center; gap: 8px; }
+    .ph-range i[data-icon] { width: 24px; height: 16px; display: flex; color: var(--content-subtle); }
+    /* survey status */
+    .ph-status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; }
+    .ph-status-dot { width: 12px; height: 12px; border-radius: var(--radius-full); background: var(--bg-positive); flex-shrink: 0; }
+    .ph-status .muted { color: var(--content-subtle); }
+    /* right-side controls */
+    .ph-controls { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+    .ph-chip-label { font-size: 14px; color: var(--content-secondary); }
+    .ph-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; color: var(--content-secondary); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-sm); padding: 7px 12px; }
+    .ph-chip i[data-icon] { width: 16px; height: 16px; display: flex; }
+    /* group / filter selector — the Select button (components.css) */
+    .sel-btn { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--border-action); border-radius: var(--radius-base); background: var(--bg-base); box-shadow: var(--sh-action); font-family: inherit; font-size: 14px; color: var(--content-base); white-space: nowrap; }
+    .sel-btn-name { font-weight: 600; color: var(--content-base); }
+    .sel-btn-value { font-weight: 500; color: var(--content-secondary); }
+    .sel-btn i[data-icon] { width: 16px; height: 16px; display: flex; flex-shrink: 0; color: var(--content-secondary); }
+    /* search field (visual only, for demos) */
+    /* search field — matches the Search component (components.css) */
+    .search-wrap { position: relative; display: flex; align-items: center; width: 235px; flex: none; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; pointer-events: none; color: var(--content-secondary); }
+    .search-icon i[data-icon] { width: 16px; height: 16px; display: flex; }
+    input[type="search"].srch { height: 36px; width: 100%; padding: 0 12px 0 34px; border: 1px solid var(--border-action); border-radius: var(--radius-base); background: var(--bg-input); box-shadow: var(--sh-action); font-family: inherit; font-size: 14px; color: var(--content-base); outline: none; -webkit-appearance: none; }
+    input[type="search"].srch::placeholder { color: var(--content-placeholder); }
+    /* divider under the header */
+    .ph-divider { height: 1px; background: var(--border-base); width: 100%; }
+    /* optional tabs row */
+    .ph-tabs { display: flex; gap: 48px; padding-top: 24px; }
+    .ph-tab { font-size: 14px; font-weight: 500; color: var(--content-secondary); padding-bottom: 9px; position: relative; white-space: nowrap; }
+    .ph-tab.is-active { color: var(--content-base); }
+    .ph-tab.is-active::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; border-radius: var(--radius-full); background: var(--content-brand-secondary); }
+
+    /* canonical button set (matches the Button page) */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: var(--radius-base); border: 1px solid transparent; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; box-shadow: var(--sh-action); }
+    .btn i[data-icon] { width: 16px; height: 16px; display: flex; }
+    .btn-primary { background: var(--bg-brand); border-color: var(--border-brand); color: var(--content-on-brand-base); }
+    .btn-secondary { background: var(--bg-base); border-color: var(--border-action); color: var(--content-action); }
+
+    /* doc framing */
+    .ph-frame { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 32px 40px; margin-bottom: 24px; }
+    .ph.is-doc { pointer-events: none; }
+    .anatomy-fig { position: relative; background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-lg); padding: 36px 32px; margin-bottom: 24px; }
+    .ana-num { position: absolute; width: 20px; height: 20px; border-radius: var(--radius-full); background: var(--content-base); color: var(--bg-base); font-size: 10px; /* font-scale-exempt: anatomy number badge */ font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 6; }
+    /* the header is a wide horizontal band — stack each demo above its description */
+    .variant-row { grid-template-columns: 1fr; }
+    .variant-row-btn { padding: 28px 40px; align-items: stretch; }
+    .variant-row-btn .ph { max-width: 760px; }
+    /* playground preview: a white page surface the header sits on */
+    #pg-preview { display: block; padding: 32px 28px; background: var(--bg-base); }
+    #pg-preview .ph { width: 100%; }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Page Header</h1>
+      <p class="page-desc">The title block at the top of a view: it names where the user is, gives context, and holds the page's primary actions. For headings that introduce a block <em>within</em> a page, use the <a class="link-inline" href="section-header-docs.html">Section Header</a> instead.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <!-- PAGE TABS -->
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════ DESIGN ════════════════════ -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">One composable block: a title with optional context above and below it, optional actions on the right, and a divider that separates it from the page content.</p>
+          <div class="anatomy-fig">
+            <div class="ph is-doc">
+              <div class="ph-eyebrow">Project name</div>
+              <div class="ph-row">
+                <div class="ph-left">
+                  <h2 class="ph-title">Employees</h2>
+                  <div class="ph-meta"><span class="ph-range">21 Feb 2019 <i data-icon="from-to"></i> 21 Feb 2019</span></div>
+                </div>
+                <div class="ph-controls"><button class="btn btn-primary"><i data-icon="plus"></i> New survey</button></div>
+              </div>
+              <div class="ph-divider"></div>
+            </div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Eyebrow</span> — Optional overline in brand colour, naming the parent context (a project, pulse or section the page belongs to).</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Title</span> — The name of the view. The single most important label on the page, and its <code>h1</code>.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Subtitle slot</span> — A flexible line — not just a description: a date range, a live status, ownership, a scope selector or a "Learn more" link all fit here, alone or combined.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Actions</span> — Optional page-level controls, pinned right: a primary button, an icon button, a status toggle, or search &amp; sort.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">5</div><div><span class="anatomy-term">Divider</span> — A hairline that closes the header and separates it from the content below. Tabs, when present, sit just above it.</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Best practices</h2>
+          <p class="section-lead">It's one composable block — fill only the parts a view needs.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>One per view.</strong> A single Page Header sits at the top of a view and is the page's <code>h1</code>. To head a block <em>within</em> a page, use a <a class="link-inline" href="section-header-docs.html">Section Header</a>.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Name the view specifically.</strong> The title should say exactly what this view is; put the broader context — a project or pulse — in the eyebrow above it.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>The subtitle is flexible.</strong> The line under the title can be a description, a date range, a live status, ownership or a scope — alone or combined. It should add context, not repeat the title.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Keep actions page-level.</strong> The right side holds the one action — or search &amp; sort — for the whole view, never row- or item-level controls.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Tabs only for real sub-sections.</strong> When a view splits into sub-views the tab bar sits just below the title; see <a class="link-inline" href="tabs-docs.html">Tabs</a>.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>The divider runs full-bleed.</strong> The bottom border spans the full width of the view, edge to edge, while the title, subtitle and actions keep the container's side padding.</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">The header is type and spacing on the page surface — no fill of its own beyond the divider.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--content-brand</code></td><td>Eyebrow / overline text</td><td>#166764</td></tr>
+              <tr><td><code>--content-base</code></td><td>Title text</td><td>#192743</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Subtitle / metadata text</td><td>rgba(25,39,67,.8)</td></tr>
+              <tr><td><code>--content-brand-secondary</code></td><td>Inline link + active tab underline</td><td>#0c827f</td></tr>
+              <tr><td><code>--content-subtle</code></td><td>Muted metadata (e.g. "— Until …")</td><td>#a6adbb</td></tr>
+              <tr><td><code>--border-base</code></td><td>Divider + control borders</td><td>#e2e4e9</td></tr>
+              <tr><td><code>--radius-full</code></td><td>Tab underline + status dot</td><td>999px</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:12px; color:var(--content-secondary);">Typography: eyebrow <code>text-l6</code> (12/SemiBold, 0.8px tracking, uppercase), title <code>text-l3</code> (26/SemiBold), subtitle <code>body-14</code> (14/Regular). Spacing: 24px below the header before the divider, 16px above the tab row.</p>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">The header anchors the page for everyone, so its structure has to be sound for assistive tech.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>The title is the page's <code>h1</code>.</strong> There should be exactly one per view, and the rest of the page's headings nest beneath it.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>The eyebrow is context, not a heading.</strong> Don't mark it up as its own heading level — keep it part of the header block so the heading outline stays clean.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Name icon-only actions.</strong> A settings or options icon button needs an accessible name ("Settings"), since there's no visible label.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Status isn't colour-only.</strong> "Running" must read as text, not just a coloured dot, so the state is clear without colour perception.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Tabs use the tab pattern.</strong> When the header carries tabs, follow the <a class="link-inline" href="tabs-docs.html">Tabs</a> roles and keyboard behaviour; the divider is decorative.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="section-header-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Section Header</span></a>
+          <a class="pag-card right" href="divider-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Divider</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Best practices</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div><!-- /tab-panel design -->
+
+  <!-- ════════════════════ DEVELOPER ════════════════════ -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">⚠️</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">Confirm the API before coding</span>
+            <span class="dev-gap-text">This page documents the Page Header pattern from Figma. Check <a class="link-inline" href="https://styleguide.effectory.com" target="_blank" rel="noopener">styleguide.effectory.com</a> for the existing Angular component and its inputs before writing snippets — the parts (eyebrow, title, subtitle, actions slot, tabs) compose, so it's likely one component with content-projection rather than many variants.</span>
+          </div>
+        </div>
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Toggle the parts and watch the header recompose. It's a visual prototype — confirm the Angular API (above) before writing markup.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">eyebrow</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-eyebrow" checked><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">title</div><div class="pg-row-ctrl"><input class="tf" id="pg-title" type="text" value="Team product survey" style="width:260px;"></div></div>
+                <div class="pg-row"><div class="pg-row-name">subtitle</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-subtitle"><option value="none">None</option><option value="description">Description</option><option value="range" selected>Date range</option><option value="rangegroup">Date range + group</option><option value="status">Status</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">actions</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-actions"><option value="none">None</option><option value="button" selected>Primary button</option><option value="icon">Icon button</option><option value="search">Search &amp; sort</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">tabs</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-tabs"><span class="pg-toggle-track"></span></label></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The same tokens as the Design tab.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--content-brand</code></td><td>Eyebrow / overline text</td><td>#166764</td></tr>
+              <tr><td><code>--content-base</code></td><td>Title text</td><td>#192743</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Subtitle / metadata text</td><td>rgba(25,39,67,.8)</td></tr>
+              <tr><td><code>--content-brand-secondary</code></td><td>Inline link + active tab underline</td><td>#0c827f</td></tr>
+              <tr><td><code>--border-base</code></td><td>Divider + control borders</td><td>#e2e4e9</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Get the document structure right in markup.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Title is the <code>&lt;h1&gt;</code>.</strong> Render the title as the single page <code>h1</code>; don't promote the eyebrow to a heading.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Action names.</strong> Icon-only buttons need <code>aria-label</code>; link-outs that open a new tab should say so.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Tabs semantics.</strong> Use the <a class="link-inline" href="tabs-docs.html">Tabs</a> component's roles (<code>role="tablist"</code> / <code>tab</code> / <code>tabpanel</code>) rather than re-implementing them.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Status text.</strong> Pair the status dot with a text label so state never relies on colour alone.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="section-header-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Section Header</span></a>
+          <a class="pag-card right" href="divider-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Divider</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div><!-- /tab-panel developer -->
+
+</div><!-- /content-wrap -->
+</div><!-- /shell -->
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    var el = function (id) { return document.getElementById(id); };
+    var preview = el('pg-preview');
+    if (!preview) return;
+
+    function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+    var SUBTITLE = {
+      none: '',
+      description: '<div class="ph-meta"><span>Explore the questions you can ask in your surveys for this project.</span></div>',
+      range: '<div class="ph-meta"><span class="ph-range">21 Feb 2019 <i data-icon="from-to"></i> 21 Feb 2019</span></div>',
+      rangegroup: '<div class="ph-meta" style="padding-top:24px; gap:16px;"><button class="sel-btn"><i data-icon="filter"></i><span class="sel-btn-name">Group:</span><span class="sel-btn-value">Product &amp; Development</span><i data-icon="chevron-down"></i></button><span class="ph-range">21 Feb 2019 <i data-icon="from-to"></i> 21 Feb 2019</span></div>',
+      status: '<div class="ph-meta"><span class="ph-status"><span class="ph-status-dot"></span><span>Running</span><span class="muted">— Until Thu, Apr 29, 2020</span></span></div>'
+    };
+    var ACTIONS = {
+      none: '',
+      button: '<div class="ph-controls"><button class="btn btn-primary"><i data-icon="plus"></i> New survey</button></div>',
+      icon: '<div class="ph-controls"><button class="btn btn-secondary" style="padding:10px; width:36px;" aria-label="Settings"><i data-icon="gear"></i></button></div>',
+      search: '<div class="ph-controls"><div class="search-wrap"><div class="search-icon"><i data-icon="search"></i></div><input type="search" class="srch" placeholder="Search projects" readonly></div><button class="btn btn-secondary">Sort on date <i data-icon="chevron-down"></i></button></div>'
+    };
+    var TABS = '<div class="ph-tabs"><span class="ph-tab is-active">Overview</span><span class="ph-tab">Scores</span><span class="ph-tab">Answers</span><span class="ph-tab">Reports</span></div>';
+
+    function render() {
+      var eyebrow = el('pg-eyebrow').checked ? '<div class="ph-eyebrow">COVID pulse</div>' : '';
+      var title = esc(el('pg-title').value) || 'Untitled';
+      var subtitle = SUBTITLE[el('pg-subtitle').value] || '';
+      var actions = ACTIONS[el('pg-actions').value] || '';
+      var tabs = el('pg-tabs').checked;
+      var rowPad = tabs ? ' style="padding-bottom:0;"' : '';
+      preview.innerHTML =
+        '<div class="ph">' +
+          eyebrow +
+          '<div class="ph-row"' + rowPad + '>' +
+            '<div class="ph-left"><h2 class="ph-title">' + title + '</h2>' + subtitle + '</div>' +
+            actions +
+          '</div>' +
+          (tabs ? TABS : '') +
+          '<div class="ph-divider"></div>' +
+        '</div>';
+      if (window.Icons && window.Icons.render) window.Icons.render(preview);
+    }
+
+    ['pg-eyebrow', 'pg-title', 'pg-subtitle', 'pg-actions', 'pg-tabs'].forEach(function (id) {
+      el(id).addEventListener('input', render);
+      el(id).addEventListener('change', render);
+    });
+    el('pg-reset').addEventListener('click', function () {
+      el('pg-eyebrow').checked = true; el('pg-title').value = 'Team product survey';
+      el('pg-subtitle').value = 'range'; el('pg-actions').value = 'button'; el('pg-tabs').checked = false;
+      render();
+    });
+    render();
+  })();
+</script>
+</body>
+</html>

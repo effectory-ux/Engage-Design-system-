@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Side Panel — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Side panel — a right-docked overlay over a scrim ── */
+    .sidepanel { display: flex; flex-direction: column; width: 800px; max-width: 100%; height: 100%; background: var(--bg-base); border-radius: var(--radius-xl) 0 0 var(--radius-xl); box-shadow: var(--sh-dialogs); font-family: 'Poppins', sans-serif; overflow: hidden; }
+    .sidepanel-sm { width: 400px; }
+
+    .sp-header { display: flex; flex-direction: column; gap: 12px; padding: 0; flex-shrink: 0; }
+    .sp-toolbar { display: flex; align-items: center; min-height: 20px; padding: 16px; }
+    .sp-heading { padding: 0 40px; }
+    .sp-nav { display: flex; align-items: center; gap: 10px; }
+    .sp-nav i[data-icon] { width: 18px; height: 18px; display: flex; color: var(--content-action); cursor: pointer; }
+    .sp-actions { display: flex; align-items: center; gap: 14px; margin-left: auto; color: var(--content-action); }
+    .sp-actions i[data-icon] { width: 18px; height: 18px; display: flex; cursor: pointer; }
+    .sp-actions .sp-sep { width: 1px; height: 18px; background: var(--border-base); }
+
+    .sp-heading .sp-title { margin: 0; font-size: 26px; font-weight: 600; line-height: 1.3; color: var(--content-base); }
+    .sp-heading.is-sm .sp-title { font-size: 18px; line-height: 1.5; }
+    .sp-heading .sp-subtitle { margin: 8px 0 0; font-size: 14px; color: var(--content-secondary); }
+    .sp-heading.is-sm .sp-subtitle { margin: 4px 0 0; }
+    /* Small header → tighter 24px padding everywhere (incl. above the title) */
+    .sidepanel.is-sm-header .sp-toolbar { padding: 24px 24px 0; }
+    .sidepanel.is-sm-header .sp-heading { padding: 0 24px; }
+    .sidepanel.is-sm-header .sp-tabs   { padding: 0 24px; }
+    .sidepanel.is-sm-header .sp-body   { padding: 16px 24px; }
+    .sidepanel.is-sm-header .sp-footer { padding: 16px 24px 24px; }
+    /* Compact small header (no advanced menu) — title shares its row with the actions */
+    .sp-header.is-compact { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 8px; padding: 24px 24px 0; }
+    .sp-header.is-compact .sp-toolbar { grid-column: 2; grid-row: 1; padding: 0; }
+    .sp-header.is-compact .sp-heading { grid-column: 1; grid-row: 1; padding: 0; }
+    .sp-header.is-compact .sp-tabs { grid-column: 1 / -1; grid-row: 2; margin: 8px -24px 0; padding: 0 24px; }
+
+    .sp-tabs { display: flex; gap: 28px; margin: 4px 0 0; padding: 0 40px; border-bottom: 1px solid var(--border-base); overflow-x: auto; }
+    .sp-tab { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 10px 0 14px; font-size: 14px; font-weight: 500; line-height: 1.6; color: var(--content-secondary); white-space: nowrap; cursor: pointer; }
+    .sp-tab i[data-icon] { width: 16px; height: 16px; display: flex; }
+    .sp-tab:hover, .sp-tab.is-hover { color: var(--content-base); }
+    .sp-tab.is-active { color: var(--content-base); }
+    .sp-tab::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 4px; border-radius: var(--radius-full); background: transparent; }
+    .sp-tab.is-active::after { background: var(--content-brand-secondary); }
+
+    .sp-body { flex: 1; overflow: auto; padding: 24px 40px; font-size: 16px; line-height: 1.5; color: var(--content-secondary); }
+    .sp-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 24px 40px 40px; flex-shrink: 0; }
+
+    /* Footer buttons (the Button component) */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 6px 12px; border-radius: var(--radius-base); border: 1px solid transparent; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: var(--sh-action); }
+    .btn-secondary { background: var(--bg-base); border-color: var(--border-action); color: var(--content-action); }
+    .btn-secondary:hover { background: var(--bg-base-hover); border-color: var(--border-action-hover); }
+    .btn-primary { background: var(--bg-brand); border-color: var(--border-brand); color: var(--content-on-brand-base); }
+    .btn-primary:hover { background: var(--bg-brand-hover); border-color: var(--bg-brand-pressed); }
+
+    /* Demo stage — panel docked on the right over a scrim */
+    .sp-stage { display: flex; justify-content: flex-end; height: 480px; background: rgba(25,39,67,.18); border-radius: var(--radius-lg); overflow: hidden; }
+    .sp-stage .sidepanel { box-shadow: -8px 0 24px -12px rgba(25,39,67,.25); }
+
+    /* Header variant preview — panel docked over a page, scaled (still reads as a side panel) */
+    .sp-hscene { position: relative; width: 420px; max-width: 100%; height: 204px; margin: 0 auto; overflow: hidden; border: 1px solid var(--border-base); border-radius: var(--radius-md); background: var(--bg-base); }
+    .sp-hscene-inner { position: absolute; top: 0; left: 0; width: 700px; height: 340px; transform: scale(.6); transform-origin: top left; }
+    .sp-hscene .sidepanel { position: absolute; top: 0; right: 0; height: 100%; width: 320px; box-shadow: -8px 0 24px -12px rgba(25,39,67,.3); }
+
+    /* Zoomed-out "page with a side panel" scene (a real page mock, scaled down) */
+    .sp-scene { position: relative; width: 300px; height: 188px; margin: 0 auto; overflow: hidden; border-radius: var(--radius-md); border: 1px solid var(--border-base); background: var(--bg-base); }
+    .sp-scene-inner { position: absolute; top: 0; left: 0; width: 960px; height: 600px; transform: scale(.3125); transform-origin: top left; }
+    .spm-page { position: absolute; inset: 0; padding: 40px; }
+    .spm-title { width: 320px; height: 30px; border-radius: var(--radius-base); background: var(--bg-secondary); }
+    .spm-tabs { display: flex; gap: 24px; margin-top: 26px; padding-bottom: 16px; border-bottom: 1px solid var(--border-base); }
+    .spm-tabs span { width: 90px; height: 14px; border-radius: var(--radius-base); background: var(--bg-secondary); }
+    .spm-row { height: 60px; border: 1px solid var(--border-base); border-radius: var(--radius-md); margin-top: 16px; }
+    .spm-scrim { position: absolute; inset: 0; background: rgba(25,39,67,.45); }
+    .sp-scene .sidepanel { position: absolute; top: 0; right: 0; height: 100%; box-shadow: -8px 0 24px -12px rgba(25,39,67,.3); }
+
+    /* Anatomy — a whole page+panel scene, scaled down a bit (zoomed out) */
+    .anatomy-fig { position: relative; background: var(--bg-secondary); border-radius: var(--radius-lg); margin-bottom: 24px; height: 440px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .ana-scene-inner { position: relative; flex-shrink: 0; width: 860px; height: 480px; transform: scale(.82); transform-origin: center; }
+    .anatomy-fig .sidepanel { position: absolute; top: 0; right: 0; height: 100%; width: 380px; pointer-events: none; z-index: 2; box-shadow: -8px 0 24px -12px rgba(25,39,67,.3); }
+    .ana-num { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--content-base); color: var(--bg-base); font-size: 9px; /* font-scale-exempt: anatomy number badge */ font-weight: 700; display: flex; align-items: center; justify-content: center; z-index: 4; }
+    .sp-slot { flex: 1; display: flex; align-items: center; justify-content: center; border: 1.5px dashed var(--border-action); border-radius: var(--radius-md); padding: 24px 16px; text-align: center; font-size: 14px; color: var(--content-subtle); }
+    .sp-body:has(.sp-slot) { display: flex; }
+
+    .dd-card .dd-prev { flex: 1; }
+    .variant-row { grid-template-columns: minmax(420px, 1fr) 1fr; }
+
+    /* Real modal overlay opened from the playground */
+    .sp-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; justify-content: flex-end; background: rgba(25,39,67,.6); animation: sp-fade .15s ease-out; }
+    .sp-overlay[hidden] { display: none; }
+    .sp-overlay .sidepanel { height: 100%; animation: sp-slide .26s cubic-bezier(.22,.61,.36,1); }
+    .sp-overlay.is-closing { animation: sp-fade-out .22s ease-in forwards; }
+    .sp-overlay.is-closing .sidepanel { animation: sp-slide-out .24s cubic-bezier(.55,.06,.68,.19) forwards; }
+    @keyframes sp-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes sp-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes sp-fade-out { from { opacity: 1; } to { opacity: 0; } }
+    @keyframes sp-slide-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Side Panel</h1>
+      <p class="page-desc">A panel that slides in from the right over a scrim to show details, a form, or a focused task without leaving the current page.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">A side panel docks against the right edge at full height, over a scrim. A header holds the title and actions; the body scrolls; an optional footer pins the actions.</p>
+          <div class="anatomy-fig">
+            <div class="ana-scene-inner">
+            <div class="spm-page">
+              <div class="spm-title"></div>
+              <div class="spm-tabs"><span></span><span></span><span></span></div>
+              <div class="spm-row"></div><div class="spm-row"></div><div class="spm-row"></div>
+            </div>
+            <div class="spm-scrim"></div>
+            <div class="sidepanel">
+              <div class="sp-header">
+                <div class="sp-toolbar">
+                  <div class="sp-nav"><i data-icon="arrow-up"></i><i data-icon="arrow-down"></i></div>
+                  <div class="sp-actions"><i data-icon="bookmark"></i><i data-icon="message"></i><i data-icon="clock"></i><i data-icon="more-vertical"></i><span class="sp-sep"></span><i data-icon="cross"></i></div>
+                </div>
+                <div class="sp-heading"><h3 class="sp-title">Title</h3><p class="sp-subtitle">Subtitle</p></div>
+                <div class="sp-tabs"><a class="sp-tab is-active"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a></div>
+              </div>
+              <div class="sp-body"><div class="sp-slot">Your content goes here — details, a form, or any custom UI</div></div>
+              <div class="sp-footer"><button class="btn btn-secondary">Cancel</button><button class="btn btn-primary">Confirm</button></div>
+            </div>
+            <!-- callouts anchored to the right edge (panel is flush right) -->
+            <div class="ana-num" style="right:190px; top:8px;">1</div>
+            <div class="ana-num" style="right:16px; top:14px;">2</div>
+            <div class="ana-num" style="right:392px; top:18px;">3</div>
+            <div class="ana-num" style="right:392px; top:58px;">4</div>
+            <div class="ana-num" style="right:392px; top:98px;">5</div>
+            <div class="ana-num" style="right:392px; top:132px;">6</div>
+            <div class="ana-num" style="right:392px; top:248px;">7</div>
+            <div class="ana-num" style="right:392px; top:430px;">8</div>
+            </div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Surface</span> — A full-height panel docked to the right edge, raised over a scrim that dims the page behind it.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Toolbar</span> — Top row of actions (bookmark, comment, history…), a <em>more</em> menu and the close button.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Navigation</span> — Optional previous/next arrows (the "advanced menu") to step between records without closing the panel.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Title</span> — A short heading naming what's shown. Always present.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">5</div><div><span class="anatomy-term">Subtitle</span> — Optional supporting line under the title.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">6</div><div><span class="anatomy-term">Tabs</span> — Optional in-panel tabs to switch between sections of the same record.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">7</div><div><span class="anatomy-term">Body</span> — The scrolling content slot: details, a form, or any custom UI.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">8</div><div><span class="anatomy-term">Footer</span> — Optional pinned action row (e.g. Cancel / Confirm).</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Use a side panel to view or edit a record beside its context — the list stays visible behind the scrim. For a full, standalone task use a page; for a short confirmation use a Dialog.</p>
+
+          <h3 class="text-l4">Keep the context visible</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px;">
+                <div class="sp-scene">
+                  <div class="sp-scene-inner">
+                    <div class="spm-page">
+                      <div class="spm-title"></div>
+                      <div class="spm-tabs"><span></span><span></span><span></span></div>
+                      <div class="spm-row"></div><div class="spm-row"></div><div class="spm-row"></div>
+                    </div>
+                    <div class="spm-scrim"></div>
+                    <div class="sidepanel sidepanel-sm is-sm-header" style="width:380px;">
+                      <div class="sp-header is-compact"><div class="sp-toolbar"><div class="sp-actions"><i data-icon="cross"></i></div></div><div class="sp-heading is-sm"><h3 class="sp-title">Jamal van Rooi</h3><p class="sp-subtitle">Response details</p></div></div>
+                      <div class="sp-body"><div class="sp-slot">Respondent details</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                Show details next to the list the user came from.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="padding:24px;">
+                <div class="sp-scene">
+                  <div class="sp-scene-inner">
+                    <div class="spm-page">
+                      <div class="spm-title"></div>
+                      <div class="spm-tabs"><span></span><span></span><span></span></div>
+                      <div class="spm-row"></div><div class="spm-row"></div><div class="spm-row"></div>
+                    </div>
+                    <div class="spm-scrim"></div>
+                    <div class="sidepanel" style="width:880px;">
+                      <div class="sp-header"><div class="sp-toolbar"><div class="sp-actions"><i data-icon="cross"></i></div></div><div class="sp-heading"><h3 class="sp-title">Full report</h3><p class="sp-subtitle">A whole multi-step flow crammed into a panel that covers the page.</p></div></div>
+                      <div class="sp-body"><div class="sp-slot">Step 1 of 6</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Stuff a full, long flow into a panel — that belongs on its own page.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">A side panel is shaped by its width, its header (navigation + tabs) and whether it has a footer.</p>
+
+          <h3 class="text-l4">Size</h3>
+          <table class="token-table">
+            <thead><tr><th>Size</th><th>Width</th><th>When to use</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Default</strong></td><td>800px</td><td>The standard width — record details, forms and content-rich panels.</td></tr>
+              <tr><td><strong>Small</strong></td><td>400px</td><td>A narrower panel for focused, lightweight content beside a wide main view.</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="text-l4">Header</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="sp-hscene">
+                  <div class="sp-hscene-inner">
+                    <div class="spm-page"><div class="spm-title"></div><div class="spm-tabs"><span></span><span></span><span></span></div><div class="spm-row"></div><div class="spm-row"></div></div>
+                    <div class="spm-scrim"></div>
+                    <div class="sidepanel">
+                      <div class="sp-header"><div class="sp-toolbar"><div class="sp-nav"><i data-icon="arrow-up"></i><i data-icon="arrow-down"></i></div><div class="sp-actions"><i data-icon="bookmark"></i><i data-icon="message"></i><i data-icon="clock"></i><i data-icon="more-vertical"></i><span class="sp-sep"></span><i data-icon="cross"></i></div></div><div class="sp-heading"><h3 class="sp-title">Title</h3><p class="sp-subtitle">Subtitle</p></div><div class="sp-tabs"><a class="sp-tab is-active"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a></div></div>
+                      <div class="sp-body"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Advanced menu</strong> — Adds previous/next navigation arrows and the extra toolbar actions (bookmark, comment, history). Use when the user steps through many records in a row.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn">
+                <div class="sp-hscene">
+                  <div class="sp-hscene-inner">
+                    <div class="spm-page"><div class="spm-title"></div><div class="spm-tabs"><span></span><span></span><span></span></div><div class="spm-row"></div><div class="spm-row"></div></div>
+                    <div class="spm-scrim"></div>
+                    <div class="sidepanel">
+                      <div class="sp-header"><div class="sp-toolbar"><div class="sp-actions"><i data-icon="cross"></i></div></div><div class="sp-heading"><h3 class="sp-title">Title</h3><p class="sp-subtitle">Subtitle</p></div><div class="sp-tabs"><a class="sp-tab is-active"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a></div></div>
+                      <div class="sp-body"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="variant-row-desc"><strong>Standard</strong> — Just the <em>more</em> menu and close. Tabs are optional; use them to switch between sections of the same record.</div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Header size</h3>
+          <p>A <strong>Large</strong> header (26px title) puts the toolbar on its own row above the title; a <strong>Small</strong> header (18px title) is more compact: it tightens the panel padding to 24px (including above the title) and places the close/actions on the title row. Try both in the playground.</p>
+
+          <h3 class="text-l4">Footer</h3>
+          <p>A footer is optional. Add one when the panel edits data and needs explicit Save/Cancel actions; omit it for read-only detail panels (use the close button).</p>
+        </section>
+
+        <section class="section" id="content-guidelines">
+          <h2 class="text-l3">Content guidelines</h2>
+          <p class="section-lead">Give the panel a clear title and keep its content and actions focused.</p>
+
+          <div class="cg-rule">
+            <h3 class="text-l4">Write a specific title</h3>
+            <p>The title should say what the panel is about. Avoid generic labels like "Details" or "Information"; a short subtitle can add context.</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px;"><div class="sidepanel" style="width:300px; height:120px; pointer-events:none; box-shadow:none; border:1px solid var(--border-base); border-radius:var(--radius-md);"><div class="sp-header"><div class="sp-heading is-sm"><h3 class="sp-title">Edit team</h3><p class="sp-subtitle">Marketing · 12 members</p></div></div></div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Specific — clear what the panel is for.</div>
+              </div>
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px;"><div class="sidepanel" style="width:300px; height:120px; pointer-events:none; box-shadow:none; border:1px solid var(--border-base); border-radius:var(--radius-md);"><div class="sp-header"><div class="sp-heading is-sm"><h3 class="sp-title">Details</h3><p class="sp-subtitle">Information</p></div></div></div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Vague — says nothing about what's shown.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cg-rule">
+            <h3 class="text-l4">Footer actions name the outcome</h3>
+            <p>The primary button should say what happens (Save, Apply, Send), not a generic "OK". Pair it with a clear way out.</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px;"><div style="display:flex; gap:8px;"><button class="btn btn-secondary" style="pointer-events:none;">Cancel</button><button class="btn btn-primary" style="pointer-events:none;">Save changes</button></div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Names the outcome.</div>
+              </div>
+              <div class="dd-card">
+                <div class="dd-prev" style="padding:24px;"><div style="display:flex; gap:8px;"><button class="btn btn-secondary" style="pointer-events:none;">Cancel</button><button class="btn btn-primary" style="pointer-events:none;">OK</button></div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>Generic — what does "OK" do?</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">The panel uses the base surface and the dialog shadow; the scrim dims the page behind it.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code></td><td>Panel surface</td><td>#ffffff</td></tr>
+              <tr><td><code>--border-base</code></td><td>Tab + footer dividers</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--sh-dialogs</code></td><td>Panel shadow</td><td>0 4px 12px rgba(25,39,67,.08)</td></tr>
+              <tr><td><code>--content-base</code></td><td>Title + active tab</td><td>#192743</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Subtitle + body + inactive tabs</td><td>rgba(25,39,67,.80)</td></tr>
+              <tr><td><code>--content-action</code></td><td>Toolbar + nav icons</td><td>rgba(25,39,67,.80)</td></tr>
+              <tr><td><code>--content-brand-secondary</code></td><td>Active tab indicator</td><td>#0c827f</td></tr>
+              <tr><td><code>--bg-interface-overlay</code></td><td>Backdrop / scrim</td><td>rgba(25,39,67,.50)</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:14px; color:var(--content-secondary);">Typography: title <code>text-l3</code> (26px) — or 18px when small; subtitle &amp; tabs <code>body-14</code>; body <code>body-16</code>.</p>
+          <div class="dev-gap">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Figma gap — backdrop opacity</span>
+              <span class="dev-gap-text">The Figma token <code>--bg-interface-overlay</code> is <code>rgba(25,39,67,.50)</code>, but the live styleguide renders the overlay scrim at <code>rgba(25,39,67,.65)</code>. This documentation uses <code>.60</code> as a middle ground — align Figma ↔ code on the final value.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">A side panel is a modal surface — manage focus and dismissal like a dialog.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Modal semantics.</strong> Expose <code>role="dialog"</code> + <code>aria-modal="true"</code> and name it via <code>aria-labelledby</code> on the title.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Focus.</strong> Move focus into the panel on open, trap <code>Tab</code> within it, and return focus to the trigger on close.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Escape closes.</strong> <code>Escape</code> dismisses the panel (= close), unless an edit is mid-flight.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label icon actions.</strong> The toolbar and nav arrows are icon-only — give each an <code>aria-label</code> (e.g. "Previous", "Bookmark", "Close").</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Tabs.</strong> If the header uses tabs, wire them with <code>role="tab"</code> / <code>role="tabpanel"</code> and arrow-key navigation.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="popover-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Popover</span></a>
+          <a class="pag-card right" href="container-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Container</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">⚠️</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">Figma gap</span>
+            <span class="dev-gap-text">In Figma the Dialog and Side Panel headers use inconsistent title↔subtitle spacing. The design system standardizes both: a <strong>small</strong> header is an 18px title with a <strong>4px</strong> gap to the 14px subtitle; a <strong>large</strong> header is a 26px title (<code>text-l3</code>) with an <strong>8px</strong> gap to the 14px subtitle.</span>
+          </div>
+        </div>
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Configure the panel and open it — it slides in from the right over a scrim. The Code tab shows the production API (<code>SidepanelService</code>).</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="padding:32px; justify-content:center; background:rgba(25,39,67,.06);"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">size</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-size"><option value="default" selected>Default</option><option value="small">Small</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">header size</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-header"><option value="large" selected>Large</option><option value="small">Small</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">advanced menu</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-adv"><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">tabs</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-tabs" checked><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">footer</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-foot" checked><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">title</div><div class="pg-row-ctrl"><input class="pg-input" type="text" id="pg-title" value="Title" /></div></div>
+                <div class="pg-row"><div class="pg-row-name">subtitle</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-subon" checked><span class="pg-toggle-track"></span></label></div></div>
+                <div class="pg-row"><div class="pg-row-name">subtitle text</div><div class="pg-row-ctrl"><input class="pg-input" type="text" id="pg-subtitle" value="Subtitle" /></div></div>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Open a panel by passing a component (and optional data) to the <code>SidepanelService</code>. The panel's own template renders the title, content and actions.</p>
+
+          <h3 class="text-l4">Open &amp; close</h3>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="cc">// component that opens the panel</span>
+<span class="ca">import</span> { SidepanelService } <span class="ca">from</span> <span class="cv">"@effectory/branding-angular"</span>;
+
+<span class="ca">constructor</span>(<span class="ca">private</span> sidepanelService: SidepanelService) {
+  <span class="ca">this</span>.sidepanelService.afterClosed
+    .pipe(takeUntilDestroyed(<span class="ca">this</span>.destroyRef))
+    .subscribe(data =&gt; <span class="ca">this</span>.result = data);
+}
+
+open() {
+  <span class="ca">this</span>.sidepanelService.open(ResponseSidepanelComponent, { name: <span class="cv">"Said"</span> });
+}</code></pre>
+          </div>
+
+          <h3 class="text-l4">The panel component</h3>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;h1</span> <span class="ca">class</span>=<span class="cv">"title text-l3"</span><span class="ct">&gt;</span>{{ data.name }}<span class="ct">&lt;/h1&gt;</span>
+<span class="ct">&lt;span</span> <span class="ca">class</span>=<span class="cv">"subtitle"</span><span class="ct">&gt;</span>Response details<span class="ct">&lt;/span&gt;</span>
+<span class="ct">&lt;button</span> <span class="ca">class</span>=<span class="cv">"icon-button close-button"</span> <span class="ca">(click)</span>=<span class="cv">"sidepanelService.close()"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;eff-mat-icon</span> <span class="ca">class</span>=<span class="cv">"icon"</span> <span class="ca">[iconName]</span>=<span class="cv">"'cross'"</span><span class="ct">/&gt;</span>
+<span class="ct">&lt;/button&gt;</span>
+
+<span class="ct">&lt;p&gt;</span>The content goes here<span class="ct">&lt;/p&gt;</span>
+
+<span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"actions-container"</span><span class="ct">&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">class</span>=<span class="cv">"secondary"</span> <span class="ca">(click)</span>=<span class="cv">"sidepanelService.close()"</span><span class="ct">&gt;</span>Cancel<span class="ct">&lt;/button&gt;</span>
+  <span class="ct">&lt;button</span> <span class="ca">class</span>=<span class="cv">"primary"</span> <span class="ca">(click)</span>=<span class="cv">"save()"</span><span class="ct">&gt;</span>Confirm<span class="ct">&lt;/button&gt;</span>
+<span class="ct">&lt;/div&gt;</span></code></pre>
+          </div>
+          <p>Return data to the opener by passing it to <code>close()</code> — e.g. <code>sidepanelService.close({ saved: true })</code> — and read it through <code>afterClosed</code>. A narrower panel opens via the service's small variant.</p>
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Class reference</h2>
+          <p class="section-lead">Inside the panel component's template, use these classes (from the live styleguide).</p>
+          <table class="token-table">
+            <thead><tr><th>Class</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>.title.text-l3</code></td><td>The panel title.</td></tr>
+              <tr><td><code>.subtitle</code></td><td>Optional supporting line under the title.</td></tr>
+              <tr><td><code>.icon-button.close-button</code></td><td>The close button (an <code>eff-mat-icon</code> <code>cross</code>); calls <code>sidepanelService.close()</code>.</td></tr>
+              <tr><td><code>.actions-container</code></td><td>Footer action row, holding <code>.primary</code> / <code>.secondary</code> buttons.</td></tr>
+            </tbody>
+          </table>
+          <table class="token-table" style="margin-top:16px;">
+            <thead><tr><th>SidepanelService</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td><code>open(Component, data?)</code></td><td>Opens the panel, rendering the given component; <code>data</code> is injected into it.</td></tr>
+              <tr><td><code>close(data?)</code></td><td>Closes the panel and emits <code>data</code> to <code>afterClosed</code>.</td></tr>
+              <tr><td><code>afterClosed</code></td><td>Observable that emits the close payload.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The panel surface and scrim are themed with these tokens.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--bg-base</code> · <code>--border-base</code></td><td>Surface + dividers</td></tr>
+              <tr><td><code>--sh-dialogs</code></td><td>Panel shadow</td></tr>
+              <tr><td><code>--content-base</code> · <code>--content-secondary</code></td><td>Title / subtitle + body</td></tr>
+              <tr><td><code>--content-action</code></td><td>Toolbar &amp; nav icons</td></tr>
+              <tr><td><code>--content-brand</code></td><td>Active tab underline</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">The <code>SidepanelService</code> manages the overlay; keep these in mind.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Modal + label.</strong> The panel is modal; ensure the title is the accessible name (<code>aria-labelledby</code>).</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Focus return.</strong> Focus returns to the trigger when the panel closes.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Icon labels.</strong> Give every icon-only toolbar/nav button an <code>aria-label</code>.</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-usage">Usage</a>
+          <a class="toc-link" href="#dev-props">Class reference</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+    const defaults = { size:'default', header:'large', adv:false, tabs:true, foot:true, subon:true, title:'Title', subtitle:'Subtitle' };
+    function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+    function state(){return{
+      size:document.getElementById('pg-size').value,
+      header:document.getElementById('pg-header').value,
+      adv:document.getElementById('pg-adv').checked,
+      tabs:document.getElementById('pg-tabs').checked,
+      foot:document.getElementById('pg-foot').checked,
+      subon:document.getElementById('pg-subon').checked,
+      title:document.getElementById('pg-title').value,
+      subtitle:document.getElementById('pg-subtitle').value,
+    };}
+    function buildPanel(s){
+      const nav = s.adv ? '<div class="sp-nav"><i data-icon="arrow-up"></i><i data-icon="arrow-down"></i></div>' : '';
+      // The kebab + extra tools belong to the advanced menu; the standard header is just close.
+      const extra = s.adv ? '<i data-icon="bookmark"></i><i data-icon="message"></i><i data-icon="clock"></i><i data-icon="more-vertical"></i><span class="sp-sep"></span>' : '';
+      const tabs = s.tabs ? '<div class="sp-tabs"><a class="sp-tab is-active"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a><a class="sp-tab"><i data-icon="box"></i> Item</a></div>' : '';
+      const foot = s.foot ? '<div class="sp-footer"><button class="btn btn-secondary">Cancel</button><button class="btn btn-primary">Confirm</button></div>' : '';
+      const headerSm = s.header==='small';
+      const compact = headerSm && !s.adv; // small header puts the actions on the title row
+      return `<div class="sidepanel${s.size==='small'?' sidepanel-sm':''}${headerSm?' is-sm-header':''}" role="dialog" aria-modal="true">
+        <div class="sp-header${compact?' is-compact':''}">
+          <div class="sp-toolbar">${nav}<div class="sp-actions">${extra}<i data-icon="cross" data-close="1"></i></div></div>
+          <div class="sp-heading${headerSm?' is-sm':''}"><h3 class="sp-title">${esc(s.title)||'Title'}</h3>${(s.subon && s.subtitle)?`<p class="sp-subtitle">${esc(s.subtitle)}</p>`:''}</div>
+          ${tabs}
+        </div>
+        <div class="sp-body"><div class="sp-slot">Your content goes here — details, a form, or any custom UI</div></div>
+        ${foot}
+      </div>`;
+    }
+    function buildCode(s){
+      const L = [];
+      L.push('// open it');
+      L.push(`this.sidepanelService.open(ResponseSidepanelComponent, { name: "Said" });`);
+      L.push('');
+      L.push('<!-- ResponseSidepanelComponent template -->');
+      L.push(`<h1 class="title ${s.header==='small'?'text-l5':'text-l3'}">${esc(s.title)||'Title'}</h1>`);
+      if (s.subon && s.subtitle) L.push(`<span class="subtitle">${esc(s.subtitle)}</span>`);
+      L.push('<button class="icon-button close-button" (click)="sidepanelService.close()"><eff-mat-icon class="icon" [iconName]="\'cross\'"/></button>');
+      L.push('');
+      L.push('<p>The content goes here</p>');
+      if (s.foot){
+        L.push('');
+        L.push('<div class="actions-container">');
+        L.push('  <button class="secondary" (click)="sidepanelService.close()">Cancel</button>');
+        L.push('  <button class="primary" (click)="save()">Confirm</button>');
+        L.push('</div>');
+      }
+      return L.join('\n');
+    }
+    function render(){const s=state();$preview.innerHTML='<button class="btn btn-primary" id="pg-open">Open side panel</button>';document.getElementById('pg-code').textContent=buildCode(s);}
+    ['pg-size','pg-header','pg-adv','pg-tabs','pg-foot','pg-subon','pg-title','pg-subtitle'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.addEventListener('input',render);el.addEventListener('change',render);});
+
+    // Open the configured panel as a real overlay sliding in from the right
+    const overlay = document.createElement('div');
+    overlay.className = 'sp-overlay'; overlay.hidden = true;
+    document.body.appendChild(overlay);
+    function escClose(e){ if (e.key==='Escape') closeOverlay(); }
+    function openOverlay(){
+      overlay.classList.remove('is-closing');
+      overlay.innerHTML = buildPanel(state());
+      overlay.hidden = false;
+      if (window.Icons && window.Icons.render) window.Icons.render(overlay);
+      document.addEventListener('keydown', escClose);
+    }
+    function closeOverlay(){
+      if (overlay.hidden || overlay.classList.contains('is-closing')) return;
+      document.removeEventListener('keydown', escClose);
+      overlay.classList.add('is-closing');
+      const done = ()=>{ overlay.hidden = true; overlay.innerHTML = ''; overlay.classList.remove('is-closing'); };
+      const panel = overlay.querySelector('.sidepanel');
+      let finished = false;
+      const finish = ()=>{ if (finished) return; finished = true; done(); };
+      if (panel) panel.addEventListener('animationend', finish, { once: true });
+      setTimeout(finish, 300);
+    }
+    overlay.addEventListener('click', e=>{
+      if (e.target === overlay || e.target.closest('[data-close]') || e.target.closest('.sp-footer .btn')) closeOverlay();
+    });
+    $preview.addEventListener('click', e=>{ if (e.target.closest('#pg-open')) openOverlay(); });
+
+    document.getElementById('pg-reset')?.addEventListener('click',()=>{document.getElementById('pg-size').value=defaults.size;document.getElementById('pg-header').value=defaults.header;document.getElementById('pg-adv').checked=defaults.adv;document.getElementById('pg-tabs').checked=defaults.tabs;document.getElementById('pg-foot').checked=defaults.foot;document.getElementById('pg-subon').checked=defaults.subon;document.getElementById('pg-title').value=defaults.title;document.getElementById('pg-subtitle').value=defaults.subtitle;closeOverlay();render();});
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+    render();
+  })();
+</script>
+</body>
+</html>

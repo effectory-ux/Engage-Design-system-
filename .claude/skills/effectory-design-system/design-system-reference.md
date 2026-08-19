@@ -171,21 +171,21 @@ Tokens zijn auto-generated vanuit Figma via `build-tokens.py`. Nooit handmatig b
 | `--bg-base-pressed` | `#f1f2f4` |
 | `--bg-secondary` | `#f8f8f9` |
 | `--bg-tertiary` | `#e1e4e8` |
-| `--bg-brand-base` | `#0a9d99` |
+| `--bg-brand` | `#0a9d99` |
 | `--bg-brand-subtle` | `#d2f8f6` |
 | `--bg-input` | `#ffffff` |
 | `--bg-disabled` | `rgba(25,39,67,.10)` |
-| `--bg-negative-base` | `#d3353b` |
+| `--bg-negative` | `#d3353b` |
 | `--bg-negative-subtle` | `#ffebeb` |
-| `--bg-positive-base` | `#278747` |
+| `--bg-positive` | `#278747` |
 | `--bg-positive-subtle` | `#d7f9e0` |
-| `--bg-info-base` | `#3174db` |
+| `--bg-info` | `#3174db` |
 | `--bg-info-subtle` | `#e6f0fe` |
-| `--bg-warning-bold` | `#fa8324` |
+| `--bg-warning` | `#fa8324` |
 | `--bg-warning-subtle` | `#feede1` |
 | `--bg-highlight-base` | `#fdbd12` |
 | `--bg-highlight-subtle` | `#ffefc2` |
-| `--bg-inverse-base` | `#192743` |
+| `--bg-inverse` | `#192743` |
 | `--bg-interface-body` | `#ffffff` |
 
 **Borders**
@@ -194,10 +194,10 @@ Tokens zijn auto-generated vanuit Figma via `build-tokens.py`. Nooit handmatig b
 | `--border-base` | `#e1e4e8` |
 | `--border-action` | `#bcc1cd` |
 | `--border-action-hover` | `#a5adbc` |
-| `--border-brand-base` | `#0c827f` |
+| `--border-brand` | `#0c827f` |
 | `--border-brand-subtle` | `#7adddb` |
-| `--border-negative-base` | `#b9252a` |
-| `--border-positive-base` | `#39a35c` |
+| `--border-negative` | `#b9252a` |
+| `--border-positive` | `#39a35c` |
 | `--border-info-base` | `#3174db` |
 | `--border-warning-base` | `#ec6e0a` |
 | `--border-highlight-base` | `#d68100` |
@@ -211,15 +211,15 @@ Tokens zijn auto-generated vanuit Figma via `build-tokens.py`. Nooit handmatig b
 | `--content-subtle` | `rgba(25,39,67,.50)` |
 | `--content-placeholder` | `rgba(25,39,67,.67)` |
 | `--content-disabled` | `rgba(25,39,67,.30)` |
-| `--content-brand-base` | `#166764` |
+| `--content-brand` | `#166764` |
 | `--content-on-brand-base` | `#ffffff` |
-| `--content-negative-base` | `#b9252a` |
+| `--content-negative` | `#b9252a` |
 | `--content-negative-secondary` | `#d3353b` |
-| `--content-positive-base` | `#236e41` |
-| `--content-info-base` | `#205bb9` |
+| `--content-positive` | `#236e41` |
+| `--content-info` | `#205bb9` |
 | `--content-warning-base` | `#a83e00` |
-| `--content-highlight-base` | `#8a4b15` |
-| `--content-inverse-base` | `#ffffff` |
+| `--content-highlight` | `#8a4b15` |
+| `--content-inverse` | `#ffffff` |
 
 **Accent-kleuren** (voor badges, tags, highlights)
 Patroon: `--bg-accent-{kleur}-base` / `--bg-accent-{kleur}-subtle`
@@ -288,7 +288,7 @@ Knop gekleurd naar sentiment. **Voornamelijk gebruikt binnen een container die z
 ```
 - Sentiment: `is-positive` / `is-negative` / `is-info` / `is-warning` — zet de border (secondary) of fill (`.is-primary`).
 - Secondary: witte fill + sentiment-border + `--content-base`; hover = `-base-hover` border + `--sh-action-hover`; pressed = `--bg-{sent}-subtle`.
-- Primary: gevuld met `--bg-{sent}-base` (warning = `--bg-warning-bold`, **donkere tekst**; info/positive/negative = witte tekst `--content-on-brand-base`).
+- Primary: gevuld met `--bg-{sent}-base` (warning = `--bg-warning`, **donkere tekst**; info/positive/negative = witte tekst `--content-on-brand-base`).
 - Hoogte 36, radius `--radius-base`, `--sh-action`, label `body-14` Medium. States: `.is-hover` `.is-pressed` `.is-disabled`.
 > ⚠️ Figma/dev gap: Figma heeft een losse sentiment-knop met secondary én **filled primary**; de Angular-styleguide kent 'm momenteel alleen als **secondary** sentiment-actie binnen een Inline notification (`buttonMessages` / `messageType`). Standalone filled-primary nog te bevestigen.
 > ⚠️ Figma/dev gap: sommige states zijn in Figma met **primitieve** tokens gekleurd (`color/orange/700`, `color/blue/900`, …). Gebruik altijd de **semantische** tokens (`--bg-{sentiment}-base/-hover/-pressed`, `--border-{sentiment}-base/-hover`); de Figma-lagen moeten daar nog op gebonden worden.
@@ -874,8 +874,8 @@ Donkere, systeem-brede melding (uitkomst van een achtergrond-proces of systeem-e
   <button class="sysnotif-close" aria-label="Dismiss"><i data-icon="cross"></i></button>
 </div>
 ```
-- Sentiment via modifier op `.sysnotif`: default = Success (accent `--border-positive-base`), `is-error` (`--border-negative-base`), `is-warning` (`--border-warning-base`).
-- Donkere surface `--bg-inverse-base`; titel `--content-inverse-base`; desc `--content-inverse-secondary`; shadow `--sh-popovers`; radius `--radius-md`; 8px accent-balk links.
+- Sentiment via modifier op `.sysnotif`: default = Success (accent `--border-positive`), `is-error` (`--border-negative`), `is-warning` (`--border-warning-base`).
+- Donkere surface `--bg-inverse`; titel `--content-inverse`; desc `--content-inverse-secondary`; shadow `--sh-popovers`; radius `--radius-md`; 8px accent-balk links.
 - De action is een **Link Button** (`.link-inline`) met een kleur-override naar de sentiment (`--border-positive/negative/warning-base`): `<button class="link-inline sysnotif-action">…</button>`. ⚠️ Figma/dev gap: Figma tekent de action wit/secondary — nog gelijk te trekken.
 - a11y: `role="status"` (Success) / `role="alert"` (Error/Warning); `aria-label` op de close-knop.
 - Onderdelen: `.sysnotif-title`, `.sysnotif-desc`, `.sysnotif-action`, `.sysnotif-close`.
@@ -898,7 +898,7 @@ Kleine, niet-interactieve donkere bubble die op hover/focus verschijnt. Alleen k
   <div class="tooltip is-above">Delete survey</div>
 </div>
 ```
-Positie-classes: `.is-above` `.is-below` `.is-left` `.is-right`. Bubble = `--bg-inverse-base` (#192743), witte tekst, Poppins Medium 14, `--radius-md`. Tekst wrapt op max-width ~240px. Gebruik nooit voor essentiële info of interactieve content → dan een Spotlight of dialog.
+Positie-classes: `.is-above` `.is-below` `.is-left` `.is-right`. Bubble = `--bg-inverse` (#192743), witte tekst, Poppins Medium 14, `--radius-md`. Tekst wrapt op max-width ~240px. Gebruik nooit voor essentiële info of interactieve content → dan een Spotlight of dialog.
 
 > ⚠️ **Clipping vermijden — render de tooltip in een fixed overlay-laag.** Een tooltip die binnen een scrollende of `overflow:hidden`-container leeft, wordt afgekapt zodra hij buiten die container valt (een `.is-above`-tooltip op een icon button bovenin een kaart schiet boven de scroll-viewport uit). Pure CSS lost dit niet op. **Markeer tooltips met de gewenste standaardrichting** (meestal `.is-above`) en laat een klein **auto-positioneer-scriptje** het werk doen: bij hover/focus meet het de trigger, kiest de eerste richting die in de viewport past (standaardzijde eerst, dan `above > below > right > left`), en zet de bubble met `position:fixed` op berekende coördinaten — geclampt binnen de viewport. Zo kan **geen enkele voorouder** (kaart, scroll-container, `overflow:hidden`) hem ooit nog clippen. Het hangt gedelegeerd op `document` (overleeft de in-place re-renders van `#root`) en herberekent bij elke hover/focus. De referentie-prototypes hebben dit blok al ingebouwd (zoek op `Tooltip auto-position`); neem het mee bij elk dashboard/scroll-scherm. Pijl volgt de gekozen `.is-*`-class via `.tooltip.is-*::after`. **Zet dus géén `overflow:hidden` op kaarten "voor de zekerheid"** — niet nodig, en het werkt het clippen juist in de hand.
 
@@ -954,7 +954,7 @@ Interactieve coach-mark/onboarding-overlay (Angular: `<eff-tooltip-dialog>`). Do
   </div>
 </div>
 ```
-Classes: `.spotlight` (+ `.is-above/.is-below/.is-left/.is-right`), `.sl-badge` (optioneel, oranje), `.sl-title` (16/SemiBold), `.sl-body` (14), `.sl-footer` (`.is-single` = volle-breedte knop · `.is-multi` = dots links + knop rechts), `.sl-dot.is-active`. Card = `--bg-inverse-base`, knop = `--bg-brand-base` (teal). Behandel als een dialog: focus erin, Escape sluit, focus terug.
+Classes: `.spotlight` (+ `.is-above/.is-below/.is-left/.is-right`), `.sl-badge` (optioneel, oranje), `.sl-title` (16/SemiBold), `.sl-body` (14), `.sl-footer` (`.is-single` = volle-breedte knop · `.is-multi` = dots links + knop rechts), `.sl-dot.is-active`. Card = `--bg-inverse`, knop = `--bg-brand` (teal). Behandel als een dialog: focus erin, Escape sluit, focus terug.
 
 > 🧩 **Eén component, twee patronen:** `eff-tooltip-dialog` dekt twee design-system-componenten af. **Spotlight** = de verankerde coach-mark/**tour**-modus (target + 1-of-meer stappen, `.tour-progression`). **Announcement** = dezelfde component in `with-svg`-modus (zwevende feature-card met illustratie). Zelfde inputs (`[targetElement]`, `[dialogTitle]`, `[dialogSubtitle]`, `[dialogButtonText]`, `[dialogLinkButtonText]`, `[dialogPositionToTarget]`, `[addHighlightToTargetElement]`, `[isNewFeature]`, `[svgUrl]`, `(dialogClosedOutput)`), andere configuratie.
 
@@ -1002,7 +1002,7 @@ De primaire app-sidebar (240px, links). Bevat een portal-switcher bovenaan, navi
   </div>
 </div>
 ```
-Classes: `.mainnav` (+ `.is-personal`), `.mn-portal` (container) met statisch `.mn-logo` + klikbare `.mn-portal-btn` (alleen het label/chevron heeft een hover-achtergrond, het logo niet), `.mn-nav`/`.mn-item` (states `.is-hover`/`.is-active`, optionele `.mn-chev`), uitklapbare groep `.mn-sub`/`.mn-subitem` (+ `.mn-sub-divider`), footer `.mn-foot`/`.mn-user` (states `.is-hover`/`.is-pressed`). De portal-switcher én de account-knop openen elk een **Dropdown Menu** (de gedeelde `.menu`-component — zie sectie *Dropdown menu*); de portal-dropdown heeft een `.menu-header` ("Switch my role") en mini-logo's, de account-dropdown groepeert account-acties met een `.menu-divider` boven Log out. De actieve item gebruikt `--bg-brand-subtle-selected` (highlight) + `--content-brand-base` (icoon). Het portal-logo (`.mn-logo`) is het Effectory-merklogo als `background-image` (teal voor Coordinator), dat naar het gele logo wisselt bij `.mainnav.is-personal`. Het Personal-portal (`html[data-portal="personal"]`, of `.mainnav.is-personal` in een prototype) remapt die brand-tokens naar geel. Het account-menu gebruikt de gedocumenteerde **Avatar** (`.av av-36`), niet een eigen avatar-class. Menu-item-iconen zijn 16px met `--content-action`; alle radii komen uit `--radius-*` tokens. A11y: `<nav aria-label="Main">`, `aria-current="page"` op de actieve item, `aria-expanded` op groep-headers.
+Classes: `.mainnav` (+ `.is-personal`), `.mn-portal` (container) met statisch `.mn-logo` + klikbare `.mn-portal-btn` (alleen het label/chevron heeft een hover-achtergrond, het logo niet), `.mn-nav`/`.mn-item` (states `.is-hover`/`.is-active`, optionele `.mn-chev`), uitklapbare groep `.mn-sub`/`.mn-subitem` (+ `.mn-sub-divider`), footer `.mn-foot`/`.mn-user` (states `.is-hover`/`.is-pressed`). De portal-switcher én de account-knop openen elk een **Dropdown Menu** (de gedeelde `.menu`-component — zie sectie *Dropdown menu*); de portal-dropdown heeft een `.menu-header` ("Switch my role") en mini-logo's, de account-dropdown groepeert account-acties met een `.menu-divider` boven Log out. De actieve item gebruikt `--bg-brand-subtle-selected` (highlight) + `--content-brand` (icoon). Het portal-logo (`.mn-logo`) is het Effectory-merklogo als `background-image` (teal voor Coordinator), dat naar het gele logo wisselt bij `.mainnav.is-personal`. Het Personal-portal (`html[data-portal="personal"]`, of `.mainnav.is-personal` in een prototype) remapt die brand-tokens naar geel. Het account-menu gebruikt de gedocumenteerde **Avatar** (`.av av-36`), niet een eigen avatar-class. Menu-item-iconen zijn 16px met `--content-action`; alle radii komen uit `--radius-*` tokens. A11y: `<nav aria-label="Main">`, `aria-current="page"` op de actieve item, `aria-expanded` op groep-headers.
 
 > ⚠️ **Dev gap:** de Angular-selector/inputs van de app-sidebar zijn nog niet bevestigd in de styleguide. Deze `.mainnav`-classes zijn de prototype-structuur; verifieer de productie-API met engineering.
 
@@ -1029,7 +1029,7 @@ Compact label; de **kleur draagt de betekenis** (status, categorie, marker). **E
 <span class="tag tag-positive">Completed</span>
 <span class="tag tag-info tag-full"><i data-icon="tag"></i> Engagement</span>
 ```
-- `.tag` (basis = `--bg-info-base` + wit, `--radius-base`, 12px/600) + background-variant: `.tag-info` (blauw, default), `.tag-brand` (teal), `.tag-warning` (oranje), `.tag-negative` (rood), `.tag-highlight` (geel, tekst `--content-base`), `.tag-positive` (groen). Radius: standaard medium; `.tag-full` maakt een pill.
+- `.tag` (basis = `--bg-info` + wit, `--radius-base`, 12px/600) + background-variant: `.tag-info` (blauw, default), `.tag-brand` (teal), `.tag-warning` (oranje), `.tag-negative` (rood), `.tag-highlight` (geel, tekst `--content-base`), `.tag-positive` (groen). Radius: standaard medium; `.tag-full` maakt een pill.
 - Optioneel leading `<i data-icon>` (12px, erft de tekstkleur). Bold fills = witte tekst, behalve highlight (ink). A11y: betekenis staat altijd in de **tekst**, nooit alleen in de kleur; een tag is niet focusbaar (geen knop/link).
 - Styleguide-API: `<eff-tag [background]="'info|brand|warning|negative|highlight|positive'" [radius]="'medium|full'" [textSize] [weight]>`. Er is dus geen `Badge`.
 - **Survey/report-status** heeft een eigen hogere component **Survey Status** (`[surveyEndDate]`, `[isSurveyResponseComplete]`, `[surveyStatusFailed]`, `[showTooltip]`…) die zelf de juiste pill+tekst rendert (incl. draft/planned/running/completed). Bouw survey-status in productie dus níét na met een losse Tag. Prototype-pills als `gl-tag`, `mb-gpill`, `tr-conf-badge` zijn losse Tags → normaliseer naar `.tag`.
@@ -1103,7 +1103,7 @@ Een paneel dat rechts invliegt over een scrim: details, een formulier of een ger
   <div class="sp-footer"><button class="btn btn-secondary">Cancel</button><button class="btn btn-primary">Confirm</button></div>  <!-- optioneel -->
 </div>
 ```
-Classes: `.sidepanel` (+ `.sidepanel-sm`), `.sp-header` met `.sp-toolbar` (`.sp-actions` rechts: standaard alléén de close-knop; het **advanced-menu** voegt links de `.sp-nav`-pijlen toe én rechts bookmark/comment/history + de kebab (⋮) met een `.sp-sep` vóór close), `.sp-heading` (+ `.is-sm` voor de kleine 18px-header) → `.sp-title`/`.sp-subtitle`; de kleine header gebruikt 24px padding overal (via `.sidepanel.is-sm-header`) i.p.v. 40px, en zet de acties op de titel-regel via `.sp-header.is-compact` (behalve bij advanced-menu). Optionele `.sp-tabs`/`.sp-tab` (`.is-active` = teal underline), `.sp-body` (scrollt), optionele `.sp-footer` (Button-component). Tokens: `--bg-base`, `--sh-dialogs`, `--border-base` (tabs/footer), `--content-base`/`--content-secondary`/`--content-action`, `--content-brand-base` (actieve tab). A11y: modal, `aria-labelledby` op de titel, focus-trap, Escape sluit, icon-only knoppen krijgen `aria-label`.
+Classes: `.sidepanel` (+ `.sidepanel-sm`), `.sp-header` met `.sp-toolbar` (`.sp-actions` rechts: standaard alléén de close-knop; het **advanced-menu** voegt links de `.sp-nav`-pijlen toe én rechts bookmark/comment/history + de kebab (⋮) met een `.sp-sep` vóór close), `.sp-heading` (+ `.is-sm` voor de kleine 18px-header) → `.sp-title`/`.sp-subtitle`; de kleine header gebruikt 24px padding overal (via `.sidepanel.is-sm-header`) i.p.v. 40px, en zet de acties op de titel-regel via `.sp-header.is-compact` (behalve bij advanced-menu). Optionele `.sp-tabs`/`.sp-tab` (`.is-active` = teal underline), `.sp-body` (scrollt), optionele `.sp-footer` (Button-component). Tokens: `--bg-base`, `--sh-dialogs`, `--border-base` (tabs/footer), `--content-base`/`--content-secondary`/`--content-action`, `--content-brand` (actieve tab). A11y: modal, `aria-labelledby` op de titel, focus-trap, Escape sluit, icon-only knoppen krijgen `aria-label`.
 
 > **Productie-API:** in code is dit de **`SidepanelService`** (`@effectory/branding-angular`): `sidepanelService.open(Component, data)`, `.close(data)`, `.afterClosed`. De paneel-component gebruikt `.title.text-l3`, `.subtitle`, `.icon-button.close-button` en `.actions-container` (met `.primary`/`.secondary`). De `.sidepanel`/`.sp-*`-classes hier zijn de prototype-structuur voor de visuele opbouw.
 
@@ -1117,7 +1117,7 @@ Wissel tussen secties van dezelfde view (altijd horizontaal); label optioneel me
   <a class="tab">Reports</a>
 </div>
 ```
-Classes: `.tabs`, `.tab` (states `.is-hover`/`.is-active`/`.is-disabled`; optioneel een leading `<i data-icon>` en/of een `.tab-count`-badge vóór of na het label — blauwe pill `--bg-info-base`, witte 12px-tekst). Actieve tab: `--content-base` tekst + een 4px afgeronde bar `--content-brand-secondary` (via `.tab::after`); inactief `--content-secondary`; disabled `--content-disabled`; track `--border-base`. Typografie `body-14-M`. A11y: `role="tablist"`/`tab`/`tabpanel`, `aria-selected`, pijltjestoetsen + roving `tabindex`.
+Classes: `.tabs`, `.tab` (states `.is-hover`/`.is-active`/`.is-disabled`; optioneel een leading `<i data-icon>` en/of een `.tab-count`-badge vóór of na het label — blauwe pill `--bg-info`, witte 12px-tekst). Actieve tab: `--content-base` tekst + een 4px afgeronde bar `--content-brand-secondary` (via `.tab::after`); inactief `--content-secondary`; disabled `--content-disabled`; track `--border-base`. Typografie `body-14-M`. A11y: `role="tablist"`/`tab`/`tabpanel`, `aria-selected`, pijltjestoetsen + roving `tabindex`.
 
 > **Productie-API:** in code is dit Angular Material `mat-tab-group` met `class="tabs"` (`mat-align-tabs="start"`, `disableRipple`) en `mat-tab`-children (`label`, of een `<ng-template mat-tab-label>` met `eff-mat-icon class="tab-icon"`). De `.tabs`/`.tab`-classes hier zijn de prototype-structuur.
 
@@ -1180,7 +1180,7 @@ Het titelblok bovenaan een view: benoemt waar de gebruiker is, geeft context, en
   <div class="ph-divider"></div>
 </div>
 ```
-Classes: `.ph`, `.ph-eyebrow` (optionele overline, 12px uppercase, `--content-brand-base`), `.ph-row` (`align-items:center` → acties centreren op **titel+subtitle**; daarom staat de eyebrow búiten de row), `.ph-title` (26px `text-l3`, de page-`h1`). Het flexibele **subtitle-slot** `.ph-meta` met o.a.: platte tekst, `.ph-range` (datumrange met het `from-to`-icoon ertussen), `.ph-status` (`.ph-status-dot` + label + `.muted`), `.ph-link` (inline link-button, `--content-brand-secondary`). Voor een group/filter-selector in het slot: de bestaande **Selection Button** (`.sel-btn`). `.ph-controls` (rechter-acties: Button / Icon Button / Search). Optionele `.ph-tabs`/`.ph-tab` (**Tabs**-component; actief = 4px underline). `.ph-divider` (1px `--border-base`) sluit de header; in de app loopt die **full-bleed** tot de schermranden terwijl de content de container-padding houdt. Typografie: titel `text-l3`, subtitle `body-14`.
+Classes: `.ph`, `.ph-eyebrow` (optionele overline, 12px uppercase, `--content-brand`), `.ph-row` (`align-items:center` → acties centreren op **titel+subtitle**; daarom staat de eyebrow búiten de row), `.ph-title` (26px `text-l3`, de page-`h1`). Het flexibele **subtitle-slot** `.ph-meta` met o.a.: platte tekst, `.ph-range` (datumrange met het `from-to`-icoon ertussen), `.ph-status` (`.ph-status-dot` + label + `.muted`), `.ph-link` (inline link-button, `--content-brand-secondary`). Voor een group/filter-selector in het slot: de bestaande **Selection Button** (`.sel-btn`). `.ph-controls` (rechter-acties: Button / Icon Button / Search). Optionele `.ph-tabs`/`.ph-tab` (**Tabs**-component; actief = 4px underline). `.ph-divider` (1px `--border-base`) sluit de header; in de app loopt die **full-bleed** tot de schermranden terwijl de content de container-padding houdt. Typografie: titel `text-l3`, subtitle `body-14`.
 
 > ⚠️ **Dev gap:** Angular-API nog te bevestigen; `.ph-*` is de prototype-structuur (titel/eyebrow/subtitle/acties/tabs componeren).
 
@@ -1209,7 +1209,7 @@ Een gecentreerde, modale **release-tour**: loopt door meerdere features, één s
 ```html
 <div class="overlay">
   <div class="dlg has-bg" role="dialog" aria-modal="true"
-       style="--dlg-tint:var(--bg-info-subtle); --dlg-accent:var(--bg-info-base); --dlg-band:color-mix(in srgb, var(--bg-info-base) 38%, #fff); --dlg-border:var(--border-info-subtle);">
+       style="--dlg-tint:var(--bg-info-subtle); --dlg-accent:var(--bg-info); --dlg-band:color-mix(in srgb, var(--bg-info) 38%, #fff); --dlg-border:var(--border-info-subtle);">
     <button class="ib ib-36 ib-secondary dlg-close" aria-label="Close"><i data-icon="cross"></i></button>
     <div class="dlg-progress"><span class="dlg-seg is-fill"></span><span class="dlg-seg"></span><span class="dlg-seg"></span></div>
     <div class="dlg-media has-img">
