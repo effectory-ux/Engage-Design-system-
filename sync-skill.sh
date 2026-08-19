@@ -2,6 +2,11 @@
 # Sync repo files → skill-source/ bundle
 # Run this after updating the design system, before building the .zip.
 #
+# What it checks first:
+#   - check-reference-drift.py — fails the sync if components.css has a component
+#     that design-system-reference.md never mentions (the skill would refuse to
+#     use it). Bypass with SKIP_DRIFT_CHECK=1.
+#
 # What it syncs:
 #   - design-system-reference.md  (from .claude/skills/...)
 #   - tokens.css, foundation.css, components.css, icons.js, serve.py
@@ -17,6 +22,19 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_SKILL="$ROOT/.claude/skills/effectory-design-system"
 SKILL_SRC="$ROOT/skill-source"
 BUNDLE="$SKILL_SRC/design-system-files"
+
+# The reference doc is hand-maintained, so components.css can gain a component
+# the reference never mentions — and the skill refuses to use what the reference
+# does not list. Catch that before it ships. Override with SKIP_DRIFT_CHECK=1.
+if [ "${SKIP_DRIFT_CHECK:-0}" != "1" ]; then
+  if ! "$ROOT/check-reference-drift.py"; then
+    echo ""
+    echo "✗ Sync aborted: components.css and design-system-reference.md are out of sync."
+    echo "  Fix the reference, or re-run with SKIP_DRIFT_CHECK=1 to sync anyway."
+    exit 1
+  fi
+  echo ""
+fi
 
 VER=$(tr -d '[:space:]' < "$ROOT/VERSION")
 echo "→ Stamping version $VER"

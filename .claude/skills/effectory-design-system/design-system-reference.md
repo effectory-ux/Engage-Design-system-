@@ -1,6 +1,7 @@
 # Engage Design System — Reference
 
-Auto-generated source: `tokens.css`, `foundation.css`, `components.css`, `assets/icons/`
+Hand-maintained. Describes `tokens.css`, `foundation.css`, `components.css` and `assets/icons/`.
+Change any of those and update this document too, or the skill will not know the new component exists (see CLAUDE.md §19).
 Do NOT invent names. If something isn't listed here, it does not exist.
 
 ---
@@ -689,6 +690,102 @@ States op `.dp-day`: `.is-today` `.is-selected` `.is-hover` `.is-disabled` `.is-
 Range states: `.is-range-start` `.is-range-end` `.is-in-range`
 Trigger states: `.is-hover` `.is-focus` `.is-open`
 
+**Range — twee kalenders naast elkaar**
+```html
+<div class="dp-range-wrap">
+  <div class="dp-range-calendars">
+    <div class="dp">
+      <div class="dp-body">
+        <div class="dp-header">
+          <div class="dp-month-group"><span class="dp-month-label">Mei 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+          <div class="dp-nav">
+            <button class="dp-nav-btn"><i data-icon="chevron-left"></i></button>
+            <button class="dp-nav-btn" style="opacity:0;pointer-events:none;"></button>
+          </div>
+        </div>
+        <div class="dp-weekdays">…</div>
+        <div class="dp-grid">
+          <div class="dp-day is-range-start">14</div>
+          <div class="dp-day is-in-range">15</div>
+          <div class="dp-day is-range-end">10</div>
+        </div>
+      </div>
+    </div>
+    <div class="dp">… tweede maand …</div>
+  </div>
+  <div class="dp-range-footer">
+    <button class="btn-dp-cancel">Annuleren</button>
+    <button class="btn-dp-apply">Toepassen</button>
+  </div>
+</div>
+```
+De linker kalender toont alleen de vorige-pijl, de rechter alleen de volgende-pijl. Houd de ongebruikte
+`.dp-nav-btn` leeg met `opacity:0;pointer-events:none;` zodat de header niet verspringt.
+De footer zit één niveau hoger dan bij een enkele kalender: `.dp-range-footer` onder beide kalenders,
+niet `.dp-footer` binnen één `.dp`.
+
+**Tijd en tijdzone** — `.dp-time-section` is een kind van `.dp`, tussen `.dp-body` en `.dp-footer`.
+```html
+<div class="dp">
+  <div class="dp-body">…</div>
+
+  <div class="dp-time-section">
+    <!-- tijdzone (optioneel) -->
+    <div class="dp-tz-wrap">
+      <div class="dp-time-field dp-tz-field">
+        <i data-icon="globe"></i>
+        <span class="dp-time-value">Europe/Amsterdam</span>
+        <i data-icon="chevron-down" class="dp-time-chevron dp-tz-chevron"></i>
+      </div>
+      <div class="dp-tz-dropdown" hidden>
+        <div class="dp-tz-option is-active">Europe/Amsterdam</div>
+        <div class="dp-tz-option">Europe/London</div>
+      </div>
+    </div>
+
+    <!-- tijd -->
+    <div class="dp-time-field">
+      <i data-icon="Clock"></i>
+      <input type="text" class="dp-time-input" value="09:00">
+      <div class="dp-steppers">
+        <button class="dp-stepper-btn"><i data-icon="chevron-up" style="display:flex;width:12px;height:12px;"></i></button>
+        <button class="dp-stepper-btn"><i data-icon="chevron-down" style="display:flex;width:12px;height:12px;"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dp-footer">…</div>
+</div>
+```
+Een tijdkiezer hoort bij een popup-kalender, niet bij `.dp-inline`. De footer is dan verplicht: de tijd
+wordt pas toegepast op "Toepassen". `.dp-tz-dropdown` is `hidden` tot je op `.dp-tz-field` klikt, de
+actieve regel krijgt `.is-active`.
+
+**Jaar- en maandkiezer** — openen via `.dp-month-group` in de header.
+```html
+<!-- jaren: 16 per scherm -->
+<div class="dp-year-panel">
+  <div class="dp-year-grid">
+    <div class="dp-year-cell">2025</div>
+    <div class="dp-year-cell is-selected">2026</div>
+  </div>
+</div>
+
+<!-- maanden: 12 -->
+<div class="dp-month-panel">
+  <div class="dp-month-grid">
+    <div class="dp-month-cell">Jan</div>
+    <div class="dp-month-cell is-selected">Mei</div>
+  </div>
+</div>
+```
+`.dp-month-group` stelt zijn chevron niet op maat in (anders dan `.dp-nav-btn i` en `.dp-time-chevron`), dus geef die `<i>` altijd zelf `width:16px;height:16px;display:flex` mee. Zonder die maat vult het icoon de halve kalender.
+
+Beide panelen staan vóór `.dp-weekdays` in de `.dp-body` en zijn `display:none` in dagweergave. Staat er
+een open, zet dan `.dp-year-open` op de `.dp-body` — dat draait de chevron in de header om. `.dp-month-label`
+toont dan het bereik (`2016 – 2031`) of het jaar in plaats van "Mei 2026". Leg de hoogte van `.dp-body`
+vast op de hoogte van de dagweergave, anders springt de popup bij het wisselen.
+
 ### Inline notification
 Moods heten in code (Angular `messageType`): **`subtle` · `info` · `warn` · `success` · `error`**. De prototype-classes volgen deze namen: `is-subtle` `is-info` `is-warn` `is-success` `is-error`. Layout: standaard gestapeld; voeg `.is-one-liner` toe voor één regel.
 
@@ -1147,5 +1244,7 @@ Iconen worden geïnjecteerd door `icons.js` (moet onderaan `<body>` staan).
 
 `accessibility` `activity` `add-on` `aggregations` `alert-circle` `alert-triangle` `alert-triangle-1` `all changes` `approximately` `archive` `archive-1` `arrow-down` `arrow-left` `arrow-right` `arrow-sub` `arrow-up` `asterisk` `at-mail` `barchart-2` `bell` `benchmark-down` `benchmark-up` `bold` `book-open` `bookmark` `bookmark-filled` `box` `briefcase` `building` `bullet-point` `calendar` `calendar-add` `calendar-recurring` `calendar-remove` `category` `check` `check-square` `chevron-down` `chevron-down-small` `chevron-end` `chevron-left` `chevron-right` `chevron-start` `chevron-up` `clipboard` `clipboard-a` `clipboard-note` `clipboard-settings` `code` `collapse-left` `collapse-right` `compass` `cookie` `copy` `correlation-positive` `cpu` `cross` `desktop` `double-chevron-down` `double-chevron-up` `down-vote` `download` `download-2` `drag-drop` `edit` `edit-inline` `equal` `excel` `expand-left` `expand-right` `export` `external-link` `eye` `eye-off` `featured` `file` `file-error` `file-plus` `filter` `find-replace` `flag` `folder` `from-to` `gear` `gender-male` `gender-male-1` `gender-non-binary` `gift` `globe` `goals` `group` `help` `hierarchy` `home` `import-export` `info` `italic` `key` `language` `layer-up-alt` `layout` `lightbulb` `link` `list-unordered` `lock` `log-out` `love` `mail` `maximize` `menu` `message` `message-filled` `minimize` `minus` `mobile` `moon` `more-horizontal` `more-vertical` `net-promoter-score` `net-promoter-score-detractor` `net-promoter-score-passive` `palette` `passkey` `pause` `pen-tool` `percent` `pie-chart` `pin` `pin-filled` `pipet` `play` `plus` `plus-minus` `point-scale` `privacy` `randomize` `refresh` `response` `rotate-backward` `rotate-forward` `search` `segments` `select` `selected` `send` `shapes` `share` `share-1` `shield` `single-answer` `single-answer-1` `sliders` `sort-ascending` `sort-descending` `star` `star-filled` `stop` `structure` `sun` `table` `tag` `target` `text-entry` `themes` `toggle-left` `toggle-right` `tool` `top-3-filled` `trash` `trend-stable` `underline` `undo` `unlock` `up-vote` `upload` `upload-file` `user` `user-badge` `user-check` `user-min` `user-plus` `users` `version-history` `waypoint` `win` `words` `youtube` `zap` `zap-filled`
 
+`Clock` werkt wél als `data-icon`, met hoofdletter C — de bestandsnaam is `Clock.svg`. De Date Picker gebruikt hem in het tijdveld.
+
 **Niet als `data-icon` te gebruiken** (bestandsnamen met spaties of hoofdletters zijn illustraties, geen UI-iconen):
-`Barchart-1` `Clock` `ESG scan` `ESG scan-1` `ESG scan-2` `Strategic fitness scan` `Tree` `Trend-down` `Trend-up` `Type` `magic wand`
+`Barchart-1` `ESG scan` `ESG scan-1` `ESG scan-2` `Strategic fitness scan` `Tree` `Trend-down` `Trend-up` `Type` `magic wand`
