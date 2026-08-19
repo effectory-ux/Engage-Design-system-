@@ -5,7 +5,7 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.12.2
+**Version:** 1.12.3
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
@@ -285,23 +285,25 @@ Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat
 het antwoord in de oplevering, zodat het prototype met de juiste `group` in
 [`prototypes.json`](https://github.com/effectory-ux/prototypes) van de projects-pagina kan.
 
-**Stel deze vragen met de `AskUserQuestion`-tool — één aanroep, in deze volgorde.** De gebruiker krijgt
-klikbare opties met een invulveld in plaats van een lap tekst, en het scheelt drie keer heen en weer:
+**Stel deze twee vragen met de `AskUserQuestion`-tool — één aanroep, naam eerst.** De gebruiker krijgt
+klikbare opties met een invulveld in plaats van een lap tekst, en het scheelt heen en weer:
 
 | # | Vraag | Header | Opties |
 |---|---|---|---|
 | 1 | Hoe moet dit prototype heten? | `Naam` | 2–3 voorstellen (zie hieronder) |
-| 2 | Welk scherm of welke flow wil je bouwen? | `Scherm` | Resultaten-dashboard · My Effectory pagina · Losse component-demo |
-| 3 | Bij welke track hoort dit prototype? | `Track` | Surveying · Leadership enablement · Reporting · Platform |
+| 2 | Bij welke track hoort dit prototype? | `Track` | Surveying · Leadership enablement · Reporting · Platform |
 
-**De naam staat vooraan — vraag hem vóór het scherm, niet erna.** Baseer de voorstellen op wat de aanvraag
-al prijsgeeft ("een settings-pagina voor CSM results" → "CSM result settings"). Geeft de aanvraag weinig
-houvast, doe dan alsnog je beste gok: elke vraag heeft minstens twee opties nodig, en de gebruiker typt er
-toch overheen in het invulveld. Benoem het onderwerp, niet de plek waar het gesprek begon.
+**Vraag níet welk scherm het moet worden.** Dat vertelt de gebruiker zelf al als hij zegt wat hij nodig
+heeft. Is het daarna nog onduidelijk, vraag het dan gewoon in tekst — daar hoeft geen menu omheen.
+
+**De naam staat vooraan.** Baseer de voorstellen op wat de aanvraag prijsgeeft ("een settings-pagina voor
+CSM results" → "CSM result settings"). Geeft de aanvraag weinig houvast, doe dan alsnog je beste gok: elke
+vraag heeft minstens twee opties nodig, en de gebruiker typt er toch overheen in het invulveld. Benoem het
+onderwerp, niet de plek waar het gesprek begon.
 
 Voeg zélf geen "Other"-optie toe. Die komt er automatisch bij en is meteen het invulveld waarin de
-gebruiker een eigen naam, scherm of track typt — voor een nieuw scherm is dat gewoon het normale antwoord.
-Is de tool in deze omgeving niet beschikbaar, vraag het dan in tekst, in dezelfde volgorde.
+gebruiker een eigen naam of track typt. Is de tool in deze omgeving niet beschikbaar, vraag het dan in
+tekst, in dezelfde volgorde.
 
 **De zichtbaarheid hoort er niet bij.** Die vraag komt pas ná het bouwen (regel 15). Kondig hem vooraf
 dus ook niet aan.
@@ -319,7 +321,7 @@ hernoemen kost een nieuwe URL, en gedeelde links breken daarop.
 
 Weet de gebruiker het nog niet, doe dan een voorstel en laat het bevestigen. Benoem het onderwerp, niet
 de plek waar het toevallig begon: "CSM result settings" zegt meer dan "results overview". Dit is de
-**eerste** vraag van de `AskUserQuestion`-aanroep uit regel 12, vóór het scherm en de track.
+**eerste** vraag van de `AskUserQuestion`-aanroep uit regel 12, vóór de track.
 
 ---
 
@@ -423,7 +425,7 @@ dezelfde kaart.
 1. **Lees de reference** — laad `design-system-reference.md` volledig
 2. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
 3. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
-4. **Vraag naam, scherm en track** — één `AskUserQuestion`, naam eerst (regel 12 en 13)
+4. **Vraag naam + track** — één `AskUserQuestion`, naam eerst (regel 12 en 13)
 5. **Leg de naam vast** — bepaalt bestandsnaam, `<title>` en de kaart op de projects-pagina (regel 13)
 6. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
