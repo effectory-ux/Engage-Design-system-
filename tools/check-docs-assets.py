@@ -41,6 +41,14 @@ for html in sorted((ROOT / 'docs').glob('*.html')):
     for ref in re.findall(r'(?:href|src)="([^"]+)"', text):
         check(html, ref, html.parent)
 
+# Scripts and styles built in JavaScript are invisible to the HTML scan — nav.js
+# assigns script.src at runtime. Those broke silently in the restructure, so check
+# any string literal assigned to .src / .href that looks like a local file.
+for js in sorted((ROOT / 'docs').glob('*.js')):
+    text = js.read_text(encoding='utf-8', errors='ignore')
+    for ref in re.findall(r"\.(?:src|href)\s*=\s*['\"]([^'\"]+)['\"]", text):
+        check(js, ref, js.parent)
+
 for css in sorted(ROOT.rglob('*.css')):
     if any(p in css.parts for p in ('.git', 'skill-source', '.claude', 'dist', 'node_modules')):
         continue
