@@ -3,12 +3,64 @@
 Reads the Figma variables export and generates:
   - tokens.css        — CSS custom properties for all modes
   - colors-tokens.js  — JS token data for the dynamic colors page
-"""
-import json, re, textwrap, os
 
-SRC  = '/Users/jente/Downloads/variables (1).json'
-DEST_CSS = os.path.join(os.path.dirname(__file__), 'tokens.css')
-DEST_JS  = os.path.join(os.path.dirname(__file__), 'colors-tokens.js')
+The export used to be hardcoded to one person's Downloads folder, which meant
+nobody else could regenerate tokens — and by 2026-08-19 that file was gone, so
+nobody could at all. Give the path explicitly, or drop the export in the repo.
+
+Usage:
+  ./build-tokens.py                       uses ./figma-variables.json
+  ./build-tokens.py path/to/export.json   uses that file
+  FIGMA_VARIABLES=… ./build-tokens.py     same, via the environment
+  ./build-tokens.py --check               regenerate in memory and report whether
+                                          tokens.css / colors-tokens.js are current
+"""
+import json, re, textwrap, os, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DEST_CSS = os.path.join(HERE, 'tokens.css')
+DEST_JS  = os.path.join(HERE, 'colors-tokens.js')
+
+CHECK = '--check' in sys.argv
+positional = [a for a in sys.argv[1:] if not a.startswith('-')]
+SRC = positional[0] if positional else (
+    os.environ.get('FIGMA_VARIABLES') or os.path.join(HERE, 'figma-variables.json'))
+
+if not os.path.exists(SRC):
+    print(f'✗ Figma variables export not found: {SRC}')
+    print('')
+    print('  tokens.css is generated from a Figma variables export, so you need that')
+    print('  export first. Take it from the variables panel in the Figma file, then')
+    print('  either:')
+    print('')
+    print('    · save it as figma-variables.json next to this script, or')
+    print('    · pass the path:  ./build-tokens.py ~/Downloads/variables.json, or')
+    print('    · set FIGMA_VARIABLES=/path/to/export')
+    print('')
+    print('  Never hand-edit tokens.css — the next run overwrites it.')
+    sys.exit(1)
+
+
+def emit(path, content):
+    """Write the file, or in --check mode report whether it is already current."""
+    current = None
+    if os.path.exists(path):
+        with open(path, encoding='utf-8') as fh:
+            current = fh.read()
+    name = os.path.basename(path)
+    if CHECK:
+        if current == content:
+            print(f'✓ up to date: {name}')
+            return True
+        print(f'✗ out of date: {name}')
+        return False
+    with open(path, 'w', encoding='utf-8') as fh:
+        fh.write(content)
+    print(f'Written: {path}')
+    return True
+
+
+up_to_date = []
 
 # ── 1. Parse multi-doc file ────────────────────────────────────────────────
 with open(SRC, 'r', encoding='utf-8') as f:
@@ -197,9 +249,7 @@ lines.append('  --brand-deep:    var(--tok-border-brand-base-pressed);')
 lines.append('}')
 # brand-subtle must also update when portal changes (it uses the token var so it auto-updates)
 
-with open(DEST_CSS, 'w', encoding='utf-8') as f:
-    f.write('\n'.join(lines) + '\n')
-print(f'Written: {DEST_CSS}')
+up_to_date.append(emit(DEST_CSS, '\n'.join(lines) + '\n'))
 
 # ── 8. Generate colors-tokens.js ─────────────────────────────────────────
 # Collect all token paths that appear in any mode
@@ -277,7 +327,12 @@ js_lines.append("""  function getMode() {
   document.addEventListener('portalchange', updatePage);
 })();""")
 
-with open(DEST_JS, 'w', encoding='utf-8') as f:
-    f.write('\n'.join(js_lines) + '\n')
-print(f'Written: {DEST_JS}')
+up_to_date.append(emit(DEST_JS, '\n'.join(js_lines) + '\n'))
+
+if CHECK and not all(up_to_date):
+    print('')
+    print('✗ Generated from the export, these differ from what is committed.')
+    print('  Either the export moved on and tokens.css was never rebuilt, or')
+    print('  tokens.css was hand-edited. Run ./build-tokens.py and commit.')
+    sys.exit(1)
 print('Done.')

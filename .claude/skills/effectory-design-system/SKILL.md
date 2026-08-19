@@ -183,7 +183,7 @@ Gebruik alleen iconnamen uit de lijst in `design-system-reference.md` sectie 5.
 
 ### 6. tokens.css is auto-generated
 Nooit `tokens.css` handmatig bewerken. Alleen lezen en gebruiken.
-Regenereren: `python3 build-tokens.py`
+Regenereren: `./build-tokens.py <pad-naar-figma-export>` in de design-system repo.
 
 ### 7. Prototype is een productscherm
 Een prototype ziet eruit als een echte pagina in de app — niet als een docs-pagina.

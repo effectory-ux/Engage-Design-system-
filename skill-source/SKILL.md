@@ -5,7 +5,7 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.13.0
+**Version:** 1.14.1
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
@@ -212,7 +212,7 @@ Gebruik alleen iconnamen uit de lijst in `design-system-reference.md` sectie 5.
 
 ### 6. tokens.css is auto-generated
 Nooit `tokens.css` handmatig bewerken. Alleen lezen en gebruiken.
-Regenereren gebeurt in de bron-repo (`effectory-design-documentation`) via `python3 build-tokens.py`.
+Regenereren gebeurt in de design-system repo (`effectory-ux/Engage-Design-system-`) via `./build-tokens.py`, vanuit een Figma variables-export.
 
 ### 7. Prototype is een productscherm
 Een prototype ziet eruit als een echte pagina in de app — niet als een docs-pagina.
