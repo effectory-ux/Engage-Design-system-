@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Date Picker — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ══════════════════════════════════════════
+       DATE PICKER COMPONENT
+       Calendar: 252px wide, 8px radius, 1px border
+       Month header: Poppins Medium 14px
+       Weekdays / days: Poppins Regular 12–14px, 28×28px cells, 4px gap
+    ══════════════════════════════════════════ */
+
+    /* ── Trigger button ── */
+    .dp-trigger {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 12px;
+      border: 1px solid var(--border-action); border-radius: 6px;
+      background: var(--bg-base); box-shadow: var(--sh-action);
+      font-family: inherit; font-size: 14px; color: var(--content-base);
+      cursor: pointer; white-space: nowrap;
+    }
+    .dp-trigger:hover, .dp-trigger.is-hover {
+      background: var(--bg-base-hover); border-color: var(--border-action-hover);
+    }
+    .dp-trigger:focus-visible, .dp-trigger.is-focus {
+      outline: none; border-color: var(--border-brand);
+      box-shadow: 0 0 0 3px rgba(10,157,153,.15);
+    }
+    .dp-trigger i { width: 16px; height: 16px; flex-shrink: 0; color: var(--content-secondary); display: flex; }
+    .dp-trigger.is-open i:last-child { transform: rotate(180deg); }
+
+    /* ── Calendar popup container ── */
+    .dp {
+      display: inline-flex; flex-direction: column;
+      width: 284px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-base);
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(25,39,67,.08);
+      overflow: hidden;
+      font-family: 'Poppins', 'Inter', sans-serif;
+    }
+
+    /* Inline mode: no border/shadow — sits flat in the layout */
+    .dp.dp-inline {
+      border: none;
+      box-shadow: none;
+    }
+
+    .dp-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── Month header ── */
+    .dp-header { display: flex; align-items: center; justify-content: space-between; }
+    .dp-month-group { display: flex; align-items: center; gap: 2px; }
+    .dp-month-label {
+      font-size: 14px; font-weight: 500;
+      color: var(--content-secondary);
+      font-family: 'Poppins', inherit;
+      cursor: pointer;
+    }
+    .dp-month-label:hover { color: var(--content-base); }
+    .dp-nav { display: flex; align-items: center; gap: 2px; }
+    .dp-nav-btn {
+      width: 24px; height: 24px;
+      border: none; background: none; padding: 0; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--content-secondary); border-radius: 4px;
+    }
+    .dp-nav-btn:hover { background: var(--bg-base-hover); color: var(--content-base); }
+    .dp-nav-btn i { width: 16px; height: 16px; display: flex; }
+
+    /* ── Weekday labels ── */
+    .dp-weekdays {
+      display: grid; grid-template-columns: repeat(7, 28px);
+      gap: 4px; justify-content: center;
+    }
+    .dp-wday {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 400;
+      color: var(--content-secondary);
+      font-family: 'Poppins', inherit;
+    }
+
+    /* ── Day grid ── */
+    .dp-grid {
+      display: grid; grid-template-columns: repeat(7, 32px);
+      gap: 4px; justify-content: center;
+      overflow: hidden; /* clips range-band bleeds at grid edges */
+      isolation: isolate; /* stacking context so ::before z-index:-1 is below .dp-day, not the whole page */
+    }
+    .dp-day {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 400;
+      color: var(--content-base);
+      border-radius: 80px;
+      cursor: pointer;
+      font-family: 'Poppins', inherit;
+      position: relative;
+      transition: background .1s, color .1s;
+    }
+    .dp-day:hover, .dp-day.is-hover {
+      background: var(--bg-base-hover);
+    }
+    .dp-day.is-selected {
+      background: var(--bg-brand);
+      color: #fff;
+    }
+    .dp-day.is-today {
+      font-weight: 600;
+      color: var(--content-brand);
+    }
+    .dp-day.is-today::after {
+      content: '';
+      position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: currentColor;
+    }
+    .dp-day.is-today.is-selected { color: #fff; }
+    .dp-day.is-today.is-selected::after { background: rgba(255,255,255,.65); }
+    .dp-day.is-other-month { color: var(--content-secondary); opacity: .45; }
+    .dp-day.is-disabled {
+      color: var(--content-disabled); cursor: not-allowed; pointer-events: none;
+    }
+    .dp-day.is-empty { opacity: 0; pointer-events: none; cursor: default; }
+
+    /* ── Range selection ── */
+    /* .dp-grid has isolation:isolate (stacking context), so ::before with z-index:-1
+       paints below .dp-day (the circle) but above .dp-grid's background — exactly right. */
+    .dp-day.is-range-start,
+    .dp-day.is-range-end {
+      background: var(--bg-brand); color: #fff; border-radius: 80px;
+    }
+    /* Band half: right side of start cell, bleeds 4px into the gap */
+    .dp-day.is-range-start::before {
+      content: ''; position: absolute; z-index: -1;
+      top: 0; bottom: 0; left: 50%; right: -4px;
+      background: var(--bg-brand-subtle);
+    }
+    /* Band half: left side of end cell, bleeds 4px into the gap */
+    .dp-day.is-range-end::before {
+      content: ''; position: absolute; z-index: -1;
+      top: 0; bottom: 0; left: -4px; right: 50%;
+      background: var(--bg-brand-subtle);
+    }
+    /* In-range: full cell + bleeds 4px into both gaps */
+    .dp-day.is-in-range {
+      background: var(--bg-brand-subtle); border-radius: 0; color: var(--content-base);
+    }
+    .dp-day.is-in-range::before {
+      content: ''; position: absolute; z-index: -1;
+      top: 0; bottom: 0; left: -4px; right: -4px;
+      background: var(--bg-brand-subtle);
+    }
+    /* Keep range colours on hover */
+    .dp-day.is-range-start:hover, .dp-day.is-range-end:hover { background: var(--bg-brand); }
+    .dp-day.is-in-range:hover { background: var(--bg-brand-subtle); }
+    /* Single-day range: no strip */
+    .dp-day.is-range-start.is-range-end::before { display: none; }
+
+    /* ── Year view ── */
+    .dp-year-panel { padding: 0 8px 8px; display: flex; flex-direction: column; flex: 1; }
+    .dp-year-grid {
+      flex: 1;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 4px; align-content: space-evenly;
+    }
+    .dp-year-cell {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--content-base); border-radius: 6px;
+      cursor: pointer; transition: background .1s, color .1s;
+    }
+    .dp-year-cell:hover { background: var(--bg-base-hover); }
+    .dp-year-cell.is-selected {
+      background: var(--bg-brand); color: #fff; border-radius: 80px;
+    }
+    .dp-year-cell.is-selected:hover { background: var(--bg-brand); }
+
+    /* ── Month picker ── */
+    .dp-month-panel { padding: 0 8px 8px; display: flex; flex-direction: column; flex: 1; }
+    .dp-month-grid {
+      flex: 1;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 4px; align-content: space-evenly;
+    }
+    .dp-month-cell {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; letter-spacing: .04em;
+      color: var(--content-base); border-radius: 6px;
+      cursor: pointer; transition: background .1s, color .1s;
+      border: 1.5px solid transparent;
+    }
+    .dp-month-cell:hover { background: var(--bg-base-hover); }
+    .dp-month-cell.is-selected { border-color: var(--content-base); }
+
+    /* Rotate chevron when year view is open */
+    .dp-month-group i[data-icon] { transition: transform .15s; }
+    .dp-body.dp-year-open .dp-month-group i[data-icon] { transform: rotate(180deg); }
+    /* Make month-group look clickable */
+    .dp-month-group { cursor: pointer; }
+    .dp-month-group:hover .dp-month-label { color: var(--content-brand); }
+
+    /* ── Time selector — no divider, just top spacing ── */
+    .dp-time-section {
+      padding: 8px 16px 0;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    /* Select-style field (matches design system .slt appearance) */
+    .dp-time-field {
+      display: flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 12px;
+      border: 1px solid var(--border-action); border-radius: 6px;
+      background: var(--bg-base); box-shadow: var(--sh-action);
+      cursor: pointer; width: 100%; box-sizing: border-box;
+    }
+    .dp-time-field > i { width: 16px; height: 16px; flex-shrink: 0; color: var(--content-secondary); display: flex; }
+    .dp-time-value { flex: 1; font-size: 14px; color: var(--content-base); font-family: 'Poppins', inherit; }
+    .dp-time-chevron { width: 16px; height: 16px; flex-shrink: 0; color: var(--content-secondary); display: flex; }
+    .dp-time-field:hover { border-color: var(--border-action-hover); }
+    /* Single HH:MM text input */
+    .dp-time-input {
+      flex: 1; border: none; background: none; outline: none;
+      font-size: 14px; color: var(--content-base);
+      font-family: 'Poppins', inherit; padding: 0; min-width: 0;
+    }
+    /* Timezone dropdown */
+    .dp-tz-wrap { position: relative; }
+    .dp-tz-field { cursor: pointer; }
+    .dp-tz-field.is-open { border-color: var(--border-brand); box-shadow: 0 0 0 3px rgba(10,157,153,.15); }
+    .dp-tz-chevron { transition: transform .15s; }
+    .dp-tz-field.is-open .dp-tz-chevron { transform: rotate(180deg); }
+    .dp-tz-dropdown {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 300;
+      background: var(--bg-base); border: 1px solid var(--border-base);
+      border-radius: 6px; box-shadow: 0 4px 16px rgba(25,39,67,.12);
+      overflow: hidden;
+    }
+    .dp-tz-option {
+      padding: 8px 12px; font-size: 13px; cursor: pointer;
+      color: var(--content-base); font-family: 'Poppins', inherit;
+    }
+    .dp-tz-option:hover { background: var(--bg-base-hover); }
+    .dp-tz-option.is-active { color: var(--content-brand); font-weight: 500; }
+
+    /* Up/down steppers for the time field */
+    .dp-steppers {
+      display: flex; flex-direction: column; gap: 1px;
+      flex-shrink: 0;
+    }
+    .dp-stepper-btn {
+      width: 14px; height: 13px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none; padding: 0; cursor: pointer;
+      color: var(--content-secondary); border-radius: 2px;
+    }
+    .dp-stepper-btn:hover { background: var(--bg-base-hover); color: var(--content-base); }
+
+    /* ── Footer — no divider, just top spacing ── */
+    .dp-footer {
+      display: flex; align-items: center; justify-content: flex-end; gap: 16px;
+      padding: 16px 16px 16px;
+    }
+
+    /* ── Range picker: two calendars side-by-side ── */
+    .dp-range-wrap {
+      display: inline-flex; flex-direction: column;
+      background: var(--bg-base);
+      border: 1px solid var(--border-base);
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(25,39,67,.08);
+      overflow: hidden;
+    }
+    .dp-range-calendars {
+      display: flex;
+    }
+    .dp-range-calendars .dp {
+      border: none; border-radius: 0; box-shadow: none;
+      background: transparent;
+    }
+    .dp-range-calendars .dp + .dp { border-left: 1px solid var(--border-base); }
+    .dp-range-footer {
+      display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+      padding: 10px 16px;
+    }
+
+    /* ── Minimal button styles for footer demos ── */
+    .btn-dp-cancel {
+      height: 32px; padding: 0 14px;
+      border: 1px solid transparent; border-radius: 6px;
+      background: transparent; color: var(--content-base);
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-dp-cancel:hover { background: var(--bg-base-hover); }
+    .btn-dp-apply {
+      height: 32px; padding: 0 14px;
+      border: 1px solid var(--bg-brand); border-radius: 6px;
+      background: var(--bg-brand); color: #fff;
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-dp-apply:hover { background: var(--bg-brand-hover, #078d8a); border-color: var(--bg-brand-hover, #078d8a); }
+
+    /* ── Anatomy number badges ── */
+    .dp-anat-badge {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--content-base); color: var(--bg-base);
+      font-size: 9px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── State demo: single day cell (enlarged for clarity) ── */
+    .dp-day-demo {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 400;
+      color: var(--content-base);
+      border-radius: 80px;
+      font-family: 'Poppins', inherit;
+      position: relative;
+    }
+    .dp-day-demo.is-hover { background: var(--bg-base-hover); }
+    .dp-day-demo.is-selected { background: var(--bg-brand); color: #fff; }
+    .dp-day-demo.is-today { font-weight: 600; color: var(--content-brand); }
+    .dp-day-demo.is-today::after {
+      content: '';
+      position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: currentColor;
+    }
+    .dp-day-demo.is-today.is-selected { color: #fff; }
+    .dp-day-demo.is-today.is-selected::after { background: rgba(255,255,255,.65); }
+    .dp-day-demo.is-other-month { color: var(--content-secondary); opacity: .45; }
+    .dp-day-demo.is-disabled { color: var(--content-disabled); }
+
+    /* Range demo strip */
+    .dp-range-strip { display: flex; align-items: center; }
+    .dp-day-demo.is-range-start {
+      background: var(--bg-brand); color: #fff;
+      border-radius: 80px 4px 4px 80px;
+    }
+    .dp-day-demo.is-range-end {
+      background: var(--bg-brand); color: #fff;
+      border-radius: 4px 80px 80px 4px;
+    }
+    .dp-day-demo.is-in-range {
+      background: var(--bg-brand-subtle);
+      border-radius: 0;
+      color: var(--content-base);
+    }
+
+    /* ── Variant row: wider preview column when the preview needs it ── */
+    .variant-row.vr-wide { grid-template-columns: 370px 1fr; }
+    .variant-row.vr-wide .variant-row-desc { font-size: 12.5px; }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+<!-- PAGE HEADER -->
+<div class="page-header-row">
+  <div class="page-header">
+    <div class="page-badges">
+      <span class="page-updated">Updated May 2026</span>
+    </div>
+    <h1 class="text-l1">Date Picker</h1>
+    <p class="page-desc">An interactive calendar for selecting single dates, date ranges, and optionally a time — available as a floating dropdown or embedded inline.</p>
+  </div>
+</div><!-- /page-header-row -->
+
+<!-- PAGE TABS -->
+<div class="page-tabs">
+  <div class="page-tabs-inner">
+    <button class="page-tab" data-tab="design">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+      Design
+    </button>
+    <button class="page-tab" data-tab="developer">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Developer
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════ DESIGN TAB ═══════════════════ -->
+<div class="tab-panel" data-panel="design">
+  <div class="content-cols">
+    <article class="content">
+
+      <!-- ANATOMY -->
+      <section class="section" id="anatomy">
+        <h2 class="text-l3">Anatomy</h2>
+        <p class="section-lead">The dropdown variant consists of a trigger button that opens a floating calendar panel. The inline variant renders the panel directly without a trigger or footer.</p>
+
+        <div class="anatomy-fig" style="flex-direction:column; gap:24px; align-items:flex-start; padding:32px 28px;">
+
+          <!-- Trigger row -->
+          <div style="position:relative; display:inline-flex; align-items:center; gap:8px;">
+            <button class="dp-trigger" style="pointer-events:none;" tabindex="-1">
+              <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+              14 May 2026
+              <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;"></i>
+            </button>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:40px;height:1px;background:var(--content-subtle);"></div>
+              <div class="dp-anat-badge">1</div>
+            </div>
+          </div>
+
+          <!-- Calendar + callouts -->
+          <div style="display:flex;align-items:flex-start;gap:0;">
+            <div style="position:relative;">
+              <div class="dp" style="pointer-events:none;">
+                <div class="dp-body">
+                  <div class="dp-header">
+                    <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                    <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                  </div>
+                  <div class="dp-weekdays">
+                    <div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div>
+                    <div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div>
+                  </div>
+                  <div class="dp-grid">
+                    <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                    <div class="dp-day is-empty"></div><div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                    <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div>
+                    <div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                    <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div>
+                    <div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div>
+                    <div class="dp-day">16</div><div class="dp-day">17</div>
+                    <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div>
+                    <div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                    <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div>
+                    <div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                  </div>
+                </div>
+                <div class="dp-footer">
+                  <button class="btn-dp-cancel" tabindex="-1" style="pointer-events:none;">Cancel</button>
+                  <button class="btn-dp-apply" tabindex="-1" style="pointer-events:none;">Apply</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Callout lines + badges -->
+            <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%;padding:0 0 0 8px;gap:0;pointer-events:none;min-width:220px;">
+              <!-- Row for each labeled part -->
+              <div style="display:flex;align-items:center;gap:8px;margin-top:16px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">2</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Calendar container</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">3</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Month navigation</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:28px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">4</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Weekday labels</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">5</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Day cell (default)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">6</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Selected day</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:20px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">7</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Today indicator</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:40px;">
+                <div style="width:24px;height:1px;background:var(--content-subtle);"></div>
+                <div class="dp-anat-badge">8</div>
+                <span style="font-size:13px;color:var(--content-secondary);">Footer actions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="anatomy-items">
+          <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Trigger button</span> — Opens and closes the calendar dropdown. Shows the currently selected date or a placeholder.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Calendar container</span> — The floating panel housing the full calendar. In inline mode, this is embedded directly in the layout.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Month navigation</span> — Prev/next chevron buttons to move between months. The month–year label can be clicked to jump to a year view.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">4</div><div><span class="anatomy-term">Weekday labels</span> — Single-letter column headers (M–S) to orient users. Always starts on Monday.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">5</div><div><span class="anatomy-term">Day cell</span> — A 28 × 28 px circular target for each calendar day. Cells outside the current month are dimmed.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">6</div><div><span class="anatomy-term">Selected day</span> — The chosen date, highlighted with the brand fill and white text.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">7</div><div><span class="anatomy-term">Today indicator</span> — The current calendar day shown in brand text with a small dot beneath it.</div></div>
+          <div class="anatomy-item"><div class="anatomy-num">8</div><div><span class="anatomy-term">Footer actions</span> — Cancel and Apply buttons confirm or dismiss the selection. Only present in dropdown mode (<code>footerButtons = true</code>).</div></div>
+        </div>
+      </section>
+
+      <!-- USAGE -->
+      <section class="section" id="usage">
+        <h2 class="text-l3">Usage</h2>
+        <p class="section-lead">Use a date picker whenever a structured, unambiguous date value is required — not free-form text input.</p>
+
+        <!-- Rule 1 -->
+        <div class="cg-rule">
+          <h3 class="text-l4">Use a picker, not a text field, for dates</h3>
+          <p>A date picker guarantees a valid, correctly formatted date. Free-text fields require validation and introduce parsing errors from different locale conventions.</p>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev">
+                <div style="display:flex;flex-direction:column;gap:6px;pointer-events:none;width:100%;max-width:220px;">
+                  <span style="font-size:13px;font-weight:600;color:var(--content-base);">Start date</span>
+                  <button class="dp-trigger" tabindex="-1" style="pointer-events:none;width:100%;justify-content:flex-start;">
+                    <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+                    14 May 2026
+                    <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;margin-left:auto;"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Do</div>
+                Use a date picker to capture structured, validated date values.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev">
+                <div style="display:flex;flex-direction:column;gap:6px;pointer-events:none;width:100%;max-width:220px;">
+                  <span style="font-size:13px;font-weight:600;color:var(--content-base);">Start date</span>
+                  <div style="height:36px;border:1px solid var(--border-action);border-radius:6px;background:var(--bg-base);padding:0 12px;display:flex;align-items:center;font-size:14px;color:var(--content-subtle);">e.g. 14/05/2026</div>
+                </div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> Don't</div>
+                Don't use a free-text field for dates — format ambiguity causes errors.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 2 -->
+        <div class="cg-rule">
+          <h3 class="text-l4">Use inline mode when the date is the main purpose of the view</h3>
+          <p>The inline date picker fits naturally into scheduling flows, booking screens, and dedicated date-selection steps. A trigger + dropdown adds unnecessary friction when a date must always be chosen.</p>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="flex-direction:column;flex-wrap:nowrap;flex:1;height:auto;justify-content:center;gap:0;align-items:center;padding:20px 16px;">
+                <div class="dp dp-inline" style="pointer-events:none;transform:scale(.85);transform-origin:top center;">
+                  <div class="dp-body">
+                    <div class="dp-header">
+                      <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                      <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                    </div>
+                    <div class="dp-weekdays">
+                      <div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div>
+                    </div>
+                    <div class="dp-grid">
+                      <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                      <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                      <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                      <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div>
+                      <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                      <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Do</div>
+                Use inline mode on scheduling screens where selecting a date is the primary task.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="flex-direction:column;flex-wrap:nowrap;flex:1;height:auto;justify-content:center;gap:8px;align-items:flex-start;padding:20px 24px;">
+                <div style="font-size:13px;font-weight:600;color:var(--content-base);pointer-events:none;">First name</div>
+                <div style="height:36px;width:100%;border:1px solid var(--border-action);border-radius:6px;background:var(--bg-base);pointer-events:none;"></div>
+                <div style="font-size:13px;font-weight:600;color:var(--content-base);pointer-events:none;">Date of birth</div>
+                <div class="dp" style="pointer-events:none;transform:scale(.7);transform-origin:top left;margin-bottom:-50px;">
+                  <div class="dp-body">
+                    <div class="dp-header">
+                      <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                      <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                    </div>
+                    <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                    <div class="dp-grid">
+                      <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                      <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div><div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div><div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div><div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div><div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> Don't</div>
+                Don't embed an inline calendar in a form with other fields — it dominates the layout. Use a dropdown trigger instead.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VARIANTS -->
+      <section class="section" id="variants">
+        <h2 class="text-l3">Variants</h2>
+        <p class="section-lead">Four modes cover the full range of date-selection needs, from simple form inputs to full scheduling flows.</p>
+
+        <div class="variant-rows">
+
+          <!-- Standard (dropdown) -->
+          <div class="variant-row">
+            <div class="variant-row-btn" style="align-items:flex-start;padding-top:16px;">
+              <div style="position:relative;display:inline-block;">
+                <button class="dp-trigger" id="vr-trigger-std">
+                  <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+                  <span id="vr-trigger-std-label">14 May 2026</span>
+                  <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;"></i>
+                </button>
+                <div class="dp" id="vr-cal-std" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:100;">
+                  <div class="dp-body">
+                    <div class="dp-header">
+                      <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                      <div class="dp-nav"><button class="dp-nav-btn"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                    </div>
+                    <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                    <div class="dp-grid">
+                      <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                      <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                      <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                      <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div>
+                      <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                      <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="variant-row-desc"><strong>Standard (dropdown)</strong> — A trigger button that opens the calendar in a floating panel. Clicking a day immediately commits the value and closes the picker. Use in forms, filter panels, or anywhere a date field appears alongside other inputs. This is the default mode.</div>
+          </div>
+
+          <!-- Inline -->
+          <div class="variant-row vr-wide">
+            <div class="variant-row-btn">
+              <div class="dp dp-inline" id="vr-cal-inline">
+                <div class="dp-body">
+                  <div class="dp-header">
+                    <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                    <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                  </div>
+                  <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                  <div class="dp-grid">
+                    <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                    <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                    <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                    <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div>
+                    <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                    <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="variant-row-desc"><strong>Inline</strong> — The calendar panel is embedded directly in the page without a trigger, border, shadow, or footer. Selecting a day immediately commits the value. Use on dedicated scheduling screens, booking flows, or onboarding steps where date selection is the primary action (<code>footerButtons = false</code>).</div>
+          </div>
+
+          <!-- With time selector -->
+          <div class="variant-row vr-wide">
+            <div class="variant-row-btn">
+              <div class="dp" id="vr-cal-time">
+                <div class="dp-body">
+                  <div class="dp-header">
+                    <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                    <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                  </div>
+                  <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                  <div class="dp-grid">
+                    <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                    <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                    <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                    <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div>
+                    <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                    <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                  </div>
+                </div>
+                <div class="dp-time-section">
+                  <div class="dp-tz-wrap">
+                    <div class="dp-time-field dp-tz-field">
+                      <i data-icon="globe" style="display:flex;width:16px;height:16px;"></i>
+                      <span class="dp-time-value">Europe/Amsterdam</span>
+                      <i data-icon="chevron-down" style="display:flex;width:16px;height:16px;" class="dp-time-chevron dp-tz-chevron"></i>
+                    </div>
+                    <div class="dp-tz-dropdown" hidden>
+                      <div class="dp-tz-option is-active">Europe/Amsterdam</div>
+                      <div class="dp-tz-option">Europe/London</div>
+                      <div class="dp-tz-option">America/New_York</div>
+                      <div class="dp-tz-option">America/Chicago</div>
+                      <div class="dp-tz-option">America/Los_Angeles</div>
+                      <div class="dp-tz-option">UTC</div>
+                    </div>
+                  </div>
+                  <div class="dp-time-field">
+                    <i data-icon="Clock" style="display:flex;width:16px;height:16px;"></i>
+                    <input type="text" class="dp-time-input" value="09:00">
+                    <div class="dp-steppers">
+                      <button class="dp-stepper-btn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 9L7 5L11 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                      <button class="dp-stepper-btn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="dp-footer">
+                  <button class="btn-dp-cancel">Cancel</button>
+                  <button class="btn-dp-apply">Apply</button>
+                </div>
+              </div>
+            </div>
+            <div class="variant-row-desc"><strong>With time selector</strong> — Adds timezone and time fields below the calendar grid. Enable with <code>showTimeSelector = true</code>. The timezone row can be toggled separately via <code>showTimezone</code>. Use for scheduling meetings, deadlines, or events where both date and time are required.</div>
+          </div>
+
+          <!-- Date range -->
+          <div class="variant-row vr-wide">
+            <div class="variant-row-btn">
+              <div class="dp" id="vr-cal-range">
+                <div class="dp-body">
+                  <div class="dp-header">
+                    <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                    <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                  </div>
+                  <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                  <div class="dp-grid">
+                    <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                    <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                    <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                    <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-range-start">14</div><div class="dp-day is-in-range">15</div><div class="dp-day is-in-range">16</div><div class="dp-day is-in-range">17</div>
+                    <div class="dp-day is-in-range">18</div><div class="dp-day is-in-range">19</div><div class="dp-day is-in-range">20</div><div class="dp-day is-in-range">21</div><div class="dp-day is-range-end">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                    <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="variant-row-desc"><strong>Date range</strong> — A single calendar where the user selects a start and end date. The span between both dates is highlighted in a lighter teal, with rounded caps on the start and end cells. Use for period filters, report date ranges, leave requests, and any scenario requiring a start and end date.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STATES -->
+      <section class="section" id="states">
+        <h2 class="text-l3">States</h2>
+        <p class="section-lead">Day cells carry the interactive states of the calendar. Each cell is an independent target with its own hover, selection, and availability state.</p>
+
+        <h3 class="text-l4">Day cell states</h3>
+        <div class="states-row">
+          <div class="state-col">
+            <span class="state-lbl">Default</span>
+            <div class="dp-day-demo" style="pointer-events:none;" tabindex="-1">14</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Hover</span>
+            <div class="dp-day-demo is-hover" style="pointer-events:none;" tabindex="-1">14</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Selected</span>
+            <div class="dp-day-demo is-selected" style="pointer-events:none;" tabindex="-1">14</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Today</span>
+            <div class="dp-day-demo is-today" style="pointer-events:none;" tabindex="-1">15</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Today selected</span>
+            <div class="dp-day-demo is-today is-selected" style="pointer-events:none;" tabindex="-1">15</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Other month</span>
+            <div class="dp-day-demo is-other-month" style="pointer-events:none;" tabindex="-1">31</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Disabled</span>
+            <div class="dp-day-demo is-disabled" style="pointer-events:none;" tabindex="-1">8</div>
+          </div>
+        </div>
+
+        <h3 class="text-l4">Range selection states</h3>
+        <div class="states-row">
+          <div class="state-col">
+            <span class="state-lbl">Range start</span>
+            <div class="dp-day-demo is-range-start" style="pointer-events:none;" tabindex="-1">14</div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">In range</span>
+            <div class="dp-range-strip" style="pointer-events:none;">
+              <div class="dp-day-demo is-in-range" tabindex="-1">18</div>
+            </div>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Range end</span>
+            <div class="dp-day-demo is-range-end" style="pointer-events:none;" tabindex="-1">22</div>
+          </div>
+          <div class="state-col" style="min-width:200px;">
+            <span class="state-lbl">Start → end strip</span>
+            <div class="dp-range-strip" style="pointer-events:none;gap:0;">
+              <div class="dp-day-demo is-range-start" tabindex="-1">14</div>
+              <div class="dp-day-demo is-in-range" tabindex="-1">15</div>
+              <div class="dp-day-demo is-in-range" tabindex="-1">16</div>
+              <div class="dp-day-demo is-in-range" tabindex="-1">17</div>
+              <div class="dp-day-demo is-range-end" tabindex="-1">18</div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-l4">Trigger button states</h3>
+        <div class="states-row">
+          <div class="state-col">
+            <span class="state-lbl">Default</span>
+            <button class="dp-trigger" style="pointer-events:none;" tabindex="-1">
+              <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+              14 May 2026
+              <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;"></i>
+            </button>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Hover</span>
+            <button class="dp-trigger is-hover" style="pointer-events:none;" tabindex="-1">
+              <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+              14 May 2026
+              <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;"></i>
+            </button>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Focus / open</span>
+            <button class="dp-trigger is-focus" style="pointer-events:none;" tabindex="-1">
+              <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+              14 May 2026
+              <i data-icon="chevron-up" style="display:flex;width:14px;height:14px;"></i>
+            </button>
+          </div>
+          <div class="state-col">
+            <span class="state-lbl">Empty (placeholder)</span>
+            <button class="dp-trigger" style="pointer-events:none;color:var(--content-subtle);" tabindex="-1">
+              <i data-icon="calendar" style="display:flex;width:16px;height:16px;color:var(--content-subtle);"></i>
+              Select a date
+              <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;color:var(--content-subtle);"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DESIGN TOKENS -->
+      <section class="section" id="tokens">
+        <h2 class="text-l3">Design Tokens</h2>
+        <p class="section-lead">Tokens cover the calendar container, day cell states, range highlight, time fields, trigger button, and the dropdown shadow.</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Token</th><th>Role</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>--bg-base</code></td><td>Calendar container background, trigger button background, time field background</td><td>#ffffff</td></tr>
+            <tr><td><code>--bg-base-hover</code></td><td>Day cell hover fill, nav button hover fill</td><td>#f5f6f8</td></tr>
+            <tr><td><code>--bg-brand</code></td><td>Selected day fill, range start / range end fill</td><td>#0a9d99</td></tr>
+            <tr><td><code>--bg-brand-subtle</code></td><td>In-range day background</td><td>#e6f6f6</td></tr>
+            <tr><td><code>--border-base</code></td><td>Calendar container border, footer/time divider lines</td><td>#e2e5eb</td></tr>
+            <tr><td><code>--border-action</code></td><td>Trigger button border (default), time field border</td><td>#d0d5df</td></tr>
+            <tr><td><code>--border-action-hover</code></td><td>Trigger button border on hover</td><td>#aab0c0</td></tr>
+            <tr><td><code>--border-brand</code></td><td>Trigger button focus ring</td><td>#0a9d99</td></tr>
+            <tr><td><code>--content-base</code></td><td>Day numbers (default), month–year label</td><td>#192743</td></tr>
+            <tr><td><code>--content-secondary</code></td><td>Weekday column labels, navigation chevrons, time field icons</td><td>#5e6a82</td></tr>
+            <tr><td><code>--content-subtle</code></td><td>Trigger placeholder text</td><td>#9aa3b5</td></tr>
+            <tr><td><code>--content-disabled</code></td><td>Disabled day number</td><td>#bec4ce</td></tr>
+            <tr><td><code>--content-brand</code></td><td>Today indicator text and dot</td><td>#0a9d99</td></tr>
+            <tr><td><code>--sh-action</code></td><td>Trigger button shadow</td><td>0 1px 2px rgba(25,39,67,.06)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ACCESSIBILITY -->
+      <section class="section" id="accessibility">
+        <h2 class="text-l3">Accessibility</h2>
+        <p class="section-lead">The date picker must be fully keyboard-navigable and announce state changes to assistive technologies.</p>
+
+        <h3 class="text-l4">Keyboard interaction</h3>
+        <table class="token-table">
+          <thead><tr><th>Key</th><th>Behaviour</th></tr></thead>
+          <tbody>
+            <tr><td><code>Enter</code> / <code>Space</code></td><td>Opens the picker from the trigger. Selects the focused day when the calendar is open.</td></tr>
+            <tr><td><code>Escape</code></td><td>Closes the dropdown and returns focus to the trigger without changing the value.</td></tr>
+            <tr><td><code>Arrow keys</code></td><td>Move focus between day cells (left/right = prev/next day; up/down = same weekday ±1 week).</td></tr>
+            <tr><td><code>Page Up / Down</code></td><td>Navigate to the previous or next month.</td></tr>
+            <tr><td><code>Home / End</code></td><td>Move focus to the first or last day of the current month.</td></tr>
+            <tr><td><code>Tab</code></td><td>Moves focus between the trigger, navigation buttons, day grid, time fields, and footer actions.</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-l4">ARIA requirements</h3>
+        <div class="a11y-list">
+          <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Grid role.</strong> The calendar grid uses <code>role="grid"</code> with an <code>aria-label</code> identifying the current month and year.</div></div>
+          <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Cells announce state.</strong> Each day cell uses <code>role="gridcell"</code>. Selected cells carry <code>aria-selected="true"</code>. Disabled cells use <code>aria-disabled="true"</code>.</div></div>
+          <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Trigger announces the value.</strong> The trigger button announces the currently selected date; if empty, it uses a descriptive placeholder such as "Select a date".</div></div>
+          <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label navigation buttons.</strong> Month navigation buttons have explicit <code>aria-label</code> values ("Go to previous month", "Go to next month").</div></div>
+          <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label range ends.</strong> For date range pickers, the start and end day cells carry <code>aria-label</code> values that describe their role (e.g., "14 May 2026, range start").</div></div>
+          <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Announce month changes.</strong> When the month changes via keyboard, the new month and year are announced live via an <code>aria-live</code> region.</div></div>
+        </div>
+      </section>
+
+      <!-- PAGINATION -->
+      <div class="pagination">
+        <a class="pag-card left" href="toggle-docs.html">
+          <span class="pag-dir">← Previous</span>
+          <span class="pag-name">Toggle</span>
+        </a>
+        <a class="pag-card right" href="file-upload-docs.html">
+          <span class="pag-dir">Next →</span>
+          <span class="pag-name">File Upload</span>
+        </a>
+      </div>
+
+    </article>
+
+    <div class="toc-col">
+      <nav class="toc">
+        <div class="toc-title">ON THIS PAGE</div>
+        <a class="toc-link" href="#anatomy">Anatomy</a>
+        <a class="toc-link" href="#usage">Usage</a>
+        <a class="toc-link" href="#variants">Variants</a>
+        <a class="toc-link" href="#states">States</a>
+        <a class="toc-link" href="#tokens">Design Tokens</a>
+        <a class="toc-link" href="#accessibility">Accessibility</a>
+      </nav>
+    </div>
+
+  </div><!-- /content-cols -->
+</div><!-- /tab-panel design -->
+
+
+<!-- ═══════════════════ DEVELOPER TAB ═══════════════════ -->
+<div class="tab-panel" data-panel="developer">
+  <div class="content-cols">
+    <article class="content">
+
+      <!-- PLAYGROUND -->
+      <section class="section" id="dev-playground">
+        <h2 class="text-l3">Playground</h2>
+        <p class="section-lead">Configure props and see the component update live — the code snippet below reflects your selection.</p>
+
+        <div class="pg-card">
+          <div class="pg-preview" id="pg-preview"></div>
+          <div class="pg-bottom">
+            <div class="pg-tab-bar">
+              <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+              <button class="pg-tab" data-pgtab="code">Code</button>
+              <button class="pg-reset" id="pg-reset">Reset</button>
+            </div>
+            <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+              <div class="pg-row">
+                <div class="pg-row-name">Mode</div>
+                <div class="pg-row-ctrl">
+                  <select class="pg-select" id="pg-mode">
+                    <option value="dropdown">Dropdown (default)</option>
+                    <option value="inline">Inline</option>
+                  </select>
+                </div>
+              </div>
+              <div class="pg-row" id="pg-row-footer" hidden>
+                <div class="pg-row-name">footerButtons</div>
+                <div class="pg-row-ctrl">
+                  <label class="pg-toggle"><input type="checkbox" id="pg-footer" checked><span class="pg-toggle-track"></span></label>
+                </div>
+              </div>
+              <div class="pg-row">
+                <div class="pg-row-name">showTimeSelector</div>
+                <div class="pg-row-ctrl">
+                  <label class="pg-toggle"><input type="checkbox" id="pg-timeselector"><span class="pg-toggle-track"></span></label>
+                </div>
+              </div>
+              <div class="pg-row" id="pg-row-timezone">
+                <div class="pg-row-name">showTimezone</div>
+                <div class="pg-row-ctrl">
+                  <label class="pg-toggle"><input type="checkbox" id="pg-timezone" checked><span class="pg-toggle-track"></span></label>
+                </div>
+              </div>
+              <div class="pg-row">
+                <div class="pg-row-name">dateRange</div>
+                <div class="pg-row-ctrl">
+                  <label class="pg-toggle"><input type="checkbox" id="pg-range"><span class="pg-toggle-track"></span></label>
+                </div>
+              </div>
+            </div>
+            <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+              <button class="dev-copy-btn" id="pg-copy">Copy</button>
+              <pre><code id="pg-code"></code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- USAGE -->
+      <section class="section" id="dev-usage">
+        <h2 class="text-l3">Usage</h2>
+        <p class="section-lead">The date picker is an Angular component from the Engage component library. Use the selector and inputs below to integrate it into your feature module.</p>
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">⚠️</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">Figma gap</span>
+            <span class="dev-gap-text">Confirm the exact component selector, module import path, and input property names against <code>styleguide.effectory.com/components/selects</code> before shipping. The snippets below use <code>eng-date-picker</code> as the assumed selector — verify with the live Angular styleguide.</span>
+          </div>
+        </div>
+
+        <h3 class="text-l4">Standard (dropdown)</h3>
+        <div class="dev-preview" style="padding:24px 28px;">
+          <button class="dp-trigger">
+            <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+            14 May 2026
+            <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;"></i>
+          </button>
+        </div>
+        <div class="dev-code-wrap">
+          <button class="dev-copy-btn">Copy</button>
+          <pre><code><span class="ct">&lt;eng-date-picker</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"selectedDate"</span>
+<span class="ct">&gt;&lt;/eng-date-picker&gt;</span></code></pre>
+        </div>
+
+        <h3 class="text-l4">Inline</h3>
+        <div class="dev-preview" style="padding:24px 28px; justify-content:flex-start;">
+          <div class="dp dp-inline" style="pointer-events:none;">
+            <div class="dp-body">
+              <div class="dp-header">
+                <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+              </div>
+              <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+              <div class="dp-grid">
+                <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div>
+                <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dev-code-wrap">
+          <button class="dev-copy-btn">Copy</button>
+          <pre><code><span class="ct">&lt;eng-date-picker</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"selectedDate"</span>
+  <span class="ca">[footerButtons]</span>=<span class="cv">"false"</span>
+<span class="ct">&gt;&lt;/eng-date-picker&gt;</span></code></pre>
+        </div>
+
+        <h3 class="text-l4">With time selector</h3>
+        <div class="dev-preview" id="dev-preview-time" style="padding:24px 28px; justify-content:flex-start;">
+          <div class="dp">
+            <div class="dp-body">
+              <div class="dp-header">
+                <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                <div class="dp-nav"><button class="dp-nav-btn"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+              </div>
+              <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+              <div class="dp-grid">
+                <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-selected">14</div><div class="dp-day is-today">15</div><div class="dp-day">16</div><div class="dp-day">17</div>
+                <div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div><div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div>
+                <div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div><div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day">31</div>
+              </div>
+            </div>
+            <div class="dp-time-section">
+              <div class="dp-tz-wrap">
+                <div class="dp-time-field dp-tz-field">
+                  <i data-icon="globe" style="display:flex;width:16px;height:16px;"></i>
+                  <span class="dp-time-value">Europe/Amsterdam</span>
+                  <i data-icon="chevron-down" style="display:flex;width:16px;height:16px;" class="dp-time-chevron dp-tz-chevron"></i>
+                </div>
+                <div class="dp-tz-dropdown" hidden>
+                  <div class="dp-tz-option is-active">Europe/Amsterdam</div>
+                  <div class="dp-tz-option">Europe/London</div>
+                  <div class="dp-tz-option">America/New_York</div>
+                  <div class="dp-tz-option">America/Chicago</div>
+                  <div class="dp-tz-option">America/Los_Angeles</div>
+                  <div class="dp-tz-option">UTC</div>
+                </div>
+              </div>
+              <div class="dp-time-field">
+                <i data-icon="Clock" style="display:flex;width:16px;height:16px;"></i>
+                <input type="text" class="dp-time-input" value="09:00">
+                <div class="dp-steppers">
+                  <button class="dp-stepper-btn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 9L7 5L11 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                  <button class="dp-stepper-btn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                </div>
+              </div>
+            </div>
+            <div class="dp-footer">
+              <button class="btn-dp-cancel">Cancel</button>
+              <button class="btn-dp-apply">Apply</button>
+            </div>
+          </div>
+        </div>
+        <div class="dev-code-wrap">
+          <button class="dev-copy-btn">Copy</button>
+          <pre><code><span class="ct">&lt;eng-date-picker</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"selectedDate"</span>
+  <span class="ca">[footerButtons]</span>=<span class="cv">"true"</span>
+  <span class="ca">[showTimeSelector]</span>=<span class="cv">"true"</span>
+  <span class="ca">[showTimezone]</span>=<span class="cv">"true"</span>
+<span class="ct">&gt;&lt;/eng-date-picker&gt;</span></code></pre>
+        </div>
+
+        <h3 class="text-l4">Date range</h3>
+        <div class="dev-preview" style="padding:24px 28px; justify-content:flex-start; overflow-x:auto;">
+          <div class="dp-range-wrap" style="pointer-events:none;">
+            <div class="dp-range-calendars">
+              <div class="dp">
+                <div class="dp-body">
+                  <div class="dp-header">
+                    <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                    <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" tabindex="-1" style="opacity:0;pointer-events:none;"></button></div>
+                  </div>
+                  <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                  <div class="dp-grid">
+                    <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                    <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                    <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                    <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-range-start">14</div><div class="dp-day is-in-range">15</div><div class="dp-day is-in-range">16</div><div class="dp-day is-in-range">17</div>
+                    <div class="dp-day is-in-range">18</div><div class="dp-day is-in-range">19</div><div class="dp-day is-in-range">20</div><div class="dp-day is-in-range">21</div><div class="dp-day is-in-range">22</div><div class="dp-day is-in-range">23</div><div class="dp-day is-in-range">24</div>
+                    <div class="dp-day is-in-range">25</div><div class="dp-day is-in-range">26</div><div class="dp-day is-in-range">27</div><div class="dp-day is-in-range">28</div><div class="dp-day is-in-range">29</div><div class="dp-day is-in-range">30</div><div class="dp-day is-in-range">31</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dp">
+                <div class="dp-body">
+                  <div class="dp-header">
+                    <div class="dp-month-group"><span class="dp-month-label">June 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                    <div class="dp-nav"><button class="dp-nav-btn" tabindex="-1" style="opacity:0;pointer-events:none;"></button><button class="dp-nav-btn" tabindex="-1"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+                  </div>
+                  <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+                  <div class="dp-grid">
+                    <div class="dp-day is-in-range">1</div><div class="dp-day is-in-range">2</div><div class="dp-day is-in-range">3</div><div class="dp-day is-in-range">4</div><div class="dp-day is-in-range">5</div><div class="dp-day is-in-range">6</div><div class="dp-day is-in-range">7</div>
+                    <div class="dp-day is-in-range">8</div><div class="dp-day is-in-range">9</div><div class="dp-day is-range-end">10</div><div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day">14</div>
+                    <div class="dp-day">15</div><div class="dp-day">16</div><div class="dp-day">17</div><div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div>
+                    <div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div><div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div>
+                    <div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="dp-range-footer">
+              <button class="btn-dp-cancel" tabindex="-1" style="pointer-events:none;">Cancel</button>
+              <button class="btn-dp-apply" tabindex="-1" style="pointer-events:none;">Apply</button>
+            </div>
+          </div>
+        </div>
+        <div class="dev-code-wrap">
+          <button class="dev-copy-btn">Copy</button>
+          <pre><code><span class="ct">&lt;eng-date-picker</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"dateRange"</span>
+  <span class="ca">[dateRange]</span>=<span class="cv">"true"</span>
+  <span class="ca">[footerButtons]</span>=<span class="cv">"true"</span>
+<span class="ct">&gt;&lt;/eng-date-picker&gt;</span></code></pre>
+        </div>
+
+      </section>
+
+      <!-- CSS CLASSES / API REFERENCE -->
+      <section class="section" id="dev-props">
+        <h2 class="text-l3">Component inputs</h2>
+        <p class="section-lead">Angular <code>@Input</code> properties exposed by <code>eng-date-picker</code>.</p>
+
+        <div class="dev-gap">
+          <span class="dev-gap-icon">⚠️</span>
+          <div class="dev-gap-body">
+            <span class="dev-gap-label">Figma gap</span>
+            <span class="dev-gap-text">Verify all property names, types, and defaults against the live Angular styleguide at <code>styleguide.effectory.com/components/selects</code>. The table below reflects the Figma component spec and may differ from the production API.</span>
+          </div>
+        </div>
+
+        <table class="token-table">
+          <thead>
+            <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>ngModel</code></td><td><code>Date | null</code></td><td><code>null</code></td><td>The currently selected date. Use two-way binding (<code>[(ngModel)]</code>) to keep it in sync.</td></tr>
+            <tr><td><code>footerButtons</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Shows Cancel and Apply buttons in the footer. Set to <code>false</code> for inline mode where tapping a day commits immediately.</td></tr>
+            <tr><td><code>showTimeSelector</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Adds timezone and time input fields below the calendar grid. Requires <code>footerButtons = true</code>.</td></tr>
+            <tr><td><code>showTimezone</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Shows the timezone selector row. Only relevant when <code>showTimeSelector</code> is <code>true</code>.</td></tr>
+            <tr><td><code>dateRange</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enables range-selection mode. Two calendar months are shown side by side and the user selects a start and end date.</td></tr>
+            <tr><td><code>minDate</code></td><td><code>Date | null</code></td><td><code>null</code></td><td>The earliest selectable date. Days before this value are rendered as disabled.</td></tr>
+            <tr><td><code>maxDate</code></td><td><code>Date | null</code></td><td><code>null</code></td><td>The latest selectable date. Days after this value are rendered as disabled.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- CSS TOKENS (DEV) -->
+      <section class="section" id="dev-tokens">
+        <h2 class="text-l3">CSS tokens</h2>
+        <p class="section-lead">The same design tokens used in the Design tab, provided here for developer reference.</p>
+        <table class="token-table">
+          <thead>
+            <tr><th>Token</th><th>Role</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>--bg-base</code></td><td>Calendar container background, trigger button background, time field background</td><td>#ffffff</td></tr>
+            <tr><td><code>--bg-base-hover</code></td><td>Day cell hover fill, nav button hover fill</td><td>#f5f6f8</td></tr>
+            <tr><td><code>--bg-brand</code></td><td>Selected day fill, range start / range end fill</td><td>#0a9d99</td></tr>
+            <tr><td><code>--bg-brand-subtle</code></td><td>In-range day background</td><td>#e6f6f6</td></tr>
+            <tr><td><code>--border-base</code></td><td>Calendar container border, footer/time divider lines</td><td>#e2e5eb</td></tr>
+            <tr><td><code>--border-action</code></td><td>Trigger button border (default), time field border</td><td>#d0d5df</td></tr>
+            <tr><td><code>--border-action-hover</code></td><td>Trigger button border on hover</td><td>#aab0c0</td></tr>
+            <tr><td><code>--border-brand</code></td><td>Trigger button focus ring</td><td>#0a9d99</td></tr>
+            <tr><td><code>--content-base</code></td><td>Day numbers (default), month–year label</td><td>#192743</td></tr>
+            <tr><td><code>--content-secondary</code></td><td>Weekday column labels, navigation chevrons, time field icons</td><td>#5e6a82</td></tr>
+            <tr><td><code>--content-subtle</code></td><td>Trigger placeholder text</td><td>#9aa3b5</td></tr>
+            <tr><td><code>--content-disabled</code></td><td>Disabled day number</td><td>#bec4ce</td></tr>
+            <tr><td><code>--content-brand</code></td><td>Today indicator text and dot</td><td>#0a9d99</td></tr>
+            <tr><td><code>--sh-action</code></td><td>Trigger button shadow</td><td>0 1px 2px rgba(25,39,67,.06)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ACCESSIBILITY (DEV) -->
+      <section class="section" id="dev-a11y">
+        <h2 class="text-l3">Accessibility</h2>
+        <p class="section-lead">The component handles ARIA roles, live regions, and keyboard navigation automatically. Use the inputs below to supplement the built-in behaviour.</p>
+
+        <h3 class="text-l4">Required: provide a meaningful label</h3>
+        <p>Always associate the date picker with a visible <code>&lt;label&gt;</code> or use <code>aria-label</code> / <code>aria-labelledby</code> to describe what date is being collected. The trigger button announces the current value; ensure the label clarifies the purpose.</p>
+        <div class="dev-code-wrap" style="margin-top:12px;">
+          <button class="dev-copy-btn">Copy</button>
+          <pre><code><span class="cc">&lt;!-- With a visible label --&gt;</span>
+<span class="ct">&lt;label</span> <span class="ca">for</span>=<span class="cv">"startDate"</span><span class="ct">&gt;</span>Start date<span class="ct">&lt;/label&gt;</span>
+<span class="ct">&lt;eng-date-picker</span>
+  <span class="ca">id</span>=<span class="cv">"startDate"</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"startDate"</span>
+<span class="ct">&gt;&lt;/eng-date-picker&gt;</span>
+
+<span class="cc">&lt;!-- With aria-label (no visible label) --&gt;</span>
+<span class="ct">&lt;eng-date-picker</span>
+  <span class="ca">aria-label</span>=<span class="cv">"Select start date"</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"startDate"</span>
+<span class="ct">&gt;&lt;/eng-date-picker&gt;</span></code></pre>
+        </div>
+
+        <h3 class="text-l4">Date range: label both ends</h3>
+        <p>For range pickers, use separate <code>aria-label</code> values or wrap in a <code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code> so assistive technologies can distinguish the start and end fields.</p>
+        <div class="dev-code-wrap" style="margin-top:12px;">
+          <button class="dev-copy-btn">Copy</button>
+          <pre><code><span class="ct">&lt;fieldset&gt;</span>
+  <span class="ct">&lt;legend&gt;</span>Report period<span class="ct">&lt;/legend&gt;</span>
+  <span class="ct">&lt;eng-date-picker</span>
+    <span class="ca">[(ngModel)]</span>=<span class="cv">"reportRange"</span>
+    <span class="ca">[dateRange]</span>=<span class="cv">"true"</span>
+    <span class="ca">[footerButtons]</span>=<span class="cv">"true"</span>
+  <span class="ct">&gt;&lt;/eng-date-picker&gt;</span>
+<span class="ct">&lt;/fieldset&gt;</span></code></pre>
+        </div>
+      </section>
+
+      <!-- PAGINATION -->
+      <div class="pagination">
+        <a class="pag-card left" href="toggle-docs.html">
+          <span class="pag-dir">← Previous</span>
+          <span class="pag-name">Toggle</span>
+        </a>
+        <a class="pag-card right" href="file-upload-docs.html">
+          <span class="pag-dir">Next →</span>
+          <span class="pag-name">File Upload</span>
+        </a>
+      </div>
+
+    </article>
+
+    <div class="toc-col">
+      <nav class="toc">
+        <div class="toc-title">ON THIS PAGE</div>
+        <a class="toc-link" href="#dev-playground">Playground</a>
+        <a class="toc-link" href="#dev-usage">Usage</a>
+        <a class="toc-link" href="#dev-props">Component inputs</a>
+        <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+        <a class="toc-link" href="#dev-a11y">Accessibility</a>
+      </nav>
+    </div>
+
+  </div><!-- /content-cols -->
+</div><!-- /tab-panel developer -->
+
+</div><!-- /content-wrap -->
+</div><!-- /shell -->
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+(function () {
+  /* ── Playground ── */
+  const defaults = {
+    mode: 'dropdown',
+    footer: true,
+    timeselector: false,
+    timezone: true,
+    range: false
+  };
+  let state = { ...defaults };
+
+  const preview       = document.getElementById('pg-preview');
+  const codeEl        = document.getElementById('pg-code');
+  const modeSel       = document.getElementById('pg-mode');
+  const footerCk      = document.getElementById('pg-footer');
+  const timeselectorCk= document.getElementById('pg-timeselector');
+  const timezoneCk    = document.getElementById('pg-timezone');
+  const rangeCk       = document.getElementById('pg-range');
+  const rowFooter     = document.getElementById('pg-row-footer');
+  const rowTimezone   = document.getElementById('pg-row-timezone');
+
+  function miniCalendar(selected) {
+    const days = [
+      '', '', '', '', '1','2','3',
+      '4','5','6','7','8','9','10',
+      '11','12','13',selected,'15','16','17',
+      '18','19','20','21','22','23','24',
+      '25','26','27','28','29','30','31'
+    ];
+    const cells = days.map((d, i) => {
+      if (!d) return `<div class="dp-day is-empty"></div>`;
+      const cls = d === selected ? 'dp-day is-selected' : (d === '15' ? 'dp-day is-today' : 'dp-day');
+      return `<div class="${cls}">${d}</div>`;
+    }).join('');
+    return `
+      <div class="dp-body">
+        <div class="dp-header">
+          <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+          <div class="dp-nav"><button class="dp-nav-btn"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+        </div>
+        <div class="dp-weekdays">
+          <div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div>
+          <div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div>
+        </div>
+        <div class="dp-grid">${cells}</div>
+      </div>`;
+  }
+
+  function rangeCalendar() {
+    return `
+      <div class="dp-range-wrap">
+        <div class="dp-range-calendars">
+          <div class="dp">
+            <div class="dp-body">
+              <div class="dp-header">
+                <div class="dp-month-group"><span class="dp-month-label">May 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                <div class="dp-nav"><button class="dp-nav-btn"><i data-icon="chevron-left" style="display:flex;width:16px;height:16px;"></i></button><button class="dp-nav-btn" style="opacity:0;pointer-events:none;"></button></div>
+              </div>
+              <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+              <div class="dp-grid">
+                <div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+                <div class="dp-day">1</div><div class="dp-day">2</div><div class="dp-day">3</div>
+                <div class="dp-day">4</div><div class="dp-day">5</div><div class="dp-day">6</div><div class="dp-day">7</div><div class="dp-day">8</div><div class="dp-day">9</div><div class="dp-day">10</div>
+                <div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day is-range-start">14</div><div class="dp-day is-in-range">15</div><div class="dp-day is-in-range">16</div><div class="dp-day is-in-range">17</div>
+                <div class="dp-day is-in-range">18</div><div class="dp-day is-in-range">19</div><div class="dp-day is-in-range">20</div><div class="dp-day is-in-range">21</div><div class="dp-day is-in-range">22</div><div class="dp-day is-in-range">23</div><div class="dp-day is-in-range">24</div>
+                <div class="dp-day is-in-range">25</div><div class="dp-day is-in-range">26</div><div class="dp-day is-in-range">27</div><div class="dp-day is-in-range">28</div><div class="dp-day is-in-range">29</div><div class="dp-day is-in-range">30</div><div class="dp-day is-in-range">31</div>
+              </div>
+            </div>
+          </div>
+          <div class="dp">
+            <div class="dp-body">
+              <div class="dp-header">
+                <div class="dp-month-group"><span class="dp-month-label">June 2026</span><i data-icon="chevron-down-small" style="display:flex;width:16px;height:16px;color:var(--content-secondary);"></i></div>
+                <div class="dp-nav"><button class="dp-nav-btn" style="opacity:0;pointer-events:none;"></button><button class="dp-nav-btn"><i data-icon="chevron-right" style="display:flex;width:16px;height:16px;"></i></button></div>
+              </div>
+              <div class="dp-weekdays"><div class="dp-wday">M</div><div class="dp-wday">T</div><div class="dp-wday">W</div><div class="dp-wday">T</div><div class="dp-wday">F</div><div class="dp-wday">S</div><div class="dp-wday">S</div></div>
+              <div class="dp-grid">
+                <div class="dp-day is-in-range">1</div><div class="dp-day is-in-range">2</div><div class="dp-day is-in-range">3</div><div class="dp-day is-in-range">4</div><div class="dp-day is-in-range">5</div><div class="dp-day is-in-range">6</div><div class="dp-day is-in-range">7</div>
+                <div class="dp-day is-in-range">8</div><div class="dp-day is-in-range">9</div><div class="dp-day is-range-end">10</div><div class="dp-day">11</div><div class="dp-day">12</div><div class="dp-day">13</div><div class="dp-day">14</div>
+                <div class="dp-day">15</div><div class="dp-day">16</div><div class="dp-day">17</div><div class="dp-day">18</div><div class="dp-day">19</div><div class="dp-day">20</div><div class="dp-day">21</div>
+                <div class="dp-day">22</div><div class="dp-day">23</div><div class="dp-day">24</div><div class="dp-day">25</div><div class="dp-day">26</div><div class="dp-day">27</div><div class="dp-day">28</div>
+                <div class="dp-day">29</div><div class="dp-day">30</div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div><div class="dp-day is-empty"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dp-range-footer">
+          <button class="btn-dp-cancel">Cancel</button>
+          <button class="btn-dp-apply">Apply</button>
+        </div>
+      </div>`;
+  }
+
+  function updatePreview() {
+    rowTimezone.style.display = state.timeselector ? '' : 'none';
+
+    const isInline  = state.mode === 'inline';
+    const showTime  = state.timeselector && !isInline;
+    const showFoot  = showTime;
+    const showTz    = showTime && state.timezone;
+
+    if (state.range) {
+      preview.innerHTML = rangeCalendar();
+      if (typeof injectIcons === 'function') injectIcons(preview);
+      return;
+    }
+
+    let timeSectionHtml = '';
+    if (showTime) {
+      const tzHtml = showTz ? `
+          <div class="dp-tz-wrap">
+            <div class="dp-time-field dp-tz-field">
+              <i data-icon="globe" style="display:flex;width:16px;height:16px;"></i>
+              <span class="dp-time-value">Europe/Amsterdam</span>
+              <i data-icon="chevron-down" style="display:flex;width:16px;height:16px;" class="dp-time-chevron dp-tz-chevron"></i>
+            </div>
+            <div class="dp-tz-dropdown" hidden>
+              <div class="dp-tz-option is-active">Europe/Amsterdam</div>
+              <div class="dp-tz-option">Europe/London</div>
+              <div class="dp-tz-option">America/New_York</div>
+              <div class="dp-tz-option">America/Chicago</div>
+              <div class="dp-tz-option">America/Los_Angeles</div>
+              <div class="dp-tz-option">UTC</div>
+            </div>
+          </div>` : '';
+      timeSectionHtml = `
+        <div class="dp-time-section">
+          ${tzHtml}
+          <div class="dp-time-field">
+            <i data-icon="Clock" style="display:flex;width:16px;height:16px;"></i>
+            <input type="text" class="dp-time-input" value="09:00">
+            <div class="dp-steppers">
+              <button class="dp-stepper-btn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 9L7 5L11 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="dp-stepper-btn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    const footerHtml = showFoot ? `
+      <div class="dp-footer">
+        <button class="btn-dp-cancel">Cancel</button>
+        <button class="btn-dp-apply">Apply</button>
+      </div>` : '';
+
+    let triggerHtml = '';
+    if (!isInline) {
+      triggerHtml = `<button class="dp-trigger" style="margin-bottom:8px;">
+        <i data-icon="calendar" style="display:flex;width:16px;height:16px;"></i>
+        14 May 2026
+        <i data-icon="chevron-down" style="display:flex;width:14px;height:14px;"></i>
+      </button>
+      <div style="font-size:11px;color:var(--content-subtle);margin-bottom:8px;text-align:center;">↓ Calendar opens below</div>`;
+    }
+
+    const dpClass = isInline ? 'dp dp-inline' : 'dp';
+    preview.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        ${triggerHtml}
+        <div class="${dpClass}">
+          ${miniCalendar('14')}
+          ${timeSectionHtml}
+          ${footerHtml}
+        </div>
+      </div>`;
+    if (typeof injectIcons === 'function') injectIcons(preview);
+    wireSteppers(preview);
+    wireTimezone(preview);
+    const pgCal = preview.querySelector('.dp:not(.dp-inline)') || preview.querySelector('.dp');
+    wireDaySelect(pgCal, false);
+    wireYearView(pgCal);
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function hi(s) {
+    return s
+      .replace(/(&lt;\/?[\w-]+)/g, '<span class="ct">$1</span>')
+      .replace(/([\w:@\[\]()]+)(?==)/g, '<span class="ca">$1</span>')
+      .replace(/=(&quot;[^&]*&quot;)/g, '=<span class="cv">$1</span>');
+  }
+
+  function buildCode() {
+    const isInline  = state.mode === 'inline';
+    const showTime  = state.timeselector && !isInline;
+    const lines = ['<eng-date-picker'];
+    lines.push('  [(ngModel)]="' + (state.range ? 'dateRange' : 'selectedDate') + '"');
+    if (state.range)        lines.push('  [dateRange]="true"');
+    if (isInline)           lines.push('  [footerButtons]="false"');
+    if (state.timeselector && !isInline) {
+      lines.push('  [showTimeSelector]="true"');
+      if (!state.timezone)  lines.push('  [showTimezone]="false"');
+    }
+    lines.push('></eng-date-picker>');
+    return lines.join('\n');
+  }
+
+  function refresh() {
+    updatePreview();
+    codeEl.innerHTML = hi(escHtml(buildCode()));
+  }
+
+  modeSel.addEventListener('change',        () => { state.mode         = modeSel.value;         refresh(); });
+  footerCk.addEventListener('change',       () => { state.footer       = footerCk.checked;       refresh(); });
+  timeselectorCk.addEventListener('change', () => { state.timeselector = timeselectorCk.checked; refresh(); });
+  timezoneCk.addEventListener('change',     () => { state.timezone     = timezoneCk.checked;     refresh(); });
+  rangeCk.addEventListener('change',        () => { state.range        = rangeCk.checked;        refresh(); });
+
+  document.getElementById('pg-reset').addEventListener('click', () => {
+    state = { ...defaults };
+    modeSel.value         = defaults.mode;
+    footerCk.checked      = defaults.footer;
+    timeselectorCk.checked= defaults.timeselector;
+    timezoneCk.checked    = defaults.timezone;
+    rangeCk.checked       = defaults.range;
+    refresh();
+  });
+
+  document.getElementById('pg-copy').addEventListener('click', () => {
+    navigator.clipboard.writeText(buildCode()).catch(() => {});
+  });
+
+  document.querySelectorAll('.pg-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.pgtab;
+      document.querySelectorAll('.pg-tab').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      document.getElementById('pg-panel-props').hidden = (tab !== 'props');
+      document.getElementById('pg-panel-code').hidden  = (tab !== 'code');
+    });
+  });
+
+  /* ── Copy buttons in dev-code-wrap ── */
+  document.querySelectorAll('.dev-code-wrap .dev-copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.nextElementSibling;
+      if (pre) navigator.clipboard.writeText(pre.textContent).catch(() => {});
+    });
+  });
+
+  refresh();
+})();
+
+/* ── Shared helpers ── */
+function wireSteppers(root) {
+  (root || document).querySelectorAll('.dp-time-field .dp-steppers').forEach(steppers => {
+    const field = steppers.closest('.dp-time-field');
+    const input = field.querySelector('.dp-time-input');
+    if (!input) return;
+
+    function parseTime() {
+      const parts = input.value.split(':');
+      const h = Math.min(23, Math.max(0, parseInt(parts[0], 10) || 0));
+      const m = Math.min(59, Math.max(0, parseInt(parts[1], 10) || 0));
+      return h * 60 + m;
+    }
+    function applyTime(mins) {
+      mins = ((mins % 1440) + 1440) % 1440;
+      const h = Math.floor(mins / 60), m = mins % 60;
+      input.value = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    }
+
+    input.addEventListener('focus', () => input.select());
+    input.addEventListener('blur',  () => applyTime(parseTime()));
+    input.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp')   { e.preventDefault(); applyTime(parseTime() + 30); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); applyTime(parseTime() - 30); }
+    });
+
+    const [up, dn] = steppers.querySelectorAll('.dp-stepper-btn');
+    up && up.addEventListener('mousedown', e => { e.preventDefault(); applyTime(parseTime() + 30); });
+    dn && dn.addEventListener('mousedown', e => { e.preventDefault(); applyTime(parseTime() - 30); });
+  });
+}
+
+function wireTimezone(root) {
+  (root || document).querySelectorAll('.dp-tz-wrap').forEach(wrap => {
+    const field    = wrap.querySelector('.dp-tz-field');
+    const dropdown = wrap.querySelector('.dp-tz-dropdown');
+    const label    = field && field.querySelector('.dp-time-value');
+    if (!field || !dropdown) return;
+
+    function openTz() {
+      dropdown.hidden = false;
+      field.classList.add('is-open');
+    }
+    function closeTz() {
+      dropdown.hidden = true;
+      field.classList.remove('is-open');
+    }
+
+    field.addEventListener('click', e => {
+      e.stopPropagation();
+      dropdown.hidden ? openTz() : closeTz();
+    });
+
+    dropdown.querySelectorAll('.dp-tz-option').forEach(opt => {
+      opt.addEventListener('click', e => {
+        e.stopPropagation();
+        dropdown.querySelectorAll('.dp-tz-option').forEach(o => o.classList.remove('is-active'));
+        opt.classList.add('is-active');
+        if (label) label.textContent = opt.textContent;
+        closeTz();
+      });
+    });
+
+    document.addEventListener('click', closeTz);
+  });
+}
+
+function wireYearView(cal) {
+  if (!cal) return;
+  const body       = cal.querySelector('.dp-body');
+  const monthGroup = cal.querySelector('.dp-month-group');
+  const monthLabel = cal.querySelector('.dp-month-label');
+  const navBtns    = [...cal.querySelectorAll('.dp-nav-btn')];
+  const weekdays   = cal.querySelector('.dp-weekdays');
+  const grid       = cal.querySelector('.dp-grid');
+  if (!body || !monthGroup || !monthLabel || !weekdays || !grid) return;
+
+  const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const MNAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const p0 = monthLabel.textContent.split(' ');
+  let curMonthIdx = Math.max(0, MNAMES.findIndex(m => m.startsWith(p0[0])));
+  let curYear = parseInt(p0[p0.length - 1]) || 2026;
+  let decade  = Math.floor(curYear / 16) * 16;
+  let view           = 'day'; // 'day' | 'year' | 'month'
+  let cachedBodyH    = 0;    // locked body height, measured while day view is visible
+
+  // Create panels
+  const yearPanel  = document.createElement('div');
+  yearPanel.className = 'dp-year-panel';
+  yearPanel.style.display = 'none';
+  const monthPanel = document.createElement('div');
+  monthPanel.className = 'dp-month-panel';
+  monthPanel.style.display = 'none';
+  weekdays.before(yearPanel);
+  weekdays.before(monthPanel);
+
+  function hideDays()  { weekdays.style.display = 'none'; grid.style.display = 'none'; }
+  function showDays()  { weekdays.style.display = ''; grid.style.display = ''; }
+
+  // ── Year view ──────────────────────────────────────────────
+  function renderYear() {
+    const s = decade, e = s + 15;
+    monthLabel.textContent = s + ' – ' + e;
+    yearPanel.innerHTML = '';
+    const g = document.createElement('div');
+    g.className = 'dp-year-grid';
+    for (let y = s; y <= e; y++) {
+      const c = document.createElement('div');
+      c.className = 'dp-year-cell' + (y === curYear ? ' is-selected' : '');
+      c.textContent = y;
+      c.addEventListener('click', ev => { ev.stopPropagation(); curYear = y; openMonth(); });
+      g.appendChild(c);
+    }
+    yearPanel.appendChild(g);
+  }
+
+  function openYear() {
+    view = 'year';
+    decade = Math.floor(curYear / 16) * 16;
+    renderYear();
+    if (!cachedBodyH) cachedBodyH = body.offsetHeight; // lock once while day view is visible
+    body.style.height = cachedBodyH + 'px';
+    yearPanel.style.display = '';
+    monthPanel.style.display = 'none';
+    hideDays();
+    body.classList.add('dp-year-open');
+  }
+
+  // ── Month view ─────────────────────────────────────────────
+  function renderMonth() {
+    monthLabel.textContent = curYear + '';
+    monthPanel.innerHTML = '';
+    const g = document.createElement('div');
+    g.className = 'dp-month-grid';
+    MONTHS.forEach((m, i) => {
+      const c = document.createElement('div');
+      c.className = 'dp-month-cell' + (i === curMonthIdx ? ' is-selected' : '');
+      c.textContent = m;
+      c.addEventListener('click', ev => { ev.stopPropagation(); curMonthIdx = i; closeToDay(); });
+      g.appendChild(c);
+    });
+    monthPanel.appendChild(g);
+  }
+
+  function openMonth() {
+    view = 'month';
+    renderMonth();
+    monthPanel.style.display = '';
+    yearPanel.style.display = 'none';
+    hideDays();
+    body.classList.add('dp-year-open');
+  }
+
+  // ── Close to day view ──────────────────────────────────────
+  function closeToDay() {
+    view = 'day';
+    yearPanel.style.display = 'none';
+    monthPanel.style.display = 'none';
+    showDays();
+    body.style.height = ''; // unlock — returns to natural day-view height
+    body.classList.remove('dp-year-open');
+    monthLabel.textContent = MNAMES[curMonthIdx] + ' ' + curYear;
+  }
+
+  // ── Nav buttons (shared; behaviour depends on view) ────────
+  function onPrev(e) {
+    e.stopPropagation();
+    if (view === 'year')  { decade -= 16; renderYear(); }
+    if (view === 'month') { curYear--;    renderMonth(); }
+  }
+  function onNext(e) {
+    e.stopPropagation();
+    if (view === 'year')  { decade += 16; renderYear(); }
+    if (view === 'month') { curYear++;    renderMonth(); }
+  }
+  if (navBtns[0]) navBtns[0].addEventListener('click', onPrev);
+  if (navBtns[1]) navBtns[1].addEventListener('click', onNext);
+
+  // ── Month-group click ──────────────────────────────────────
+  monthGroup.addEventListener('click', e => {
+    e.stopPropagation();
+    if (view === 'day') {
+      const p = monthLabel.textContent.split(' ');
+      const mi = MNAMES.findIndex(m => m.startsWith(p[0]));
+      if (mi >= 0) curMonthIdx = mi;
+      curYear = parseInt(p[p.length - 1]) || curYear;
+      openYear();
+    } else if (view === 'year') {
+      closeToDay();
+    } else if (view === 'month') {
+      openYear(); // go back up one level
+    }
+  });
+}
+
+function wireDaySelect(cal, isRange) {
+  if (!cal) return;
+  if (isRange) {
+    let rangeStart = null;
+    cal.addEventListener('click', function(e) {
+      const day = e.target.closest('.dp-day');
+      if (!day || day.classList.contains('is-empty') || day.classList.contains('is-disabled')) return;
+      const allDays = [...cal.querySelectorAll('.dp-day')].filter(d => !d.classList.contains('is-empty'));
+      const idx = allDays.indexOf(day);
+      const hasEnd = cal.querySelector('.dp-day.is-range-end:not(.is-range-start)');
+      if (rangeStart === null || hasEnd) {
+        allDays.forEach(d => d.classList.remove('is-range-start','is-range-end','is-in-range'));
+        // Add both start+end so the ::before band is hidden (single selection, no strip)
+        day.classList.add('is-range-start', 'is-range-end');
+        rangeStart = idx;
+      } else {
+        if (idx < rangeStart) {
+          allDays.forEach(d => d.classList.remove('is-range-start','is-range-end','is-in-range'));
+          day.classList.add('is-range-start', 'is-range-end');
+          rangeStart = idx;
+          return;
+        }
+        allDays.forEach((d, i) => {
+          d.classList.remove('is-range-start','is-range-end','is-in-range');
+          if (i === rangeStart) d.classList.add('is-range-start');
+          else if (i === idx)   d.classList.add('is-range-end');
+          else if (i > rangeStart && i < idx) d.classList.add('is-in-range');
+        });
+        rangeStart = null;
+      }
+    });
+  } else {
+    cal.addEventListener('click', function(e) {
+      const day = e.target.closest('.dp-day');
+      if (!day || day.classList.contains('is-empty') || day.classList.contains('is-disabled')) return;
+      cal.querySelectorAll('.dp-day').forEach(d => d.classList.remove('is-selected'));
+      day.classList.add('is-selected');
+    });
+  }
+}
+
+/* ── Wire variant row calendars ── */
+(function() {
+  const inline = document.getElementById('vr-cal-inline');
+  const time   = document.getElementById('vr-cal-time');
+  const range  = document.getElementById('vr-cal-range');
+  wireDaySelect(inline, false);
+  wireDaySelect(time,   false);
+  wireDaySelect(range,  true);
+  wireYearView(inline);
+  wireYearView(time);
+  wireYearView(range);
+  wireSteppers(document.getElementById('vr-cal-time'));
+  wireTimezone(document.getElementById('vr-cal-time'));
+  wireSteppers(document.getElementById('dev-preview-time'));
+  wireTimezone(document.getElementById('dev-preview-time'));
+  // Wire year view on standard dropdown cal and dev-usage previews
+  wireYearView(document.getElementById('vr-cal-std'));
+  document.querySelectorAll('.dev-preview .dp').forEach(dp => wireYearView(dp));
+
+  // Standard dropdown variant
+  const stdTrigger = document.getElementById('vr-trigger-std');
+  const stdCal     = document.getElementById('vr-cal-std');
+  const stdLabel   = document.getElementById('vr-trigger-std-label');
+  const months     = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  if (stdTrigger && stdCal) {
+    function openStd()  { stdCal.style.display = ''; stdTrigger.classList.add('is-open'); }
+    function closeStd() { stdCal.style.display = 'none'; stdTrigger.classList.remove('is-open'); }
+
+    stdTrigger.addEventListener('click', e => {
+      e.stopPropagation();
+      stdCal.style.display === 'none' ? openStd() : closeStd();
+    });
+
+    // Select a day → update label + close
+    stdCal.addEventListener('click', e => {
+      const day = e.target.closest('.dp-day');
+      if (!day || day.classList.contains('is-empty')) return;
+      stdCal.querySelectorAll('.dp-day').forEach(d => d.classList.remove('is-selected'));
+      day.classList.add('is-selected');
+      stdLabel.textContent = day.textContent.trim() + ' May 2026';
+      closeStd();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', e => {
+      if (!stdTrigger.contains(e.target) && !stdCal.contains(e.target)) closeStd();
+    });
+  }
+})();
+</script>
+</body>
+</html>

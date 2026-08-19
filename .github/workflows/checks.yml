@@ -21,9 +21,9 @@ jobs:
       # mentions is unusable: rule 1 of the skill only allows what the reference
       # lists, so the skill reports it as non-existent.
       - name: components.css vs the reference
-        run: ./check-reference-drift.py
+        run: ./tools/check-reference-drift.py
 
       # SKILL.md and reference-prototypes/ exist twice here and sync-skill.sh
       # deliberately does not copy them, so nothing else keeps the two in step.
       - name: both skill copies carry the same content
-        run: ./check-skill-consistency.py
+        run: ./tools/check-skill-consistency.py

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Loading — spinner (block + inline) ── */
+    @keyframes loadingspin { to { transform: rotate(360deg); } }
+    /* Block spinner: a track ring with a rotating arc */
+    .spinner { --thk: 4px; display: inline-block; box-sizing: border-box; width: 24px; height: 24px; border-radius: var(--radius-full); background: radial-gradient(farthest-side, var(--content-base) 98%, transparent) 50% 0 / var(--thk) var(--thk) no-repeat, radial-gradient(farthest-side, var(--content-base) 98%, transparent) 100% 50% / var(--thk) var(--thk) no-repeat, conic-gradient(transparent 25%, var(--content-base) 0), var(--border-base); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--thk)), #000 0); mask: radial-gradient(farthest-side, transparent calc(100% - var(--thk)), #000 0); animation: loadingspin .8s linear infinite; }
+    .spinner-sm { width: 16px; height: 16px; --thk: 3px; }
+    .spinner-lg { width: 32px; height: 32px; --thk: 4px; }
+    /* Block loader: spinner + label */
+    .block-loader { display: inline-flex; flex-direction: column; align-items: center; gap: 12px; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; color: var(--content-secondary); }
+    /* Inline loader: a small spinner that sits in a line of text or a button (styleguide .loader-inline) */
+    .loader-inline { display: inline-block; box-sizing: border-box; width: 16px; height: 16px; border: 2px solid var(--content-base); border-top-color: transparent; border-radius: var(--radius-full); animation: loadingspin .8s ease infinite; vertical-align: middle; }
+
+    .anatomy-fig { background: var(--bg-secondary); border-radius: var(--radius-lg); padding: 56px; margin-bottom: 24px; display: flex; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+
+  <div class="page-header-row">
+    <div class="page-header">
+      <div class="page-badges">
+        <span class="page-updated">Updated June 2026</span>
+      </div>
+      <h1 class="text-l1">Loading</h1>
+      <p class="page-desc">An animated spinner that signals an indeterminate wait — when the system is busy and there's no progress to report. For content that's loading into a known layout use a Skeleton; for a measurable task use a Progress Bar.</p>
+    </div>
+  </div><!-- /page-header-row -->
+
+  <div class="page-tabs">
+    <div class="page-tabs-inner">
+      <button class="page-tab" data-tab="design">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+        Design
+      </button>
+      <button class="page-tab" data-tab="developer">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Developer
+      </button>
+    </div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="tab-panel" data-panel="design">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="anatomy">
+          <h2 class="text-l3">Anatomy</h2>
+          <p class="section-lead">A circular track with a coloured arc that rotates continuously.</p>
+          <div class="anatomy-fig">
+            <div class="block-loader">
+              <span class="spinner spinner-lg" role="status" aria-label="Loading"></span>
+              Loading
+            </div>
+          </div>
+          <div class="anatomy-items">
+            <div class="anatomy-item"><div class="anatomy-num">1</div><div><span class="anatomy-term">Track</span> — The faint full ring the arc travels along.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">2</div><div><span class="anatomy-term">Arc</span> — The solid segment that rotates to show activity.</div></div>
+            <div class="anatomy-item"><div class="anatomy-num">3</div><div><span class="anatomy-term">Label</span> — Optional "Loading" text below the spinner (block loader only).</div></div>
+          </div>
+        </section>
+
+        <section class="section" id="usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">Reach for a spinner when a wait is short and you can't show progress. When you know the shape of what's coming, a Skeleton feels faster; when you can measure progress, use a Progress Bar.</p>
+
+          <h3 class="text-l4">Indeterminate, short waits</h3>
+          <div class="dd-grid">
+            <div class="dd-card">
+              <div class="dd-prev" style="min-height:160px;">
+                <div class="block-loader"><span class="spinner"></span> Loading</div>
+              </div>
+              <div class="dd-cap do">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>
+                A spinner for a brief, unmeasurable wait.
+              </div>
+            </div>
+            <div class="dd-card">
+              <div class="dd-prev" style="min-height:160px; flex-direction:column; gap:10px;">
+                <div style="width:200px; height:12px; border-radius:var(--radius-full); background:var(--bg-secondary); overflow:hidden;"><div style="width:55%; height:100%; background:var(--content-base);"></div></div>
+                <span style="font-size:12px; color:var(--content-subtle);">55%</span>
+              </div>
+              <div class="dd-cap dont">
+                <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>
+                Use a spinner when you can show real progress — that's a Progress Bar.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="variants">
+          <h2 class="text-l3">Variants</h2>
+          <p class="section-lead">Two forms — a centred block loader with a label, and a compact inline loader — each available in three sizes.</p>
+
+          <h3 class="text-l4">Form</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn"><div class="block-loader"><span class="spinner"></span> Loading</div></div>
+              <div class="variant-row-desc"><strong>Block loader</strong> — A centred spinner with an optional "Loading" label. Use it to fill an area or a whole view while it loads.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><span style="font-size:14px; color:var(--content-secondary); display:inline-flex; align-items:center; gap:8px;"><span class="loader-inline"></span> Saving…</span></div>
+              <div class="variant-row-desc"><strong>Inline loader</strong> — A small spinner that sits in a line of text or inside a button while an action runs.</div>
+            </div>
+          </div>
+
+          <h3 class="text-l4">Size</h3>
+          <div class="variant-rows">
+            <div class="variant-row">
+              <div class="variant-row-btn"><span class="spinner spinner-sm"></span></div>
+              <div class="variant-row-desc"><strong>Small — 16px</strong> — Inside buttons, table rows, or next to a single line of text.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><span class="spinner"></span></div>
+              <div class="variant-row-desc"><strong>Medium — 24px</strong> — The default, for cards and panels.</div>
+            </div>
+            <div class="variant-row">
+              <div class="variant-row-btn"><span class="spinner spinner-lg"></span></div>
+              <div class="variant-row-desc"><strong>Large — 32px</strong> — Full-page or large-area loading.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="content-guidelines">
+          <h2 class="text-l3">Content guidelines</h2>
+          <p class="section-lead">A label is optional — when you add one, keep it short and honest.</p>
+          <div class="cg-rule">
+            <h3 class="text-l4">Say what's happening, briefly</h3>
+            <p>Use a short verb or just "Loading". Don't promise a duration you can't keep.</p>
+            <div class="dd-grid">
+              <div class="dd-card">
+                <div class="dd-prev" style="min-height:150px;"><div class="block-loader"><span class="spinner"></span> Loading reports…</div></div>
+                <div class="dd-cap do"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Do</div>Short and specific.</div>
+              </div>
+              <div class="dd-card">
+                <div class="dd-prev" style="min-height:150px;"><div class="block-loader"><span class="spinner"></span> Almost done, just a few seconds left…</div></div>
+                <div class="dd-cap dont"><div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>Don't</div>A time promise you can't keep.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="tokens">
+          <h2 class="text-l3">Design Tokens</h2>
+          <p class="section-lead">A neutral track with the base content colour for the arc.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Role</th><th>Value</th></tr></thead>
+            <tbody>
+              <tr><td><code>--content-base</code></td><td>Arc (and inline loader) colour</td><td>#192743</td></tr>
+              <tr><td><code>--border-base</code></td><td>Track (block spinner)</td><td>#e1e4e8</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Label text</td><td>rgba(25,39,67,.80)</td></tr>
+              <tr><td><code>--radius-full</code></td><td>Circle</td><td>999px</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:14px; color:var(--content-secondary);">Sizes: 16 / 24 / 32px. Rotation: one full turn every 0.8s.</p>
+        </section>
+
+        <section class="section" id="accessibility">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">A spinner is decorative on its own — make the wait perceivable to everyone.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Announce it.</strong> Put <code>role="status"</code> on the loader (or its region) so assistive tech announces that content is loading.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label icon-only spinners.</strong> A spinner with no visible label needs <code>aria-label="Loading"</code>.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Remove it when done.</strong> Take the loader out of the DOM (or update the region) once loaded, so it doesn't keep announcing.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Don't trap focus.</strong> A spinner isn't interactive — keep it out of the tab order.</div></div>
+          </div>
+        </section>
+
+        <div class="pagination">
+          <a class="pag-card left" href="announcement-docs.html"><span class="pag-dir">← Previous</span><span class="pag-name">Announcement</span></a>
+          <a class="pag-card right" href="progress-bar-docs.html"><span class="pag-dir">Next →</span><span class="pag-name">Progress Bar</span></a>
+        </div>
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#anatomy">Anatomy</a>
+          <a class="toc-link" href="#usage">Usage</a>
+          <a class="toc-link" href="#variants">Variants</a>
+          <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+          <a class="toc-link" href="#tokens">Design Tokens</a>
+          <a class="toc-link" href="#accessibility">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVELOPER -->
+  <div class="tab-panel" data-panel="developer">
+    <div class="content-cols">
+      <article class="content">
+
+        <section class="section" id="dev-playground">
+          <h2 class="text-l3">Playground</h2>
+          <p class="section-lead">Pick the form and size — the spinner animates live.</p>
+          <div class="pg-card">
+            <div class="pg-preview" id="pg-preview" style="padding:48px; justify-content:center;"></div>
+            <div class="pg-bottom">
+              <div class="pg-tab-bar">
+                <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+                <button class="pg-tab" data-pgtab="code">Code</button>
+                <button class="pg-reset" id="pg-reset">Reset</button>
+              </div>
+              <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+                <div class="pg-row"><div class="pg-row-name">form</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-form"><option value="block">Block loader</option><option value="inline">Inline loader</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">size</div><div class="pg-row-ctrl"><select class="pg-select" id="pg-size"><option value="sm">Small — 16</option><option value="md" selected>Medium — 24</option><option value="lg">Large — 32</option></select></div></div>
+                <div class="pg-row"><div class="pg-row-name">label</div><div class="pg-row-ctrl"><label class="pg-toggle"><input type="checkbox" id="pg-label" checked><span class="pg-toggle-track"></span></label></div></div>
+              </div>
+              <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+                <button class="dev-copy-btn" id="pg-copy">Copy</button>
+                <pre><code id="pg-code"></code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-usage">
+          <h2 class="text-l3">Usage</h2>
+          <p class="section-lead">In production the block loader is the Angular <code>&lt;eff-loader&gt;</code> component; the inline loader is a <code>.loader-inline</code> element. The styleguide documents both under <a class="link-inline" href="https://styleguide.effectory.com/components/loaders" target="_blank">Loaders</a>.</p>
+
+          <h3 class="text-l4">Block loader</h3>
+          <div class="dev-preview" style="padding:32px;">
+            <div class="block-loader"><span class="spinner"></span> Loading</div>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;eff-loader</span> <span class="ct">/&gt;</span></code></pre>
+          </div>
+
+          <h3 class="text-l4">Inline loader</h3>
+          <div class="dev-preview" style="padding:32px;">
+            <span style="font-size:14px; color:var(--content-secondary); display:inline-flex; align-items:center; gap:8px;"><span class="loader-inline"></span> Saving…</span>
+          </div>
+          <div class="dev-code-wrap">
+            <button class="dev-copy-btn">Copy</button>
+            <pre><code><span class="ct">&lt;div</span> <span class="ca">class</span>=<span class="cv">"loader-inline"</span><span class="ct">&gt;&lt;/div&gt;</span>
+
+<span class="cc">/* styleguide CSS */</span>
+<span class="ca">.loader-inline</span> {
+  <span class="ca">width</span>: 1rem; <span class="ca">height</span>: 1rem;
+  <span class="ca">border</span>: .2rem solid var(--content-base);
+  <span class="ca">border-top-color</span>: transparent;
+  <span class="ca">border-radius</span>: 50%;
+  <span class="ca">animation</span>: loadingspin .8s ease infinite;
+}
+<span class="ca">@keyframes loadingspin</span> { <span class="ca">100%</span> { <span class="ca">transform</span>: rotate(360deg); } }</code></pre>
+          </div>
+
+          <div class="dev-gap">
+            <span class="dev-gap-icon">⚠️</span>
+            <div class="dev-gap-body">
+              <span class="dev-gap-label">Loading bar lives elsewhere</span>
+              <span class="dev-gap-text">The styleguide's Loaders page also lists a <strong>Loading bar</strong> (<code>&lt;eff-loading-bar&gt;</code> / <code>.loading-bar</code>). That's a determinate progress indicator — see the <a class="link-inline" href="progress-bar-docs.html">Progress Bar</a> page.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="dev-props">
+          <h2 class="text-l3">Class reference</h2>
+          <p class="section-lead">Prototype classes for the spinner (<code>components.css</code>).</p>
+          <table class="token-table">
+            <thead><tr><th>Class</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td><code>.spinner</code></td><td>Block spinner (24px). Sizes: <code>.spinner-sm</code> (16px), <code>.spinner-lg</code> (32px).</td></tr>
+              <tr><td><code>.block-loader</code></td><td>Centred wrapper for a spinner + optional label.</td></tr>
+              <tr><td><code>.loader-inline</code></td><td>Compact 16px spinner for inline / in-button use.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-tokens">
+          <h2 class="text-l3">CSS tokens</h2>
+          <p class="section-lead">The spinner is themed with these tokens.</p>
+          <table class="token-table">
+            <thead><tr><th>Token</th><th>Used for</th></tr></thead>
+            <tbody>
+              <tr><td><code>--content-base</code></td><td>Arc + inline loader</td></tr>
+              <tr><td><code>--border-base</code></td><td>Block spinner track</td></tr>
+              <tr><td><code>--content-secondary</code></td><td>Label</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="dev-a11y">
+          <h2 class="text-l3">Accessibility</h2>
+          <p class="section-lead">Make the loading state announce itself.</p>
+          <div class="a11y-list">
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Status role.</strong> Wrap with <code>role="status"</code> (the <code>eff-loader</code> handles this) so screen readers hear the change.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Label.</strong> Add <code>aria-label="Loading"</code> when there's no visible text.</div></div>
+            <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Reduced motion.</strong> The spin is the only signal — keep it, but avoid pairing with other large motion.</div></div>
+          </div>
+        </section>
+
+      </article>
+
+      <div class="toc-col">
+        <nav class="toc">
+          <div class="toc-title">ON THIS PAGE</div>
+          <a class="toc-link" href="#dev-playground">Playground</a>
+          <a class="toc-link" href="#dev-usage">Usage</a>
+          <a class="toc-link" href="#dev-props">Class reference</a>
+          <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+          <a class="toc-link" href="#dev-a11y">Accessibility</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+</div></div>
+
+<script src="nav.js"></script>
+<script src="../icons.js"></script>
+<script>
+  (function () {
+    const $preview = document.getElementById('pg-preview');
+    if (!$preview) return;
+    const defaults = { form:'block', size:'md', label:true };
+    const SIZE_CLS = { sm:' spinner-sm', md:'', lg:' spinner-lg' };
+    function state(){ return { form: document.getElementById('pg-form').value, size: document.getElementById('pg-size').value, label: document.getElementById('pg-label').checked }; }
+    function build(s){
+      if (s.form === 'inline') {
+        return `<span style="font-size:14px;color:var(--content-secondary);display:inline-flex;align-items:center;gap:8px;"><span class="loader-inline"></span>${s.label?' Saving…':''}</span>`;
+      }
+      return `<div class="block-loader"><span class="spinner${SIZE_CLS[s.size]}"></span>${s.label?' Loading':''}</div>`;
+    }
+    function buildCode(s){
+      if (s.form === 'inline') return '<div class="loader-inline"></div>';
+      return '<eff-loader />';
+    }
+    function render(){
+      const s = state();
+      // size only applies to the block spinner
+      document.getElementById('pg-size').closest('.pg-row').style.opacity = s.form === 'inline' ? '.4' : '1';
+      $preview.innerHTML = build(s);
+      document.getElementById('pg-code').textContent = buildCode(s);
+    }
+    ['pg-form','pg-size','pg-label'].forEach(id=>document.getElementById(id).addEventListener('change', render));
+    document.getElementById('pg-reset')?.addEventListener('click',()=>{ document.getElementById('pg-form').value=defaults.form; document.getElementById('pg-size').value=defaults.size; document.getElementById('pg-label').checked=defaults.label; render(); });
+    document.querySelectorAll('.pg-tab[data-pgtab]').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('is-active'));tab.classList.add('is-active');const w=tab.dataset.pgtab;document.getElementById('pg-panel-props').hidden=w!=='props';document.getElementById('pg-panel-code').hidden=w!=='code';});});
+    document.getElementById('pg-copy')?.addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('pg-code').textContent));
+    render();
+  })();
+</script>
+</body>
+</html>

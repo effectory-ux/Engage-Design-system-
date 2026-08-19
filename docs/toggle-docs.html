@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Toggle — Engage Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&family=Poppins:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ═══════════════════════════════════════════════
+       TOGGLE COMPONENT
+       Track: 36×22px, border-radius:16px, 3px padding, 1px border
+       Thumb: 16×16px circle, check icon when on
+       Travel: 36 − 2(border) − 6(padding) − 16(thumb) = 12px
+    ═══════════════════════════════════════════════ */
+
+    /* ── Hidden native input (keyboard + screen-reader accessible) ── */
+    input[type="checkbox"].tgl {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      border: 0; pointer-events: none;
+    }
+
+    /* ── Outer wrapper ── */
+    .tgl-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .tgl-wrap:has(input:disabled),
+    .tgl-wrap:has(input.is-disabled) { cursor: not-allowed; }
+
+    /* ── Track ── */
+    .tgl-track {
+      display: inline-flex;
+      align-items: center;
+      width: 36px; height: 22px;
+      border-radius: 16px;
+      padding: 3px;
+      box-sizing: border-box;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-action);
+      box-shadow: 0 1px 1px rgba(25,39,67,.04);
+      flex-shrink: 0;
+      transition: background .15s, border-color .15s, box-shadow .15s;
+    }
+
+    /* ── Thumb ── */
+    .tgl-thumb {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px;
+      border-radius: 99px;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(25,39,67,.04);
+      flex-shrink: 0;
+      transition: transform .15s, box-shadow .15s;
+    }
+
+    /* ── Check icon inside thumb (visible only when on) ── */
+    .tgl-thumb::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background-color: var(--content-brand-secondary);
+      -webkit-mask-image: url('../assets/icons/check.svg');
+      mask-image: url('../assets/icons/check.svg');
+      -webkit-mask-size: contain; mask-size: contain;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      -webkit-mask-position: center; mask-position: center;
+      opacity: 0;
+      transition: opacity .1s;
+    }
+
+    /* ══ ON STATE — via real checked input ══ */
+    input[type="checkbox"].tgl:checked + .tgl-track,
+    input[type="checkbox"].tgl.is-checked + .tgl-track {
+      background: var(--bg-brand);
+      border-color: var(--border-brand);
+    }
+    input[type="checkbox"].tgl:checked + .tgl-track .tgl-thumb,
+    input[type="checkbox"].tgl.is-checked + .tgl-track .tgl-thumb {
+      transform: translateX(12px);
+      box-shadow: 0 1px 1px rgba(25,39,67,.04);
+    }
+    input[type="checkbox"].tgl:checked + .tgl-track .tgl-thumb::before,
+    input[type="checkbox"].tgl.is-checked + .tgl-track .tgl-thumb::before {
+      opacity: 1;
+    }
+
+    /* ══ HOVER — off ══ */
+    .tgl-wrap:hover input[type="checkbox"].tgl:not(:disabled):not(.is-disabled) + .tgl-track,
+    .tgl-label-wrap:hover .tgl-wrap input[type="checkbox"].tgl:not(.is-disabled) + .tgl-track,
+    .tgl-info-wrap:hover .tgl-wrap input[type="checkbox"].tgl:not(.is-disabled) + .tgl-track,
+    input[type="checkbox"].tgl.is-hover + .tgl-track {
+      border-color: var(--border-action-hover);
+      box-shadow: 0 2px 1px rgba(25,39,67,.06);
+    }
+
+    /* ══ HOVER — on ══ */
+    .tgl-wrap:hover input[type="checkbox"].tgl:checked:not(:disabled):not(.is-disabled) + .tgl-track,
+    .tgl-label-wrap:hover .tgl-wrap input[type="checkbox"].tgl:checked:not(.is-disabled) + .tgl-track,
+    .tgl-info-wrap:hover .tgl-wrap input[type="checkbox"].tgl:checked:not(.is-disabled) + .tgl-track,
+    input[type="checkbox"].tgl.is-checked.is-hover + .tgl-track {
+      background: var(--bg-brand);
+      border-color: var(--border-brand-hover);
+      box-shadow: 0 2px 1px rgba(25,39,67,.06);
+    }
+
+    /* ══ HOVER — thumb shadow ══ */
+    .tgl-wrap:hover .tgl-thumb,
+    .tgl-label-wrap:hover .tgl-thumb,
+    .tgl-info-wrap:hover .tgl-thumb {
+      box-shadow: 0 2px 2px rgba(25,39,67,.06);
+    }
+
+    /* ══ DISABLED ══ */
+    input[type="checkbox"].tgl:disabled + .tgl-track,
+    input[type="checkbox"].tgl.is-disabled + .tgl-track {
+      background: var(--bg-disabled);
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    /* ══ STATIC STATE DEMO CLASSES (applied to .tgl-track directly) ══ */
+    .tgl-track.is-on {
+      background: var(--bg-brand);
+      border-color: var(--border-brand);
+    }
+    .tgl-track.is-on .tgl-thumb {
+      transform: translateX(12px);
+      box-shadow: 0 1px 1px rgba(25,39,67,.04);
+    }
+    .tgl-track.is-on .tgl-thumb::before { opacity: 1; }
+
+    .tgl-track.is-hover {
+      box-shadow: 0 2px 1px rgba(25,39,67,.06);
+    }
+    .tgl-track.is-hover:not(.is-on) { border-color: var(--border-action-hover); }
+    .tgl-track.is-on.is-hover { border-color: var(--border-brand-hover); }
+    .tgl-track.is-hover .tgl-thumb { box-shadow: 0 2px 2px rgba(25,39,67,.06); }
+
+    .tgl-track.is-disabled {
+      background: var(--bg-disabled);
+      border-color: transparent;
+      box-shadow: none;
+    }
+    .tgl-track.is-on.is-disabled { background: var(--bg-disabled); }
+
+    /* ══ LABELED TOGGLE ══ */
+    .tgl-label-wrap {
+      display: inline-flex; align-items: center; gap: 8px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif; font-size: 14px; line-height: 1.6;
+      color: var(--content-base);
+      user-select: none;
+    }
+    .tgl-label-wrap .tgl-wrap { cursor: inherit; }
+    .tgl-label-wrap.is-disabled {
+      color: var(--content-disabled);
+      cursor: not-allowed;
+    }
+
+    /* ══ TOGGLE WITH DESCRIPTION ══ */
+    .tgl-info-wrap {
+      display: flex; align-items: flex-start; gap: 12px;
+      cursor: pointer;
+    }
+    .tgl-info-wrap .tgl-wrap {
+      margin-top: 2px;
+      cursor: inherit;
+    }
+    .tgl-info-body { display: flex; flex-direction: column; gap: 2px; }
+    .tgl-info-label {
+      font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500;
+      line-height: 1.5; color: var(--content-base);
+    }
+    .tgl-info-desc {
+      font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 400;
+      line-height: 1.5; color: var(--content-secondary);
+    }
+    .tgl-info-wrap.is-disabled { cursor: not-allowed; }
+    .tgl-info-wrap.is-disabled .tgl-info-label,
+    .tgl-info-wrap.is-disabled .tgl-info-desc { color: var(--content-disabled); }
+  </style>
+</head>
+<body>
+
+<div id="topnav-placeholder"></div>
+
+<div class="shell">
+<div id="sidebar-placeholder"></div>
+
+<div class="content-wrap">
+<div class="page-header-row">
+  <div class="page-header">
+    <div class="page-badges">
+      <span class="page-updated">Updated May 2026</span>
+    </div>
+    <h1 class="text-l1">Toggle</h1>
+    <p class="page-desc">A switch control for binary on/off settings that take effect immediately — no save step required. Three variants support different levels of labelling: bare, labeled, and with description.</p>
+  </div>
+</div><!-- /page-header-row -->
+
+<!-- PAGE TABS -->
+<div class="page-tabs">
+  <div class="page-tabs-inner">
+    <button class="page-tab" data-tab="design">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+      Design
+    </button>
+    <button class="page-tab" data-tab="developer">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 4L1 8l4 4M11 4l4 4-4 4M9 2l-2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Developer
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ DESIGN TAB ═══════════════════════════════ -->
+<div class="tab-panel" data-panel="design">
+<div class="content-cols">
+<article class="content">
+
+  <!-- ANATOMY -->
+  <section class="section" id="anatomy">
+    <h2 class="text-l3">Anatomy</h2>
+    <p class="section-lead">The toggle is built from a bordered pill track and a sliding thumb. When on, a check icon appears inside the thumb to reinforce the active state beyond colour alone.</p>
+
+    <div class="anatomy-fig">
+      <div style="display:inline-flex; flex-direction:column; padding:8px 64px 8px 24px;">
+
+        <!-- Top callouts -->
+        <div style="display:flex; align-items:flex-end; gap:0;">
+          <!-- Track column (36px wide) -->
+          <div style="width:36px; display:flex; flex-direction:column; align-items:center; gap:5px;">
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--content-secondary);white-space:nowrap;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--content-base);color:var(--bg-base);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>Track
+            </span>
+            <div style="width:1px;height:12px;background:var(--content-subtle);"></div>
+          </div>
+          <!-- Gap -->
+          <div style="width:8px;"></div>
+          <!-- Label column -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--content-secondary);white-space:nowrap;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--content-base);color:var(--bg-base);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">4</span>Label
+            </span>
+            <div style="width:1px;height:12px;background:var(--content-subtle);"></div>
+          </div>
+        </div>
+
+        <!-- Main element (on state) -->
+        <div style="display:flex; align-items:center; gap:8px; pointer-events:none;">
+          <span class="tgl-track is-on" style="flex-shrink:0;"><span class="tgl-thumb"></span></span>
+          <span style="font-size:14px; color:var(--content-base); white-space:nowrap; font-family:'Poppins',sans-serif;">Enable notifications</span>
+        </div>
+
+        <!-- Bottom callouts: Thumb + Check -->
+        <div style="display:flex; align-items:flex-start; gap:0;">
+          <!-- Thumb callout (under right side of track = ~26px from left) -->
+          <div style="width:26px; display:flex; flex-direction:column; align-items:center; gap:5px;">
+            <div style="width:1px;height:12px;background:var(--content-subtle);"></div>
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--content-secondary);white-space:nowrap;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--content-base);color:var(--bg-base);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>Thumb
+            </span>
+          </div>
+          <!-- Offset to place check callout roughly over the check icon -->
+          <div style="width:4px;"></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px; margin-left:2px;">
+            <div style="width:1px;height:12px;background:var(--content-subtle);"></div>
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--content-secondary);white-space:nowrap;">
+              <span style="width:18px;height:18px;border-radius:50%;background:var(--content-base);color:var(--bg-base);font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>Check
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="anatomy-items">
+      <div class="anatomy-item">
+        <div class="anatomy-num">1</div>
+        <div><span class="anatomy-term">Track</span> — 36 × 22 px pill with a 1 px border and a subtle drop-shadow. Off: <code>--bg-tertiary</code> fill with an action border. On: brand-teal fill with a brand border. Hover darkens only the border in each state.</div>
+      </div>
+      <div class="anatomy-item">
+        <div class="anatomy-num">2</div>
+        <div><span class="anatomy-term">Thumb</span> — 16 × 16 px white circle with a drop-shadow. Positioned at the left when off; slides 14 px to the right when on.</div>
+      </div>
+      <div class="anatomy-item">
+        <div class="anatomy-num">3</div>
+        <div><span class="anatomy-term">Check icon</span> — a 12 × 12 px teal checkmark centred inside the thumb, visible only when the toggle is on. Reinforces the active state beyond colour alone.</div>
+      </div>
+      <div class="anatomy-item">
+        <div class="anatomy-num">4</div>
+        <div><span class="anatomy-term">Label</span> — required text to the right of the track (or optionally left), vertically centred with it. Can be omitted only where context makes the purpose unambiguous. Appears muted when disabled.</div>
+      </div>
+      <div class="anatomy-item">
+        <div class="anatomy-num">5</div>
+        <div><span class="anatomy-term">Description</span> <em>(with-description variant)</em> — secondary text below the label explaining the effect of toggling. Use when the label alone is too brief to communicate the consequence.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USAGE -->
+  <section class="section" id="usage">
+    <h2 class="text-l3">Usage</h2>
+    <p class="section-lead">Toggles are for settings that turn on or off instantly — no confirmation or save button needed. Avoid using them when the change requires a form submit.</p>
+
+    <div class="usage-cols">
+      <div>
+        <div class="usage-col-hd do">Use when</div>
+        <ul class="usage-list">
+          <li>The setting takes effect immediately on flip (e.g. "Dark mode")</li>
+          <li>There are exactly two states: on and off</li>
+          <li>The toggle lives in a settings panel, a preferences page, or a table action row</li>
+          <li>Screen space is tight and a full checkbox row would feel heavy</li>
+        </ul>
+      </div>
+      <div>
+        <div class="usage-col-hd dont">Avoid when</div>
+        <ul class="usage-list">
+          <li>The change needs a "Save" button — use a <a class="link-inline" href="checkbox-docs.html">Checkbox</a> instead</li>
+          <li>Multiple independent items can be selected — use <a class="link-inline" href="checkbox-docs.html">Checkboxes</a></li>
+          <li>There are more than two states — use <a class="link-inline" href="radio-group-docs.html">Radio Group</a> or <a class="link-inline" href="select-docs.html">Select</a></li>
+          <li>You need to confirm a destructive action — use a <a class="link-inline" href="dialog-docs.html">Dialog</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="text-l4">Best practices</h3>
+
+    <!-- Do/Don't 1: always label -->
+    <div class="dd-grid">
+      <div class="dd-card">
+        <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:14px; align-items:flex-start; padding:24px 28px;">
+          <label class="tgl-label-wrap" style="pointer-events:none;">
+            <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+            Email notifications
+          </label>
+          <label class="tgl-label-wrap" style="pointer-events:none;">
+            <span class="tgl-wrap"><input type="checkbox" class="tgl" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+            Push notifications
+          </label>
+        </div>
+        <div class="dd-cap do">
+          <div class="dd-cap-hd">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Do
+          </div>
+          Give every toggle a clear, descriptive label so users know exactly what they're controlling.
+        </div>
+      </div>
+      <div class="dd-card">
+        <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:14px; align-items:flex-start; padding:24px 28px;">
+          <span class="tgl-track is-on" style="pointer-events:none;"><span class="tgl-thumb"></span></span>
+          <span class="tgl-track" style="pointer-events:none;"><span class="tgl-thumb"></span></span>
+        </div>
+        <div class="dd-cap dont">
+          <div class="dd-cap-hd">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Don't
+          </div>
+          Don't render toggles without labels — users have no way to know what each switch controls.
+        </div>
+      </div>
+    </div>
+
+    <!-- Do/Don't 2: immediate vs deferred -->
+    <div class="dd-grid">
+      <div class="dd-card">
+        <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:14px; align-items:flex-start; padding:24px 28px;">
+          <label class="tgl-label-wrap" style="pointer-events:none;">
+            <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+            Show results to all admins
+          </label>
+          <p style="font-size:12px; color:var(--content-subtle); margin:0; padding-left:44px;">Setting saved automatically</p>
+        </div>
+        <div class="dd-cap do">
+          <div class="dd-cap-hd">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Do
+          </div>
+          Use a toggle when the setting auto-saves. Add a caption like "saved automatically" when that behaviour isn't obvious.
+        </div>
+      </div>
+      <div class="dd-card">
+        <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:14px; align-items:flex-start; padding:24px 28px;">
+          <label class="tgl-label-wrap" style="pointer-events:none;">
+            <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+            Enable marketing emails
+          </label>
+          <button class="btn btn-primary" style="pointer-events:none; margin-left:44px; font-size:13px; height:32px; padding:0 12px;">Save preferences</button>
+        </div>
+        <div class="dd-cap dont">
+          <div class="dd-cap-hd">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Don't
+          </div>
+          Don't pair a toggle with a save button. If the change isn't immediate, use a checkbox instead.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="section" id="variants">
+    <h2 class="text-l3">Variants</h2>
+    <p class="section-lead">Three variants cover different labelling needs. The label can appear to the right (default) or left of the track.</p>
+
+    <div class="variant-rows">
+      <div class="variant-row">
+        <div class="variant-row-btn">
+          <label class="tgl-label-wrap">
+            <span class="tgl-wrap"><input type="checkbox" class="tgl" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+            Dark mode
+          </label>
+        </div>
+        <div class="variant-row-desc"><strong>Labeled</strong> — the standard toggle. A text label sits to the right and the entire row is a click target. Use for settings lists and preference panels where a single line of context is sufficient.</div>
+      </div>
+
+      <div class="variant-row">
+        <div class="variant-row-btn">
+          <div class="tgl-info-wrap">
+            <span class="tgl-wrap"><input type="checkbox" class="tgl" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+            <div class="tgl-info-body">
+              <span class="tgl-info-label">Two-factor authentication</span>
+              <span class="tgl-info-desc">Require a second verification step each time you sign in.</span>
+            </div>
+          </div>
+        </div>
+        <div class="variant-row-desc"><strong>With description</strong> — adds a secondary description line below the label. Use when the label alone is not self-explanatory — especially for security settings, billing options, or features that have consequential side effects.</div>
+      </div>
+
+      <div class="variant-row">
+        <div class="variant-row-btn">
+          <span class="tgl-wrap">
+            <input type="checkbox" class="tgl" />
+            <span class="tgl-track"><span class="tgl-thumb"></span></span>
+          </span>
+        </div>
+        <div class="variant-row-desc"><strong>Bare</strong> — just the track and thumb, no label. Use only where the surrounding UI makes the purpose unambiguous — for example, an "Enabled" column in a dense settings table where each row already has a row label.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT GUIDELINES -->
+  <section class="section" id="content-guidelines">
+    <h2 class="text-l3">Content guidelines</h2>
+    <p class="section-lead">Toggle labels describe the feature being controlled — not the action of toggling.</p>
+
+    <!-- Rule 1: Feature, not action -->
+    <div class="cg-rule">
+      <h3 class="text-l4">Name the feature, not the action</h3>
+      <p>The toggle's position already communicates on/off. The label should name what is being controlled, not instruct the user to enable or disable it.</p>
+      <div class="dd-grid">
+        <div class="dd-card">
+          <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:12px; align-items:flex-start; padding:24px 28px;">
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>Email notifications</label>
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>Dark mode</label>
+          </div>
+          <div class="dd-cap do">
+            <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Do</div>
+            Short feature names — the toggle position says the rest.
+          </div>
+        </div>
+        <div class="dd-card">
+          <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:12px; align-items:flex-start; padding:24px 28px;">
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>Enable email notifications</label>
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>Turn on dark mode</label>
+          </div>
+          <div class="dd-cap dont">
+            <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> Don't</div>
+            "Enable" and "turn on" are redundant — the toggle already communicates this.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rule 2: Avoid negatives -->
+    <div class="cg-rule">
+      <h3 class="text-l4">Avoid negatives</h3>
+      <p>Negative labels ("Hide tips", "Don't show banner") create a double-negative when the toggle is off — it becomes unclear whether the feature is on or off. Always frame the label as the positive state.</p>
+      <div class="dd-grid">
+        <div class="dd-card">
+          <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:12px; align-items:flex-start; padding:24px 28px;">
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>Show tips</label>
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>Weekly digest</label>
+          </div>
+          <div class="dd-cap do">
+            <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Do</div>
+            Positive framing — "on" means the feature is active, "off" means it isn't.
+          </div>
+        </div>
+        <div class="dd-card">
+          <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; gap:12px; align-items:flex-start; padding:24px 28px;">
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>Hide tips</label>
+            <label class="tgl-label-wrap" style="pointer-events:none;"><span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>Disable weekly digest</label>
+          </div>
+          <div class="dd-cap dont">
+            <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> Don't</div>
+            When the toggle is off, "Hide tips" = tips are shown — confusing double-negative.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rule 3: Description writing -->
+    <div class="cg-rule">
+      <h3 class="text-l4">Keep descriptions brief and consequential</h3>
+      <p>Descriptions add context when the label alone isn't enough. Explain the effect — don't repeat the label or instruct the user how to interact.</p>
+      <div class="dd-grid">
+        <div class="dd-card">
+          <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; padding:24px 28px; align-items:flex-start;">
+            <label class="tgl-info-wrap" style="pointer-events:none;">
+              <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>
+              <span class="tgl-text"><span class="tgl-lbl">Marketing emails</span><span class="tgl-desc">Receive product updates, tips, and offers from Engage.</span></span>
+            </label>
+          </div>
+          <div class="dd-cap do">
+            <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#16a34a"/><path d="M5 9l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Do</div>
+            One sentence on the consequence. Plain language, no interaction verbs.
+          </div>
+        </div>
+        <div class="dd-card">
+          <div class="dd-prev" style="flex-direction:column; flex-wrap:nowrap; flex:1; height:auto; justify-content:center; padding:24px 28px; align-items:flex-start;">
+            <label class="tgl-info-wrap" style="pointer-events:none;">
+              <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track is-on"><span class="tgl-thumb"></span></span></span>
+              <span class="tgl-text"><span class="tgl-lbl">Marketing emails</span><span class="tgl-desc">Toggle this on to enable marketing emails. Click to receive product updates and news.</span></span>
+            </label>
+          </div>
+          <div class="dd-cap dont">
+            <div class="dd-cap-hd"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#dc2626"/><path d="M6 6l6 6M12 6l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg> Don't</div>
+            "Toggle this on" and "Click to" are obvious — never describe how to use a toggle in its own label.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- STATES -->
+  <section class="section" id="states">
+    <h2 class="text-l3">States</h2>
+    <p class="section-lead">Two value states (off/on) × three interactive states (default, hover, disabled) = six combinations per variant.</p>
+
+    <h3 class="text-l4">Bare toggle</h3>
+    <div class="states-row">
+      <div class="state-col">
+        <span class="state-lbl">Off</span>
+        <span class="tgl-track" style="pointer-events:none;" tabindex="-1"><span class="tgl-thumb"></span></span>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">On</span>
+        <span class="tgl-track is-on" style="pointer-events:none;" tabindex="-1"><span class="tgl-thumb"></span></span>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Hover — off</span>
+        <span class="tgl-track is-hover" style="pointer-events:none;" tabindex="-1"><span class="tgl-thumb"></span></span>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Hover — on</span>
+        <span class="tgl-track is-on is-hover" style="pointer-events:none;" tabindex="-1"><span class="tgl-thumb"></span></span>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Disabled — off</span>
+        <span class="tgl-track is-disabled" style="pointer-events:none;" tabindex="-1"><span class="tgl-thumb"></span></span>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Disabled — on</span>
+        <span class="tgl-track is-on is-disabled" style="pointer-events:none;" tabindex="-1"><span class="tgl-thumb"></span></span>
+      </div>
+    </div>
+
+    <h3 class="text-l4" style="margin-top:24px;">Labeled toggle</h3>
+    <div class="states-row">
+      <div class="state-col">
+        <span class="state-lbl">Off</span>
+        <label class="tgl-label-wrap" style="pointer-events:none;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          Notifications
+        </label>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">On</span>
+        <label class="tgl-label-wrap" style="pointer-events:none;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          Notifications
+        </label>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Hover — off</span>
+        <label class="tgl-label-wrap" style="pointer-events:none;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-hover" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          Notifications
+        </label>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Hover — on</span>
+        <label class="tgl-label-wrap" style="pointer-events:none;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked is-hover" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          Notifications
+        </label>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Disabled — off</span>
+        <label class="tgl-label-wrap is-disabled" style="pointer-events:none;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-disabled" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          Notifications
+        </label>
+      </div>
+      <div class="state-col">
+        <span class="state-lbl">Disabled — on</span>
+        <label class="tgl-label-wrap is-disabled" style="pointer-events:none;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked is-disabled" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          Notifications
+        </label>
+      </div>
+    </div>
+
+    <h3 class="text-l4" style="margin-top:24px;">Toggle with description</h3>
+    <div class="states-row">
+      <div class="state-col" style="width:100%;">
+        <span class="state-lbl">Off</span>
+        <div class="tgl-info-wrap" style="pointer-events:none; width:100%;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          <div class="tgl-info-body">
+            <span class="tgl-info-label">Two-factor authentication</span>
+            <span class="tgl-info-desc">Require a second step each time you sign in.</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-col" style="width:100%;">
+        <span class="state-lbl">On</span>
+        <div class="tgl-info-wrap" style="pointer-events:none; width:100%;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          <div class="tgl-info-body">
+            <span class="tgl-info-label">Two-factor authentication</span>
+            <span class="tgl-info-desc">Require a second step each time you sign in.</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-col" style="width:100%;">
+        <span class="state-lbl">Disabled</span>
+        <div class="tgl-info-wrap is-disabled" style="pointer-events:none; width:100%;" tabindex="-1">
+          <span class="tgl-wrap"><input type="checkbox" class="tgl is-disabled" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+          <div class="tgl-info-body">
+            <span class="tgl-info-label">Two-factor authentication</span>
+            <span class="tgl-info-desc">Require a second step each time you sign in.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESIGN TOKENS -->
+  <section class="section" id="tokens">
+    <h2 class="text-l3">Design Tokens</h2>
+    <p class="section-lead">Tokens used by the toggle for track, thumb, and label across all states.</p>
+    <table class="token-table">
+      <thead>
+        <tr><th>Token</th><th>Role</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--bg-tertiary</code></td><td>Track fill — off (default &amp; hover)</td><td>#e1e4e8</td></tr>
+        <tr><td><code>--border-action</code></td><td>Track border — off, default</td><td>#bcc1cd</td></tr>
+        <tr><td><code>--border-action-hover</code></td><td>Track border — off, hover</td><td>#a5adbc</td></tr>
+        <tr><td><code>--bg-brand</code></td><td>Track fill — on (default &amp; hover)</td><td>#0a9d99</td></tr>
+        <tr><td><code>--border-brand</code></td><td>Track border — on, default</td><td>#0c827f</td></tr>
+        <tr><td><code>--border-brand-hover</code></td><td>Track border — on, hover</td><td>#166764</td></tr>
+        <tr><td><code>--content-brand-secondary</code></td><td>Check icon colour</td><td>#166764</td></tr>
+        <tr><td><code>--bg-disabled</code></td><td>Track fill — disabled (both states)</td><td>rgba(25,39,67,.10)</td></tr>
+        <tr><td><code>--content-base</code></td><td>Label text</td><td>#192743</td></tr>
+        <tr><td><code>--content-secondary</code></td><td>Description text</td><td>rgba(25,39,67,.80)</td></tr>
+        <tr><td><code>--content-disabled</code></td><td>Disabled label and description</td><td>rgba(25,39,67,.30)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" id="accessibility">
+    <h2 class="text-l3">Accessibility</h2>
+    <p class="section-lead">Toggles must be keyboard-operable and announce their state to screen readers.</p>
+    <ul class="section-list">
+      <li><strong>Use a real <code>&lt;input type="checkbox"&gt;</code></strong> wired to a <code>&lt;label&gt;</code>. This gives keyboard focus and space-bar toggling for free, and screen readers announce "checked / unchecked".</li>
+      <li><strong>Or use <code>role="switch"</code></strong> with <code>aria-checked="true|false"</code> on a custom element. The switch role reads "on / off" in modern screen readers — a clearer description of a toggle than "checked".</li>
+      <li><strong>Always provide a visible label.</strong> Don't rely on tooltips or <code>title</code> attributes alone — they are not accessible to keyboard users.</li>
+      <li><strong>The check icon and thumb position</strong> communicate state independent of colour — satisfying WCAG 1.4.1 (Use of Colour).</li>
+      <li><strong>Disabled toggles</strong> should use <code>aria-disabled="true"</code> rather than the native <code>disabled</code> attribute when you still need the element to receive focus, so screen reader users can discover why it is unavailable.</li>
+      <li><strong>Focus indicator</strong> — the native input's focus ring is preserved. Never suppress it with <code>outline: none</code> without providing an equivalent custom focus style.</li>
+    </ul>
+  </section>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+    <a class="pag-card left" href="radio-group-docs.html">
+      <span class="pag-dir">← Previous</span>
+      <span class="pag-name">Radio Group</span>
+    </a>
+    <a class="pag-card right" href="date-picker-docs.html">
+      <span class="pag-dir">Next →</span>
+      <span class="pag-name">Date Picker</span>
+    </a>
+  </div>
+
+</article>
+
+<div class="toc-col">
+  <nav class="toc">
+    <div class="toc-title">ON THIS PAGE</div>
+    <a class="toc-link" href="#anatomy">Anatomy</a>
+    <a class="toc-link" href="#usage">Usage</a>
+    <a class="toc-link" href="#variants">Variants</a>
+    <a class="toc-link" href="#content-guidelines">Content guidelines</a>
+    <a class="toc-link" href="#states">States</a>
+    <a class="toc-link" href="#tokens">Design Tokens</a>
+    <a class="toc-link" href="#accessibility">Accessibility</a>
+  </nav>
+</div>
+
+</div><!-- /content-cols -->
+</div><!-- /tab-panel design -->
+
+
+<!-- ═══════════════════════════════ DEVELOPER TAB ═══════════════════════════════ -->
+<div class="tab-panel" data-panel="developer">
+<div class="content-cols">
+<article class="content">
+
+  <!-- PLAYGROUND -->
+  <section class="section" id="dev-playground">
+    <h2 class="text-l3">Playground</h2>
+    <p class="section-lead">Configure props and see the component update live — the code snippet below reflects your selection.</p>
+
+    <div class="pg-card">
+      <div class="pg-preview" id="pg-preview"></div>
+      <div class="pg-bottom">
+        <div class="pg-tab-bar">
+          <button class="pg-tab is-active" data-pgtab="props">Properties</button>
+          <button class="pg-tab" data-pgtab="code">Code</button>
+          <button class="pg-reset" id="pg-reset">Reset</button>
+        </div>
+        <div class="pg-panel pg-props-wrap" id="pg-panel-props">
+          <div class="pg-row">
+            <div class="pg-row-name">Variant</div>
+            <div class="pg-row-ctrl">
+              <select class="pg-select" id="pg-variant">
+                <option value="labeled">Labeled</option>
+                <option value="description">With description</option>
+                <option value="bare">Bare</option>
+              </select>
+            </div>
+          </div>
+          <div class="pg-row">
+            <div class="pg-row-name">Label position</div>
+            <div class="pg-row-ctrl">
+              <select class="pg-select" id="pg-labelpos">
+                <option value="right">Right (default)</option>
+                <option value="left">Left</option>
+              </select>
+            </div>
+          </div>
+          <div class="pg-row">
+            <div class="pg-row-name">Checked</div>
+            <div class="pg-row-ctrl">
+              <label class="pg-toggle"><input type="checkbox" id="pg-checked"><span class="pg-toggle-track"></span></label>
+            </div>
+          </div>
+          <div class="pg-row">
+            <div class="pg-row-name">Disabled</div>
+            <div class="pg-row-ctrl">
+              <label class="pg-toggle"><input type="checkbox" id="pg-disabled"><span class="pg-toggle-track"></span></label>
+            </div>
+          </div>
+        </div>
+        <div class="pg-panel pg-code-wrap" id="pg-panel-code" hidden>
+          <button class="dev-copy-btn" id="pg-copy">Copy</button>
+          <pre><code id="pg-code"></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USAGE -->
+  <section class="section" id="dev-usage">
+    <h2 class="text-l3">Usage</h2>
+    <p class="section-lead">The toggle is implemented as <code>mat-slide-toggle</code> from Angular Material, wrapped with Engage-specific theming.</p>
+
+    <div class="dev-gap">
+      <span class="dev-gap-icon">⚠️</span>
+      <div class="dev-gap-body">
+        <span class="dev-gap-label">Figma gap</span>
+        <span class="dev-gap-text">Confirm the exact component selector and module import against <code>styleguide.effectory.com</code> before shipping. The snippets below use <code>mat-slide-toggle</code> as a reference — verify selector name and required imports with the live Angular styleguide.</span>
+      </div>
+    </div>
+
+    <h3 class="text-l4">Labeled</h3>
+    <div class="dev-preview" style="flex-direction:column; gap:12px; align-items:flex-start; padding:24px 28px;">
+      <label class="tgl-label-wrap">
+        <span class="tgl-wrap"><input type="checkbox" class="tgl" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+        Email notifications
+      </label>
+      <label class="tgl-label-wrap">
+        <span class="tgl-wrap"><input type="checkbox" class="tgl" checked /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+        Push notifications
+      </label>
+    </div>
+    <div class="dev-code-wrap">
+      <button class="dev-copy-btn">Copy</button>
+      <pre><code><span class="ct">&lt;mat-slide-toggle</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"emailEnabled"</span>
+<span class="ct">&gt;</span>Email notifications<span class="ct">&lt;/mat-slide-toggle&gt;</span>
+
+<span class="ct">&lt;mat-slide-toggle</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"pushEnabled"</span>
+  <span class="ca">[checked]</span>=<span class="cv">"true"</span>
+<span class="ct">&gt;</span>Push notifications<span class="ct">&lt;/mat-slide-toggle&gt;</span></code></pre>
+    </div>
+
+    <h3 class="text-l4">Label on left</h3>
+    <div class="dev-preview" style="padding:24px 28px;">
+      <label class="tgl-label-wrap" style="flex-direction:row-reverse;">
+        <span class="tgl-wrap"><input type="checkbox" class="tgl" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+        Dark mode
+      </label>
+    </div>
+    <div class="dev-code-wrap">
+      <button class="dev-copy-btn">Copy</button>
+      <pre><code><span class="ct">&lt;mat-slide-toggle</span>
+  <span class="ca">labelPosition</span>=<span class="cv">"before"</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"darkMode"</span>
+<span class="ct">&gt;</span>Dark mode<span class="ct">&lt;/mat-slide-toggle&gt;</span></code></pre>
+    </div>
+
+    <h3 class="text-l4">With description</h3>
+    <p class="section-lead">Pair the toggle with a description element and connect them via <code>aria-describedby</code>.</p>
+    <div class="dev-preview" style="padding:24px 28px;">
+      <div class="tgl-info-wrap">
+        <span class="tgl-wrap"><input type="checkbox" class="tgl" id="dev-2fa" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+        <label class="tgl-info-body" for="dev-2fa">
+          <span class="tgl-info-label">Two-factor authentication</span>
+          <span class="tgl-info-desc">Require a second verification step each time you sign in.</span>
+        </label>
+      </div>
+    </div>
+    <div class="dev-code-wrap">
+      <button class="dev-copy-btn">Copy</button>
+      <pre><code><span class="ct">&lt;mat-slide-toggle</span>
+  <span class="ca">id</span>=<span class="cv">"twofa"</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"twoFaEnabled"</span>
+  <span class="ca">aria-describedby</span>=<span class="cv">"twofa-desc"</span>
+<span class="ct">&gt;</span>Two-factor authentication<span class="ct">&lt;/mat-slide-toggle&gt;</span>
+<span class="ct">&lt;p</span> <span class="ca">id</span>=<span class="cv">"twofa-desc"</span><span class="ct">&gt;</span>Require a second verification step each time you sign in.<span class="ct">&lt;/p&gt;</span></code></pre>
+    </div>
+
+    <h3 class="text-l4">Disabled</h3>
+    <div class="dev-preview" style="flex-direction:column; gap:12px; align-items:flex-start; padding:24px 28px;">
+      <label class="tgl-label-wrap is-disabled">
+        <span class="tgl-wrap"><input type="checkbox" class="tgl is-disabled" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+        Disabled off
+      </label>
+      <label class="tgl-label-wrap is-disabled">
+        <span class="tgl-wrap"><input type="checkbox" class="tgl is-checked is-disabled" tabindex="-1" /><span class="tgl-track"><span class="tgl-thumb"></span></span></span>
+        Disabled on
+      </label>
+    </div>
+    <div class="dev-code-wrap">
+      <button class="dev-copy-btn">Copy</button>
+      <pre><code><span class="ct">&lt;mat-slide-toggle</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"setting"</span>
+  <span class="ca">[disabled]</span>=<span class="cv">"true"</span>
+<span class="ct">&gt;</span>Disabled off<span class="ct">&lt;/mat-slide-toggle&gt;</span>
+
+<span class="ct">&lt;mat-slide-toggle</span>
+  <span class="ca">[(ngModel)]</span>=<span class="cv">"setting"</span>
+  <span class="ca">[checked]</span>=<span class="cv">"true"</span>
+  <span class="ca">[disabled]</span>=<span class="cv">"true"</span>
+<span class="ct">&gt;</span>Disabled on<span class="ct">&lt;/mat-slide-toggle&gt;</span></code></pre>
+    </div>
+  </section>
+
+  <!-- CSS CLASSES -->
+  <section class="section" id="dev-props">
+    <h2 class="text-l3">CSS classes</h2>
+    <p class="section-lead">Classes used by the toggle component and available for custom integrations.</p>
+    <div class="tbl-wrap">
+      <table class="dev-props-table">
+        <thead>
+          <tr><th>Class</th><th>Element</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>.tgl</code></td><td><code>&lt;input&gt;</code></td><td>Base class for the visually-hidden checkbox input. Required.</td></tr>
+          <tr><td><code>.tgl-wrap</code></td><td><code>&lt;span&gt;</code></td><td>Immediate parent of the input + track pair. Sets cursor and relative positioning.</td></tr>
+          <tr><td><code>.tgl-track</code></td><td><code>&lt;span&gt;</code></td><td>The visible pill track. Must immediately follow <code>.tgl</code> in the DOM for CSS sibling selectors to work.</td></tr>
+          <tr><td><code>.tgl-thumb</code></td><td><code>&lt;span&gt;</code></td><td>The white sliding circle inside the track. Must be a direct child of <code>.tgl-track</code>. Its <code>::before</code> pseudo-element renders the check icon when on.</td></tr>
+          <tr><td><code>.tgl-label-wrap</code></td><td><code>&lt;label&gt;</code></td><td>Outer wrapper for the labeled variant. Contains <code>.tgl-wrap</code> and the label text. Add <code>flex-direction:row-reverse</code> to move the label to the left.</td></tr>
+          <tr><td><code>.tgl-info-wrap</code></td><td><code>&lt;div&gt;</code></td><td>Outer wrapper for the with-description variant.</td></tr>
+          <tr><td><code>.tgl-info-label</code></td><td><code>&lt;span&gt;</code></td><td>Primary label text in the with-description variant.</td></tr>
+          <tr><td><code>.tgl-info-desc</code></td><td><code>&lt;span&gt;</code></td><td>Secondary description text in the with-description variant.</td></tr>
+          <tr><td><code>.is-checked</code></td><td><code>.tgl</code></td><td>On state for static demos. In production use the native <code>checked</code> attribute or a framework binding.</td></tr>
+          <tr><td><code>.is-disabled</code></td><td><code>.tgl</code>, <code>.tgl-label-wrap</code>, <code>.tgl-info-wrap</code></td><td>Disabled state. Apply to the input to mute the track; also apply to the wrapper to grey out label text and set <code>cursor:not-allowed</code>.</td></tr>
+          <tr><td><code>.is-on</code></td><td><code>.tgl-track</code></td><td>On state applied directly to the track (static demo use only).</td></tr>
+          <tr><td><code>.is-hover</code></td><td><code>.tgl</code> or <code>.tgl-track</code></td><td>Hover state (static demo use only).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CSS TOKENS -->
+  <section class="section" id="dev-tokens">
+    <h2 class="text-l3">CSS tokens</h2>
+    <p class="section-lead">Design tokens consumed by the toggle. All defined in <code>tokens.css</code>.</p>
+    <table class="token-table">
+      <thead>
+        <tr><th>Token</th><th>Role</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--bg-tertiary</code></td><td>Track fill — off (default &amp; hover)</td><td>#e1e4e8</td></tr>
+        <tr><td><code>--border-action</code></td><td>Track border — off, default</td><td>#bcc1cd</td></tr>
+        <tr><td><code>--border-action-hover</code></td><td>Track border — off, hover</td><td>#a5adbc</td></tr>
+        <tr><td><code>--bg-brand</code></td><td>Track fill — on</td><td>#0a9d99</td></tr>
+        <tr><td><code>--border-brand</code></td><td>Track border — on, default</td><td>#0c827f</td></tr>
+        <tr><td><code>--border-brand-hover</code></td><td>Track border — on, hover</td><td>#166764</td></tr>
+        <tr><td><code>--content-brand-secondary</code></td><td>Check icon colour</td><td>#166764</td></tr>
+        <tr><td><code>--bg-disabled</code></td><td>Track fill — disabled</td><td>rgba(25,39,67,.10)</td></tr>
+        <tr><td><code>--content-base</code></td><td>Label text</td><td>#192743</td></tr>
+        <tr><td><code>--content-secondary</code></td><td>Description text</td><td>rgba(25,39,67,.80)</td></tr>
+        <tr><td><code>--content-disabled</code></td><td>Disabled label and description</td><td>rgba(25,39,67,.30)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section" id="dev-a11y">
+    <h2 class="text-l3">Accessibility</h2>
+    <p class="section-lead">Requirements for building an accessible toggle.</p>
+    <div class="a11y-list">
+      <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Use a real input or <code>role="switch"</code>.</strong> Either <code>&lt;input type="checkbox"&gt;</code> paired with a <code>&lt;label&gt;</code>, or a custom element with <code>role="switch"</code> and <code>aria-checked</code>.</div></div>
+      <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Space bar must toggle.</strong> Native checkboxes handle this automatically.</div></div>
+      <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>State without colour.</strong> The check icon and thumb position communicate state independently of colour — satisfying WCAG 1.4.1.</div></div>
+      <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Provide an accessible name.</strong> Use a visible label, <code>aria-label</code>, or <code>aria-labelledby</code>.</div></div>
+      <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Connect descriptions.</strong> When using the with-description variant, connect the description with <code>aria-describedby</code>.</div></div>
+      <div class="a11y-item"><span class="a11y-arrow">→</span><div><strong>Keep disabled controls focusable.</strong> Use <code>aria-disabled="true"</code> instead of <code>disabled</code> if the control needs to remain focusable.</div></div>
+    </div>
+  </section>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+    <a class="pag-card left" href="radio-group-docs.html">
+      <span class="pag-dir">← Previous</span>
+      <span class="pag-name">Radio Group</span>
+    </a>
+    <a class="pag-card right" href="date-picker-docs.html">
+      <span class="pag-dir">Next →</span>
+      <span class="pag-name">Date Picker</span>
+    </a>
+  </div>
+
+</article>
+
+<div class="toc-col">
+  <nav class="toc">
+    <div class="toc-title">ON THIS PAGE</div>
+    <a class="toc-link" href="#dev-playground">Playground</a>
+    <a class="toc-link" href="#dev-usage">Usage</a>
+    <a class="toc-link" href="#dev-props">CSS classes</a>
+    <a class="toc-link" href="#dev-tokens">CSS tokens</a>
+    <a class="toc-link" href="#dev-a11y">Accessibility</a>
+  </nav>
+</div>
+
+</div><!-- /content-cols -->
+</div><!-- /tab-panel developer -->
+
+</div><!-- /content-wrap -->
+</div><!-- /shell -->
+
+<script src="nav.js"></script>
+<script>
+(function () {
+  const defaults = { variant: 'labeled', labelpos: 'right', checked: false, disabled: false };
+  let state = { ...defaults };
+
+  const preview    = document.getElementById('pg-preview');
+  const codeEl     = document.getElementById('pg-code');
+  const variantSel = document.getElementById('pg-variant');
+  const labelposSel= document.getElementById('pg-labelpos');
+  const checkedCk  = document.getElementById('pg-checked');
+  const disabledCk = document.getElementById('pg-disabled');
+
+  function track() {
+    return '<span class="tgl-track"><span class="tgl-thumb"></span></span>';
+  }
+
+  function input() {
+    const cls = [
+      'tgl',
+      state.checked  ? 'is-checked'  : '',
+      state.disabled ? 'is-disabled' : ''
+    ].filter(Boolean).join(' ');
+    const tab = state.disabled ? ' tabindex="-1"' : '';
+    return `<input type="checkbox" class="${cls}"${tab} />`;
+  }
+
+  function renderPreview() {
+    const disLabelCls = state.disabled ? ' is-disabled' : '';
+    const wrap = `<span class="tgl-wrap">${input()}${track()}</span>`;
+
+    if (state.variant === 'bare') {
+      preview.innerHTML = wrap;
+    } else if (state.variant === 'labeled') {
+      const flexDir = state.labelpos === 'left' ? ' style="flex-direction:row-reverse;"' : '';
+      preview.innerHTML = `<label class="tgl-label-wrap${disLabelCls}"${flexDir}>${wrap}Enable notifications</label>`;
+    } else {
+      preview.innerHTML = `
+        <div class="tgl-info-wrap${disLabelCls}" style="max-width:320px;">
+          ${wrap}
+          <div class="tgl-info-body">
+            <span class="tgl-info-label">Two-factor authentication</span>
+            <span class="tgl-info-desc">Require a second verification step each time you sign in.</span>
+          </div>
+        </div>`;
+    }
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function hi(s) {
+    return s
+      .replace(/(&lt;\/?[\w-]+)/g, '<span class="ct">$1</span>')
+      .replace(/(labelPosition|[([]?ngModel[\])]?|\[checked\]|\[disabled\]|aria-describedby|id|for)=/g, '<span class="ca">$1</span>=')
+      .replace(/=&quot;([^&]*)&quot;/g, '=<span class="cv">&quot;$1&quot;</span>')
+      .replace(/(&lt;!--.*?--&gt;)/g, '<span class="cc">$1</span>');
+  }
+
+  function buildCode() {
+    const checkedA  = state.checked  ? '\n  [checked]="true"'  : '';
+    const disabledA = state.disabled ? '\n  [disabled]="true"' : '';
+
+    if (state.variant === 'bare') {
+      return `<mat-slide-toggle\n  [(ngModel)]="mySetting"${checkedA}${disabledA}\n></mat-slide-toggle>`;
+    } else if (state.variant === 'labeled') {
+      const posA = state.labelpos === 'left' ? '\n  labelPosition="before"' : '';
+      return `<mat-slide-toggle${posA}\n  [(ngModel)]="notifications"${checkedA}${disabledA}\n>Enable notifications</mat-slide-toggle>`;
+    } else {
+      return `<mat-slide-toggle\n  id="twofa"\n  [(ngModel)]="twoFaEnabled"${checkedA}${disabledA}\n  aria-describedby="twofa-desc"\n>Two-factor authentication</mat-slide-toggle>\n<p id="twofa-desc">Require a second verification step each time you sign in.</p>`;
+    }
+  }
+
+  function render() {
+    renderPreview();
+    codeEl.innerHTML = hi(escHtml(buildCode()));
+  }
+
+  variantSel.addEventListener('change',  () => { state.variant  = variantSel.value;  render(); });
+  labelposSel.addEventListener('change', () => { state.labelpos = labelposSel.value; render(); });
+  checkedCk.addEventListener('change',   () => { state.checked  = checkedCk.checked;  render(); });
+  disabledCk.addEventListener('change',  () => { state.disabled = disabledCk.checked; render(); });
+
+  document.getElementById('pg-reset').addEventListener('click', () => {
+    state = { ...defaults };
+    variantSel.value  = defaults.variant;
+    labelposSel.value = defaults.labelpos;
+    checkedCk.checked  = defaults.checked;
+    disabledCk.checked = defaults.disabled;
+    render();
+  });
+
+  document.getElementById('pg-copy').addEventListener('click', () => {
+    navigator.clipboard.writeText(buildCode()).catch(() => {});
+  });
+
+  document.querySelectorAll('.pg-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pg-tab').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const tab = btn.dataset.pgtab;
+      document.getElementById('pg-panel-props').hidden = tab !== 'props';
+      document.getElementById('pg-panel-code').hidden  = tab !== 'code';
+    });
+  });
+
+  document.querySelectorAll('.dev-copy-btn:not(#pg-copy)').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.nextElementSibling;
+      if (pre) navigator.clipboard.writeText(pre.innerText).catch(() => {});
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

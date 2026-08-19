@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Engage Design System</title>
+  <script>
+    /* Documentation pages moved from / to /docs/ . Anything still pointing at an old
+       URL — bookmarks, Figma links, the prototype gallery — lands here; forward it
+       rather than showing a 404. Only paths we know moved get rewritten. */
+    (function () {
+      var m = location.pathname.match(/^(.*)\/((?:[a-z0-9-]+-docs|index|changelog|nav)\.html)$/);
+      if (m && m[1].indexOf('/docs') === -1) {
+        location.replace(m[1] + '/docs/' + m[2] + location.search + location.hash);
+      }
+    })();
+  </script>
+</head>
+<body><p>That page has moved. Try <a href="/Engage-Design-system-/docs/">the design system documentation</a>.</p></body>
+</html>
