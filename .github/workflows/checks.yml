@@ -1,0 +1,29 @@
+name: checks
+
+# The skill's two hand-maintained seams are checked on the way in, not only when
+# whoever releases happens to run sync-skill.sh on their laptop.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  skill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # A component in components.css that design-system-reference.md never
+      # mentions is unusable: rule 1 of the skill only allows what the reference
+      # lists, so the skill reports it as non-existent.
+      - name: components.css vs the reference
+        run: ./check-reference-drift.py
+
+      # SKILL.md and reference-prototypes/ exist twice here and sync-skill.sh
+      # deliberately does not copy them, so nothing else keeps the two in step.
+      - name: both skill copies carry the same content
+        run: ./check-skill-consistency.py
