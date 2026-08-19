@@ -5,9 +5,18 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.12.3
+**Version:** 1.12.4
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
+
+> ## Eerste actie: vraag de naam en de track
+>
+> Je eerste bericht is één `AskUserQuestion` met twee vragen — **naam** eerst, dan **track** (regel 12).
+> Daar gaat **niets** aan vooraf: geen vraag welk scherm het wordt, geen vraag welke componenten je mag
+> gebruiken, geen samenvatting van wat je van plan bent, geen check of je mag beginnen. Ook niet als de
+> aanvraag vaag is — vraag dan éérst naam en track, en pas daarna de rest.
+>
+> De zichtbaarheid hoort hier niet bij; die komt ná het bouwen (regel 15).
 
 ## Setup — eerste keer in een sessie
 
@@ -285,7 +294,8 @@ Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat
 het antwoord in de oplevering, zodat het prototype met de juiste `group` in
 [`prototypes.json`](https://github.com/effectory-ux/prototypes) van de projects-pagina kan.
 
-**Stel deze twee vragen met de `AskUserQuestion`-tool — één aanroep, naam eerst.** De gebruiker krijgt
+**Stel deze twee vragen met de `AskUserQuestion`-tool — één aanroep, naam eerst, als je eerste
+bericht.** Stel geen enkele andere vraag ervóór. De gebruiker krijgt
 klikbare opties met een invulveld in plaats van een lap tekst, en het scheelt heen en weer:
 
 | # | Vraag | Header | Opties |
@@ -422,23 +432,22 @@ dezelfde kaart.
 
 ## Workflow
 
-1. **Lees de reference** — laad `design-system-reference.md` volledig
-2. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
-3. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
-4. **Vraag naam + track** — één `AskUserQuestion`, naam eerst (regel 12 en 13)
-5. **Leg de naam vast** — bepaalt bestandsnaam, `<title>` en de kaart op de projects-pagina (regel 13)
-6. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
+1. **Vraag naam + track** — één `AskUserQuestion`, naam eerst. Dit is je eerste bericht, vóór elke andere vraag (regel 12 en 13)
+2. **Lees de reference** — laad `design-system-reference.md` volledig
+3. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
+4. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
+5. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
-7. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
-8. **Bouw incrementeel** — begin met de HTML-structuur, voeg components toe, stel layout in met tokens
-9. **Geen eigen stijlen** — custom CSS alleen voor layout-specifieke zaken (positionering, grid, flex), altijd met tokens voor waarden
-10. **Review** — check de output op doc-classes en hardcoded waarden vóór oplevering
-11. **Lokale server vereist** — meld na het bouwen altijd de URL van **elke** pagina:
+6. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
+7. **Bouw incrementeel** — begin met de HTML-structuur, voeg components toe, stel layout in met tokens
+8. **Geen eigen stijlen** — custom CSS alleen voor layout-specifieke zaken (positionering, grid, flex), altijd met tokens voor waarden
+9. **Review** — check de output op doc-classes en hardcoded waarden vóór oplevering
+10. **Lokale server vereist** — meld na het bouwen altijd de URL van **elke** pagina:
     > ⚠️ Open dit prototype via de lokale server, **niet** via dubbelklik (file://).
     > SVG-maskers (o.a. Toggle-vinkje) en icoonfuncties werken niet zonder HTTP.
     > Start de server met `python3 serve.py` en open daarna:
     > `http://localhost:<poort>/<bestandsnaam>.html`
-12. **Vraag de zichtbaarheid** — `AskUserQuestion`: public (kaart op de projects-pagina) of hidden (alleen via de URL). Zie regel 15
+11. **Vraag de zichtbaarheid** — `AskUserQuestion`: public (kaart op de projects-pagina) of hidden (alleen via de URL). Zie regel 15
 
 ---
 

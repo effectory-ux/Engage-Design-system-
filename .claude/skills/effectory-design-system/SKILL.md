@@ -2,6 +2,15 @@
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
+> ## Eerste actie: vraag de naam en de track
+>
+> Je eerste bericht is één `AskUserQuestion` met twee vragen — **naam** eerst, dan **track** (regel 12).
+> Daar gaat **niets** aan vooraf: geen vraag welk scherm het wordt, geen vraag welke componenten je mag
+> gebruiken, geen samenvatting van wat je van plan bent, geen check of je mag beginnen. Ook niet als de
+> aanvraag vaag is — vraag dan éérst naam en track, en pas daarna de rest.
+>
+> De zichtbaarheid hoort hier niet bij; die komt ná het bouwen (regel 15).
+
 Laad voor elke bouwsessie eerst:
 ```
 Read(".claude/skills/effectory-design-system/design-system-reference.md")
@@ -256,7 +265,8 @@ Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat
 het antwoord in de oplevering, zodat het prototype met de juiste `group` in
 [`prototypes.json`](https://github.com/effectory-ux/prototypes) van de projects-pagina kan.
 
-**Stel deze twee vragen met de `AskUserQuestion`-tool — één aanroep, naam eerst.** De gebruiker krijgt
+**Stel deze twee vragen met de `AskUserQuestion`-tool — één aanroep, naam eerst, als je eerste
+bericht.** Stel geen enkele andere vraag ervóór. De gebruiker krijgt
 klikbare opties met een invulveld in plaats van een lap tekst, en het scheelt heen en weer:
 
 | # | Vraag | Header | Opties |
@@ -393,9 +403,9 @@ dezelfde kaart.
 
 ## Workflow
 
-1. **Lees de reference** — laad `design-system-reference.md` volledig
-2. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
-3. **Vraag naam + track** — één `AskUserQuestion`, naam eerst (regel 12 en 13)
+1. **Vraag naam + track** — één `AskUserQuestion`, naam eerst. Dit is je eerste bericht, vóór elke andere vraag (regel 12 en 13)
+2. **Lees de reference** — laad `design-system-reference.md` volledig
+3. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
 4. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
 5. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
