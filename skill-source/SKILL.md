@@ -270,7 +270,7 @@ Token-gebaseerd: 64 = `--spacing-extra-loose × 2`, 48 = `--spacing-loose × 2`,
 
 ### 12. Vraag in welke track het prototype hoort
 Bouw je een nieuw prototype, vraag dan **voordat je begint** bij welke track het hoort. Product & Tech
-werkt in drie tracks, en de prototype-galerij is daarop ingedeeld:
+werkt in drie tracks, en de projects-pagina is daarop ingedeeld:
 
 | Track | Waar het over gaat |
 |---|---|
@@ -283,18 +283,18 @@ Het gaat om het onderwerp, niet om wie het maakt: group linking is van Jente maa
 
 Weet de gebruiker het niet, doe dan een voorstel op basis van het scherm en laat het bevestigen. Noteer
 het antwoord in de oplevering, zodat het prototype met de juiste `group` in
-[`prototypes.json`](https://github.com/effectory-ux/prototypes) van de galerij kan.
+[`prototypes.json`](https://github.com/effectory-ux/prototypes) van de projects-pagina kan.
 
 ---
 
 ### 13. Vraag hoe het prototype moet heten
 Vraag **voordat je begint** hoe het prototype heet. Die naam legt drie dingen tegelijk vast: de
-**bestandsnaam**, de **`<title>`** van elke pagina, en de **`name`** van de kaart in de galerij. Achteraf
+**bestandsnaam**, de **`<title>`** van elke pagina, en de **`name`** van de kaart op de projects-pagina. Achteraf
 hernoemen kost een nieuwe URL, en gedeelde links breken daarop.
 
 - **Bestandsnaam:** de naam in kebab-case → `prototypes/<naam>.html`. Bestaat het prototype uit meerdere
   schermen, dan komt het scherm erachter (regel 14).
-- **Kaartnaam:** de naam zoals de gebruiker hem uitspreekt, in de galerij-entry (regel 15).
+- **Kaartnaam:** de naam zoals de gebruiker hem uitspreekt, op de kaart op de projects-pagina (regel 15).
 
 Weet de gebruiker het nog niet, doe dan een voorstel op basis van het scherm en laat het bevestigen.
 Benoem het onderwerp, niet de plek waar het toevallig begon: "CSM result settings" zegt meer dan
@@ -307,7 +307,7 @@ Bestaat een prototype uit meer dan één scherm, dan is **elk scherm een apart H
 URL. Bouw **nooit** één bestand dat met JS de hele view omwisselt (`showPage()`, `hidden` op
 page-containers, hash-routing, een `switch` op een `currentPage`-variabele).
 
-Waarom: elk scherm is dan deelbaar als deep link (review, Slack, Figma, de galerij), refresh en
+Waarom: elk scherm is dan deelbaar als deep link (review, Slack, Figma, de projects-pagina), refresh en
 back/forward landen op hetzelfde scherm, en de bestanden blijven leesbaar.
 
 **Naamgeving:** `<prototype>-<scherm>.html`, met het scherm als laatste deel.
@@ -347,23 +347,41 @@ eerste.
 ---
 
 
-### 15. Bied de galerij-entry aan — maar commit niks zonder akkoord
-Elk prototype hoort in de galerij ([`effectory-ux/prototypes`](https://github.com/effectory-ux/prototypes)),
-maar die staat in een **andere repo** en de kaarten zijn met de hand samengesteld. Doe daarom na het
-bouwen een voorstel en wacht op akkoord.
+### 15. Vraag wat de zichtbaarheid moet zijn — en commit niks zonder akkoord
+Zodra een prototype gepusht is, staat het live op zijn eigen URL. Daar los van staat of het een **kaart
+krijgt op de projects-pagina** ([`effectory-ux/prototypes`](https://github.com/effectory-ux/prototypes)).
+Die staat in een **andere repo** en de kaarten zijn met de hand samengesteld, dus vraag na het bouwen wat
+het moet worden:
+
+| Zichtbaarheid | Wat het betekent |
+|---|---|
+| **Public** | krijgt een kaart op de projects-pagina, vindbaar voor het hele team |
+| **Hidden** | geen kaart; alleen te openen door wie de URL heeft |
+
+⚠️ **Hidden is geen afscherming.** De pagina staat gewoon op een publieke Pages-site, dus de URL blijft
+voor iedereen te openen. Het enige verschil is dat hij niet op de projects-pagina verschijnt. Is iets
+écht niet deelbaar, zeg dat dan — een prototype is daar de verkeerde plek voor.
+
+**Bij hidden:** voeg geen entry toe en meld bij de oplevering dat het prototype alleen via zijn URL te
+vinden is.
+
+**Bij public:**
 
 1. **Stel de entry voor** die in `prototypes.json` zou komen: `path` = de **entry-pagina**, `also`-regexes
    die de overige schermen claimen (zodat een prototype van meerdere pagina's één kaart blijft met
    "N schermen"), de `name` uit regel 13, de `group` uit regel 12, en een korte, zelf geschreven omschrijving.
-2. **Vraag expliciet of je hem mag toevoegen.** Geen akkoord = niet committen in de galerij-repo.
+2. **Vraag expliciet of je hem mag toevoegen.** Geen akkoord = niet committen in de projects-repo.
 3. **Na akkoord:** push eerst het prototype zelf — `build-gallery.py` crawlt de bron-repo live via de
    GitHub API en vindt ongepushte pagina's niet. Voeg dan de entry toe, draai `./build-gallery.py` en
    commit **zowel** `prototypes.json` als de gegenereerde `index.html`. Alleen `prototypes.json`
    committen laat de kaart achter op de oude build.
 4. **Check de output van de builder:** die print elke pagina die geen enkele kaart claimt. Staat een van je
    nieuwe schermen in die lijst, dan dekt je `also` niet alles — fix dat vóór de commit.
+5. **Let op bestaande `also`-regexes:** een te brede regex van een ánder prototype slokt je pagina op, en
+   dan verschijnt hij als naamloze variant onder díe kaart in plaats van als eigen kaart. Controleer na
+   het bouwen of je prototype als eigen kaart in `index.html` staat.
 
-**Eén kaart per prototype, niet per pagina.** Regel 13 levert meerdere bestanden op; die horen allemaal bij
+**Eén kaart per prototype, niet per pagina.** Regel 14 levert meerdere bestanden op; die horen allemaal bij
 dezelfde kaart.
 
 ---
@@ -375,7 +393,7 @@ dezelfde kaart.
 2. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
 3. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
 4. **Vraag naar de track** — Surveying, Leadership enablement, Reporting of Platform (zie regel 12)
-5. **Vraag de naam** — hoe heet dit prototype? Bepaalt bestandsnaam, `<title>` en galerij-kaart (zie regel 13)
+5. **Vraag de naam** — hoe heet dit prototype? Bepaalt bestandsnaam, `<title>` en de kaart op de projects-pagina (zie regel 13)
 6. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker
 7. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
@@ -387,7 +405,7 @@ dezelfde kaart.
     > SVG-maskers (o.a. Toggle-vinkje) en icoonfuncties werken niet zonder HTTP.
     > Start de server met `python3 serve.py` en open daarna:
     > `http://localhost:<poort>/<bestandsnaam>.html`
-12. **Galerij aanbieden** — stel de `prototypes.json`-entry voor en vraag of je hem mag toevoegen (regel 15)
+12. **Vraag de zichtbaarheid** — public (kaart op de projects-pagina) of hidden (alleen via de URL)? Zie regel 15
 
 ---
 
