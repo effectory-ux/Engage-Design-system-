@@ -7,11 +7,18 @@
     document.documentElement.setAttribute('data-portal', portal);
   })();
 
-  // Auto-load icons.js so every page has access to the icon library
+  // Auto-load icons.js so every page has access to the icon library.
+  // icons.js lives at the repo root (the skill and every prototype fetch it there);
+  // this file lives in docs/, hence the ../ . The check strips any ?v= cache-buster,
+  // otherwise a page that already links ../icons.js?v=123 does not match and we
+  // inject a second, broken copy.
   (function loadIconScript() {
-    if (document.querySelector('script[src$="icons.js"]')) return;
+    var already = [].some.call(document.querySelectorAll('script[src]'), function (el) {
+      return el.getAttribute('src').split('?')[0].replace(/^.*\//, '') === 'icons.js';
+    });
+    if (already) return;
     var s = document.createElement('script');
-    s.src = 'icons.js';
+    s.src = '../icons.js';
     document.head.appendChild(s);
   })();
 
