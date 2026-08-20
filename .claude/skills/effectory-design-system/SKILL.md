@@ -24,33 +24,51 @@ Read(".claude/skills/effectory-design-system/design-system-reference.md")
 
 ### Design system updates — `auto` of `manual`
 
-Een prototype draait op een **gepinde** kopie van het design system. Hoe die kopie ververst wordt,
-bepaalt de gebruiker. De keuze staat in `ds-pin.json` in de projectmap:
+Een prototype draait op een **eigen, gepinde kopie** van het design system: `tokens.css`,
+`foundation.css`, `components.css`, `icons.js` en de iconen die het scherm gebruikt staan in de
+projectmap. Dat is ook wat meegaat als het prototype gedeeld of gepubliceerd wordt — een screen
+rendert morgen hetzelfde als vandaag. `ds-pin.json` legt vast uit welke commit die kopie komt:
 
 ```json
 {
   "designSystem": "effectory-ux/Engage-Design-system-",
-  "ref": "d7ac1a5",
-  "pinned": "2026-08-19",
+  "ref": "a1a3704",
+  "pinned": "2026-08-20",
   "update": "auto"
 }
 ```
 
-- **`"update": "auto"`** *(standaard)* — haal bij de start van een bouwsessie de nieuwste versie op
-  (`tools/ds-update.sh`) en meld in één zin wat er veranderd is. Zo werk je altijd met het actuele system.
-- **`"update": "manual"`** — verander niets. Meld alleen dat er een update klaarstaat en op welke
-  ref het project nu staat; de gebruiker beslist. Gebruik dit zodra een prototype af is, gedeeld is
-  of in de galerij staat: dan hoort het niet meer te bewegen.
+**Aan het begin van elke bouwsessie: kijken, dan vragen.**
+
+```bash
+tools/ds-update.sh --check
+```
+
+- Zegt het `up to date` → niets melden, gewoon beginnen.
+- Zegt het `behind: …` → **vraag het de gebruiker**, met wat je weet:
+  - op welke ref het project staat en wat de laatste is;
+  - welke bestanden zouden veranderen (`--check` noemt ze) — of juist dat er **geen**
+    bestandsverschillen zijn en alleen de commit is opgeschoven;
+  - dat de vorige kopie in `.ds-prev/` bewaard blijft en `tools/ds-update.sh --revert` het terugzet.
+
+  Update pas na een **ja**. Bij `"update": "auto"` is bijwerken de aanbevolen keuze, bij
+  `"manual"` is gepind blijven de aanbevolen keuze — maar in beide gevallen beslist de gebruiker.
+- Is er nog geen `ds-pin.json` (nieuw project) → haal de laatste op zonder te vragen en leg de pin
+  vast. Er is dan niets om stuk te maken.
 
 Regels:
 
-1. Ontbreekt `ds-pin.json`, behandel het project als **`auto`** en maak het bestand aan bij de eerste update.
-2. Bij `manual` **nooit** ongevraagd verversen — ook niet "even snel" om een bug te fixen. Vraag het.
-3. Vraagt de gebruiker erom ("zet dit vast", "bevries het design system", "detach"), zet dan
-   `"update": "manual"`. Vraagt hij om los te laten ("weer meelopen", "attach"), zet `"auto"`.
-4. De gebruiker kan het ook in de prompt zeggen ("bouw dit maar pin het design system") — dat wint
-   van wat er in het bestand staat, en je legt het daarna vast.
-5. `tools/ds-update.sh --check` zegt alleen of het project achterloopt, zonder iets te wijzigen.
+1. Werk **nooit** ongevraagd bij als er al een `ds-pin.json` is — ook niet "even snel" om een bug te
+   fixen. Een design-system-wijziging kan een goedgekeurd scherm veranderen; dat is de gebruiker zijn
+   keuze, niet die van jou.
+2. Meld het maar **één keer per sessie**. Zegt de gebruiker nee, dan blijft het nee.
+3. `"manual"` betekent niet "niets zeggen": je meldt het nog steeds, je raadt alleen aan te blijven
+   waar je bent. Zet dit zodra een prototype af is, gedeeld is of in de galerij staat.
+4. Vraagt de gebruiker erom ("zet dit vast", "bevries het design system", "detach"), zet dan
+   `"update": "manual"`. Vraagt hij om weer mee te lopen ("attach"), zet `"auto"`.
+5. Wat de gebruiker in de prompt zegt wint van wat in het bestand staat — leg het daarna wel vast.
+6. Breekt een scherm na een update: `tools/ds-update.sh --revert`. Dat zet de bestanden **en** de pin
+   terug naar de kopie van vóór de update.
 
 > Op termijn komt deze schakelaar in de prototype-toolbar; tot die tijd is `ds-pin.json` plus de
 > prompt de plek waar het geregeld wordt.
