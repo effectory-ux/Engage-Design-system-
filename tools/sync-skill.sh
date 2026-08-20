@@ -54,6 +54,8 @@ cp "$ROOT/VERSION" "$SKILL_SRC/VERSION"
 # Keep the **Version:** line in SKILL.md in sync with the VERSION file
 sed -i.bak "s/^\*\*Version:\*\*.*/**Version:** $VER/" "$SKILL_SRC/SKILL.md" && rm -f "$SKILL_SRC/SKILL.md.bak"
 
+cp "$ROOT/tools/ds-update.sh" "$SKILL_SRC/ds-update.sh"
+chmod +x "$SKILL_SRC/ds-update.sh"
 cp "$ROOT/tools/ds-skill.sh" "$SKILL_SRC/ds-skill.sh"
 chmod +x "$SKILL_SRC/ds-skill.sh"
 cp "$ROOT/skill-manifest.json" "$SKILL_SRC/skill-manifest.json"
