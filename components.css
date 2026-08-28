@@ -2040,6 +2040,36 @@ span.inline-notif-icon.is-subtle i[data-icon] { width: 24px; height: 24px; displ
 .btn-tertiary { background: transparent; border-color: transparent; color: var(--content-secondary); }
 .btn-tertiary:hover, .btn-tertiary.is-hover { background: var(--bg-base-hover); color: var(--content-base); }
 
+/* Colour set — the card takes the subtle tint and the call-to-action the matching accent.
+   Every state the button reads is pointed at that family, so hover and press cannot fall back
+   to the brand teal. Only the negative family has a -pressed token; the others hold at hover. */
+.announcement.is-blue { background: var(--bg-info-subtle); }
+.announcement.is-blue .btn-primary {
+  --bg-brand: var(--bg-info); --border-brand: var(--border-info-hover);
+  --bg-brand-hover: var(--bg-info-hover); --bg-brand-pressed: var(--bg-info-hover);
+  --border-brand-pressed: var(--border-info-hover);
+}
+.announcement.is-green { background: var(--bg-positive-subtle); }
+.announcement.is-green .btn-primary {
+  --bg-brand: var(--bg-positive); --border-brand: var(--border-positive-hover);
+  --bg-brand-hover: var(--bg-positive-hover); --bg-brand-pressed: var(--bg-positive-hover);
+  --border-brand-pressed: var(--border-positive-hover);
+}
+/* orange is light enough that the label has to go dark */
+.announcement.is-orange { background: var(--bg-warning-subtle); }
+.announcement.is-orange .btn-primary {
+  --bg-brand: var(--bg-warning); --border-brand: var(--border-warning);
+  --bg-brand-hover: var(--bg-warning-hover); --bg-brand-pressed: var(--bg-warning-hover);
+  --border-brand-pressed: var(--border-warning-hover);
+  --content-on-brand-base: var(--content-base);
+}
+.announcement.is-red { background: var(--bg-negative-subtle); }
+.announcement.is-red .btn-primary {
+  --bg-brand: var(--bg-negative); --border-brand: var(--border-negative-hover);
+  --bg-brand-hover: var(--bg-negative-hover); --bg-brand-pressed: var(--bg-negative-pressed);
+  --border-brand-pressed: var(--border-negative-pressed);
+}
+
 /* Stacked = card deck: real cards behind the front one, promoting one step on advance */
 .ann-deck { position: relative; width: 260px; }
 .ann-deck .announcement { transition: transform .42s cubic-bezier(.3,.1,.3,1), opacity .42s ease; }
