@@ -1123,11 +1123,21 @@
     /* positioning only — the menu itself uses the design-system .menu / .menu-item component */
     .act-goal-menu { position: absolute; top: calc(100% + var(--spacing-extra-tight)); left: 0; z-index: 40; width: max-content; min-width: 180px; }
     .act-goal-menu[hidden] { display: none; }
-    .goal-chip { display: inline-flex; align-items: center; gap: var(--spacing-tight); padding: var(--spacing-extra-tight) var(--spacing-tight); border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; line-height: 18px; letter-spacing: 0.8px; text-transform: uppercase; }
+    /* The response chip, one style everywhere it appears: the side panel, its dropdown,
+       the pin popovers and the Actions table. */
+    .goal-chip { display: inline-flex; align-items: center; gap: 6px; padding: var(--spacing-extra-tight) var(--spacing-base-tight); border-radius: var(--radius-full); font-size: 12px; font-weight: 600; white-space: nowrap; }
     .goal-chip i { display: flex; width: 14px; height: 14px; }
-    .goal-chip.is-improve { background: var(--bg-warning); color: var(--content-inverse); }
-    .goal-chip.is-promote { background: var(--bg-positive); color: var(--content-inverse); }
-    .goal-chip.is-contemplate { background: var(--bg-disabled); color: var(--content-base); }
+    .goal-chip.is-improve { background: var(--bg-brand-subtle); color: var(--content-brand); }
+    .goal-chip.is-monitor { background: var(--bg-info-subtle); color: var(--content-info); }
+    .goal-chip.is-support { background: var(--bg-negative-subtle); color: var(--content-negative); }
+    .goal-chip.is-promote { background: var(--bg-positive-subtle); color: var(--content-positive); }
+    /* Single-select goal menu: the check marks the current goal, so it only shows on that row.
+       The row's highlight is neutral — the DS default is --bg-brand-subtle, which is exactly the
+       Improve chip's own background, so that chip would vanish when selected. */
+    .act-goal-opt.is-selected, .act-goal-opt.is-selected:hover { background: var(--bg-secondary); }
+    .act-goal-opt { justify-content: space-between; }
+    .act-goal-opt .menu-item-check { visibility: hidden; }
+    .act-goal-opt.is-selected .menu-item-check { visibility: visible; }
     /* "Remove goal & actions" — only shown once a goal is set */
     .act-goal-remove-sep, .act-goal-remove { display: none; }
     .act-goal-menu.has-goal .act-goal-remove-sep { display: block; }
@@ -1342,6 +1352,10 @@
     }
     .fv-card-head { display: flex; flex-direction: column; gap: var(--spacing-base-tight); }
     .fv-card-top { display: flex; align-items: flex-start; gap: var(--spacing-base-tight); }
+    /* the question can run to two lines; its controls stay centred against it as one row */
+    .fv-card-top > .fv-relevance,
+    .fv-card-top > .fv-score,
+    .fv-card-top > .fv-card-cta { align-self: center; }
     .fv-card-q { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spacing-extra-tight); }
     .fv-card-question { margin: 0; font-size: 14px; font-weight: 600; line-height: 22px; color: var(--content-base); }
     .fv-card .fv-card-question { font-size: 16px; line-height: 24px; }
@@ -1354,30 +1368,22 @@
     .fv-score.is-focus { background: var(--bg-warning); color: var(--content-inverse); }
     .fv-score.is-win { background: var(--bg-positive); color: var(--content-inverse); }
 
-    .fv-relevance { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--spacing-base); }
-    .fv-rel-btn { display: inline-flex; align-items: center; gap: var(--spacing-extra-tight); font-size: 12px; font-weight: 500; color: var(--content-secondary); cursor: pointer; }
-    .fv-rel-btn i { display: flex; width: 12px; height: 12px; }
+    /* Relevance sits in the card's top row as two icon buttons; the label is the tooltip. */
+    .fv-relevance { flex: none; display: inline-flex; align-items: center; gap: var(--spacing-extra-tight); margin: 0 var(--spacing-tight); }
+    .fv-thumb { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--border-base); border-radius: var(--radius-base); background: var(--bg-base); color: var(--content-secondary); cursor: pointer; transition: border-color var(--motion-fast) var(--ease-out), background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+    .fv-thumb:hover { border-color: var(--border-action-hover); color: var(--content-base); }
+    .fv-thumb i { display: flex; width: 15px; height: 15px; }
+    .fv-thumb.is-on-up { background: var(--bg-positive-subtle); border-color: var(--border-positive); color: var(--content-positive); }
+    .fv-thumb.is-on-down { background: var(--bg-negative-subtle); border-color: var(--border-negative); color: var(--content-negative); }
+    .fv-relevance .tt-demo .tooltip { z-index: 3; }
 
-    .fv-divider { height: 1px; width: 100%; background: var(--border-base); }
 
     .fv-approach { display: flex; flex-direction: column; gap: var(--spacing-base); }
-    .fv-approach-lbl { display: flex; align-items: center; gap: var(--spacing-tight); font-size: 14px; font-weight: 400; color: var(--content-base); }
-    .fv-approach-lbl i { display: flex; width: 20px; height: 20px; color: var(--content-highlight-secondary); }
-    .fv-approach-chips { display: flex; flex-wrap: wrap; gap: var(--spacing-base-tight); }
-    .fv-approach-chips .rb-btn-bordered.is-checked { background: var(--bg-brand-subtle); border-color: var(--border-brand-subtle); }
 
     /* Active focus card (an approach is selected) */
     .fv-card.is-active { border-color: var(--border-warning-subtle); box-shadow: var(--sh-card); }
 
     /* Recommended-action card (appears on selection) */
-    .fv-reco {
-      display: flex; flex-direction: column; gap: var(--spacing-base);
-      padding: var(--spacing-loose); background: var(--bg-base);
-      border: 1px solid var(--border-base); border-radius: var(--radius-md); box-shadow: var(--sh-card);
-    }
-    .fv-reco[hidden] { display: none; }
-    .fv-reco-content { display: flex; flex-direction: column; gap: var(--spacing-tight); }
-    .fv-reco-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-base); }
     .fv-reco-title-wrap { display: flex; flex-direction: column; gap: var(--spacing-tight); }
     .fv-reco-eyebrow { font-size: 12px; font-weight: 600; line-height: 18px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--content-subtle); }
     .fv-reco-title { margin: 0; font-size: 16px; font-weight: 600; line-height: 24px; color: var(--content-base); }
@@ -1389,8 +1395,6 @@
     .fv-reco-effort.is-medium { background: var(--bg-accent-yellow-subtle); color: var(--content-accent-yellow); }
     .fv-reco-effort.is-high { background: var(--bg-accent-orange-subtle); color: var(--content-accent-orange); }
     .fv-reco-body { margin: 0; font-size: 14px; line-height: 1.6; color: var(--content-secondary); }
-    .fv-reco-add { align-self: flex-start; }
-    .fv-reco-add i { display: flex; width: 16px; height: 16px; }
     .fv-create.btn-link { align-self: flex-start; gap: var(--spacing-tight); padding: 0; }
     .fv-create.btn-link i { display: flex; width: 16px; height: 16px; }
 
@@ -1403,6 +1407,9 @@
     .fv-win-card .fv-card-q { flex: 1; }
     .fv-win-card .fv-card-question { font-size: 16px; line-height: 24px; }
     .fv-win-card .fv-card-theme { font-size: 12px; line-height: 19px; }
+    /* an answered win keeps its row, with the response on the button */
+    .fv-choose-btn.is-chosen { background: var(--bg-brand-subtle); border-color: var(--border-brand); color: var(--content-brand); }
+    .fv-choose-btn.is-chosen i { display: flex; width: 15px; height: 15px; }
 
     /* ──────────────────────────────────────────────
        Responsiveness
@@ -1527,30 +1534,32 @@
     .ap-export-menu, .ap-kebab-menu { position: absolute; z-index: 30; right: 0; top: calc(100% + var(--spacing-extra-tight)); width: max-content; min-width: 180px; }
     .ap-export-menu[hidden], .ap-kebab-menu[hidden] { display: none; }
 
-    .ap-thead, .ap-row { display: grid; grid-template-columns: 1fr 72px 150px 184px 36px; align-items: center; gap: var(--spacing-base); }
-    .ap-thead { padding: var(--spacing-tight) var(--spacing-base); background: var(--bg-secondary); border-radius: var(--radius-base) var(--radius-base) 0 0; }
-    .ap-th { font-size: 12px; font-weight: 500; color: var(--content-secondary); justify-self: start; }
+    /* Actions table — a card, with an uppercase header band */
+    .ap-table { border: 1px solid var(--border-base); border-radius: var(--radius-md); background: var(--bg-base); box-shadow: var(--sh-card); }
+    .ap-thead, .ap-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px 168px 190px 44px; align-items: center; gap: var(--spacing-base); padding: var(--spacing-base) var(--spacing-loose); }
+    .ap-thead { background: var(--bg-secondary); border-radius: var(--radius-md) var(--radius-md) 0 0; }
+    .ap-th { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--content-subtle); justify-self: start; }
     .ap-sort { background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: var(--spacing-extra-tight); border-radius: var(--radius-sm); padding: var(--spacing-extra-tight); margin: calc(-1 * var(--spacing-extra-tight)); }
     .ap-sort i { width: 14px; height: 14px; display: flex; }
     .ap-sort:hover { color: var(--content-secondary); }
     .ap-sort.is-active { color: var(--content-brand); }
     .ap-goal-none { color: var(--content-subtle); }
 
-    .ap-row { min-height: 76px; padding: 0 var(--spacing-base); border-top: 1px solid var(--border-base); cursor: pointer; }
-    .ap-tbody .ap-row:first-child { border-top: 0; }
-    .ap-tbody .ap-row:last-child { border-bottom: 1px solid var(--border-base); }
-    .ap-row:hover { background: var(--bg-base-hover); }
-    .ap-name { font-size: 14px; color: var(--content-base); font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .ap-score { font-size: 14px; color: var(--content-base); }
+    .ap-row { border-top: 1px solid var(--border-base); cursor: pointer; transition: background var(--motion-fast) var(--ease-out); }
+    .ap-row:hover { background: var(--bg-secondary); }
+    /* name over its theme, so the row reads as the focus area it came from */
+    .ap-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--content-base); }
+    .ap-score { font-size: 14px; font-weight: 600; color: var(--content-secondary); }
     .ap-goal { display: flex; }
     .ap-prog-cell { display: flex; }
-    .ap-prog { display: flex; align-items: center; gap: var(--spacing-tight); }
-    .ap-bar { width: 96px; height: 6px; background: var(--bg-tertiary); border-radius: var(--radius-full); overflow: hidden; flex: none; }
+    .ap-prog { display: flex; align-items: center; gap: var(--spacing-tight); width: 100%; }
+    .ap-bar { flex: 1; height: 6px; background: var(--bg-tertiary); border-radius: var(--radius-full); overflow: hidden; }
     .ap-bar-fill { height: 100%; background: var(--bg-brand); border-radius: var(--radius-full); }
-    .ap-bar-count { font-size: 12px; color: var(--content-secondary); }
+    .ap-bar-count { font-size: 12px; font-weight: 600; color: var(--content-secondary); white-space: nowrap; }
     .ap-kebab-wrap { position: relative; display: flex; justify-content: flex-end; }
     .app-eyebrow { font-size: 14px; font-weight: 600; color: var(--content-base); }
-    .sp-title.is-editable { cursor: text; border-radius: var(--radius-md); outline: none; padding: var(--spacing-base-tight); margin: calc(-1 * var(--spacing-base-tight)); box-shadow: inset 0 0 0 1px transparent; transition: box-shadow var(--motion-fast) var(--ease-out); }
+    /* An editable pin title reads as a field, so it carries its border at rest too. */
+    .sp-title.is-editable { cursor: text; border-radius: var(--radius-md); outline: none; padding: var(--spacing-base-tight); margin: calc(-1 * var(--spacing-base-tight)); box-shadow: inset 0 0 0 1px var(--border-base); transition: box-shadow var(--motion-fast) var(--ease-out); }
     .sp-title.is-editable:hover { box-shadow: inset 0 0 0 1px var(--border-action); }
     .sp-title.is-editable:focus { box-shadow: inset 0 0 0 1px var(--border-brand); }
     .sp-title.is-editable:empty::before { content: attr(data-placeholder); color: var(--content-placeholder); }
@@ -1565,9 +1574,10 @@
     .sc-pin-score { color: var(--content-secondary); font-weight: 500; }
     /* a pinned pin is a filled icon in its goal colour (stays even non-hover) */
     .sc-pin.is-pinned { color: var(--content-brand); }
-    .sc-pin.is-pinned.is-goal-promote { color: var(--bg-positive); }
-    .sc-pin.is-pinned.is-goal-improve { color: var(--bg-warning); }
-    .sc-pin.is-pinned.is-goal-contemplate { color: var(--content-secondary); }
+    .sc-pin.is-pinned.is-goal-promote { color: var(--content-positive); }
+    .sc-pin.is-pinned.is-goal-improve { color: var(--content-brand); }
+    .sc-pin.is-pinned.is-goal-monitor { color: var(--content-info); }
+    .sc-pin.is-pinned.is-goal-support { color: var(--content-negative); }
     .sc-row.is-pinning { position: relative; z-index: 50; }
     .sc-row.is-pinning .sc-actions { display: flex; }
     /* card/row whose pin popover is open: lift above siblings + don't clip the popover */
@@ -1576,7 +1586,7 @@
     .sc-pin-wrap.sc-pin-multi { display: inline-flex; align-items: center; }
     .sc-pin-count { display: inline-flex; align-items: center; color: var(--content-secondary); font-size: 14px; font-weight: 600; margin-right: 2px; }
     .sc-pin-count[hidden] { display: none; }
-    /* multi-item card pin: filled grey when items are pinned (like contemplate) */
+    /* multi-item card pin: filled grey when items are pinned */
     .sc-pin-multi .sc-pin.is-pinned { color: var(--content-secondary); }
     .sc-pinlist-item { align-items: flex-start; }
     .sc-pinlist-item .menu-item-title { white-space: normal; }
@@ -1585,9 +1595,10 @@
     .sc-pinlist-meta:empty { display: none; }
     .sc-pinlist-pin { display: none; width: 16px; height: 16px; flex: none; align-self: center; color: var(--content-brand); }
     .sc-pinlist-item.is-pinned .sc-pinlist-pin { display: flex; }
-    .sc-pinlist-pin.is-goal-promote { color: var(--bg-positive); }
-    .sc-pinlist-pin.is-goal-improve { color: var(--bg-warning); }
-    .sc-pinlist-pin.is-goal-contemplate { color: var(--content-secondary); }
+    .sc-pinlist-pin.is-goal-promote { color: var(--content-positive); }
+    .sc-pinlist-pin.is-goal-improve { color: var(--content-brand); }
+    .sc-pinlist-pin.is-goal-monitor { color: var(--content-info); }
+    .sc-pinlist-pin.is-goal-support { color: var(--content-negative); }
     .sc-pin-back { display: inline-flex; align-items: center; gap: var(--spacing-extra-tight); background: none; border: 0; cursor: pointer; font: inherit; font-size: 12px; color: var(--content-secondary); padding: var(--spacing-extra-tight) 0; margin-bottom: var(--spacing-extra-tight); }
     .sc-pin-back i { width: 14px; height: 14px; display: flex; }
 
@@ -1637,3 +1648,228 @@
     .fb-done-ico i { width: 100%; height: 100%; display: flex; }
     .fb-done h4 { font-size: 18px; margin: 0 0 var(--spacing-extra-tight); color: var(--content-base); }
     .fb-done p { font-size: 14px; color: var(--content-secondary); margin: 0; }
+
+/* ═══════════ Focus View: the respond dialog ═══════════
+   A focus card is answered in a dialog rather than on the card: pick a response, plan it, done.
+   Ported from the Action Center stepper prototype. */
+
+/* The card's collapsed head: a fixed-width slot for the CTA so scores stay aligned whether or
+   not the area has been answered. */
+.fv-card-cta { flex: none; width: 108px; display: flex; align-items: center; justify-content: flex-end; }
+.fv-card-cta .fv-choose-btn { width: 100%; justify-content: center; }
+.fv-choose-btn { flex: none; gap: 6px; }
+.fv-choose-btn i { display: flex; width: 15px; height: 15px; }
+
+/* Why this question is a focus area — one short signal under the score row. */
+.fv-smarttag-row { display: flex; align-items: center; gap: var(--spacing-base-tight); margin-top: var(--spacing-base-tight); min-width: 0; }
+.fv-smarttag { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: var(--spacing-extra-tight) var(--spacing-base-tight); border-radius: var(--radius-full); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.fv-smarttag i { display: flex; width: 14px; height: 14px; }
+.fv-smarttag.is-info { background: var(--bg-info-subtle); color: var(--content-info); }
+.fv-smarttag.is-warning { background: var(--bg-warning-subtle); color: var(--content-warning); }
+.fv-smarttag.is-accent { background: var(--bg-positive-subtle); color: var(--content-positive); }
+.fv-smarttag.is-neutral { background: var(--bg-secondary); color: var(--content-secondary); }
+
+/* Overlay + modal — .overlay (components.css) supplies the scrim, the z-index and the fade-in. */
+.step-overlay { padding: var(--spacing-loose); }
+.step-overlay[hidden] { display: none; }
+.step-modal { position: relative; display: flex; flex-direction: column; gap: var(--spacing-base); width: min(880px, 94vw); max-height: calc(100dvh - 4rem); overflow: hidden; padding: var(--spacing-loose); background: var(--bg-base); border-radius: var(--radius-lg); box-shadow: var(--sh-dialogs); }
+.step-modal > .step-body { flex: 0 1 auto; min-height: 0; }
+.step-body { display: flex; flex-direction: column; gap: var(--spacing-base); min-height: 0; justify-content: flex-start; overflow-y: auto; }
+.step-close { position: absolute; top: var(--spacing-base); right: var(--spacing-base); }
+
+/* Step bar — step 1 is always complete: the manager arrived by picking a focus area. */
+.stp-bar { display: flex; align-items: flex-start; gap: var(--spacing-tight); padding: 0 40px var(--spacing-tight); }
+.stp-step { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-tight); flex: 0 0 auto; width: 120px; text-align: center; }
+.stp-dot { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--bg-secondary); border: 1px solid var(--border-base); color: var(--content-subtle); font-size: 13px; font-weight: 600; }
+.stp-dot i { display: flex; width: 16px; height: 16px; }
+.stp-label { font-size: 13px; font-weight: 600; line-height: 1.35; color: var(--content-subtle); }
+.stp-step.is-active .stp-dot { background: var(--bg-base); border-color: var(--content-subtle); color: var(--content-base); box-shadow: 0 0 0 3px var(--bg-secondary); }
+.stp-step.is-active .stp-label { color: var(--content-base); }
+.stp-step.is-done .stp-dot { background: var(--bg-positive); border-color: var(--bg-positive); color: var(--content-inverse); }
+.stp-step.is-done .stp-label { color: var(--content-base); }
+.stp-line { flex: 1; height: 2px; min-width: 24px; margin-top: 16px; background: var(--border-base); border-radius: 2px; }
+.stp-line.is-done { background: var(--bg-positive); }
+
+/* Brief loader while the dialog moves between steps */
+.step-loading { min-height: 300px; display: flex; align-items: center; justify-content: center; }
+.step-spinner { width: 40px; height: 40px; border: 3px solid var(--border-base); border-top-color: var(--content-brand); border-radius: 50%; animation: stp-spin 0.8s linear infinite; }
+@keyframes stp-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .step-spinner { animation-duration: 2.4s; } }
+
+/* Hero */
+.step-hero { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: var(--spacing-tight); }
+.step-hero-row { display: flex; align-items: center; gap: var(--spacing-base-tight); }
+.step-hero-ico { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-base); background: var(--bg-secondary); color: var(--content-secondary); }
+.step-hero-ico i { display: flex; width: 22px; height: 22px; }
+.step-hero-ico.is-improve { background: var(--bg-brand-subtle); color: var(--content-brand); }
+.step-hero-ico.is-monitor { background: var(--bg-info-subtle); color: var(--content-info); }
+.step-hero-ico.is-support { background: var(--bg-negative-subtle); color: var(--content-negative); }
+.step-hero-ico.is-promote { background: var(--bg-positive-subtle); color: var(--content-positive); }
+.step-hero-ico.is-success { background: var(--bg-positive-subtle); color: var(--content-positive); }
+.step-h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--content-base); }
+.step-sub { margin: 0; font-size: 14px; line-height: 1.6; color: var(--content-secondary); }
+.step-context-card { background: var(--bg-secondary); cursor: default; }
+
+/* The four responses */
+.step-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--spacing-base-tight); }
+.step-opt { display: flex; flex-direction: column; align-items: flex-start; gap: var(--spacing-tight); text-align: left; padding: var(--spacing-base); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); cursor: pointer; font-family: inherit; }
+.step-opt:hover { border-color: var(--border-action); }
+.step-opt.is-selected { border-color: var(--content-brand); box-shadow: 0 0 0 1px var(--content-brand); }
+.step-opt-ico { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-base); background: var(--bg-secondary); color: var(--content-secondary); }
+.step-opt-ico i { display: flex; width: 20px; height: 20px; }
+.step-opt.is-improve .step-opt-ico { background: var(--bg-brand-subtle); color: var(--content-brand); }
+.step-opt.is-monitor .step-opt-ico { background: var(--bg-info-subtle); color: var(--content-info); }
+.step-opt.is-support .step-opt-ico { background: var(--bg-negative-subtle); color: var(--content-negative); }
+.step-opt.is-promote .step-opt-ico { background: var(--bg-positive-subtle); color: var(--content-positive); }
+.step-opt-title { font-size: 15px; font-weight: 600; color: var(--content-base); }
+.step-opt-desc { font-size: 12px; line-height: 1.5; color: var(--content-secondary); }
+@media (max-width: 760px) { .step-options { grid-template-columns: 1fr; } }
+
+/* Plan step */
+.step-plan { display: flex; flex-direction: column; gap: var(--spacing-base-tight); }
+.step-plan-h { margin: var(--spacing-tight) 0 0; font-size: 14px; font-weight: 600; color: var(--content-base); }
+.step-footer { display: flex; flex: none; justify-content: space-between; gap: var(--spacing-base); padding-top: var(--spacing-base); background: var(--bg-base); }
+
+/* Recommended actions — multi-select, one per recommendation type for this question */
+.fv-picks { display: flex; flex-direction: column; gap: var(--spacing-base-tight); }
+.fv-pick { display: flex; align-items: flex-start; gap: var(--spacing-tight); padding: var(--spacing-base); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); cursor: pointer; }
+.fv-pick:hover { border-color: var(--border-action-hover); background: var(--bg-base-hover); }
+.fv-pick.is-selected { border-color: var(--border-brand); background: var(--bg-brand-subtle); }
+.fv-pick .cb-wrap { flex: none; margin-top: 2px; }
+.fv-pick-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spacing-tight); }
+.fv-pick-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--spacing-base); }
+.fv-pick-title-wrap { display: flex; flex-direction: column; gap: var(--spacing-tight); }
+
+/* Action / monitoring step / support request form */
+.fv-newaction { display: flex; flex-direction: column; gap: var(--spacing-tight); }
+.fv-na-lbl { font-size: 13px; font-weight: 600; color: var(--content-base); }
+.fv-na-opt { font-weight: 400; color: var(--content-subtle); }
+.fa-req { color: var(--content-negative-secondary); }
+.fv-newaction .tf, .fv-newaction .ta { width: 100%; }
+.fv-na-opts { display: flex; gap: var(--spacing-base); flex-wrap: wrap; }
+.fv-na-field { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: var(--spacing-extra-tight); }
+.fv-newaction .fv-na-field input.tf { height: 40px; }
+/* Due date uses the design system's date picker in a popover, not a native date input. */
+.fv-na-dp-wrap { position: relative; display: flex; align-items: center; gap: var(--spacing-tight); min-height: 40px; }
+.fv-na-dp { position: absolute; top: calc(100% + var(--spacing-extra-tight)); left: 0; z-index: 40; }
+.fv-na-dp[hidden] { display: none; }
+/* the modal clips its content, so let the open picker escape it */
+.step-modal:has(.fv-na-dp:not([hidden])), .step-modal:has(.fv-na-dp:not([hidden])) .step-body { overflow: visible; }
+
+/* Actions added by hand, before the response is confirmed */
+.fv-custom-list { display: flex; flex-direction: column; gap: var(--spacing-tight); margin-top: var(--spacing-tight); }
+.fv-custom-item { display: flex; align-items: flex-start; gap: var(--spacing-base-tight); padding: var(--spacing-base-tight) var(--spacing-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); background: var(--bg-base); }
+.fv-custom-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fv-custom-title { font-size: 14px; font-weight: 600; color: var(--content-base); }
+.fv-custom-desc { font-size: 13px; color: var(--content-secondary); }
+.fv-custom-meta { display: inline-flex; flex-wrap: wrap; gap: var(--spacing-base-tight); margin-top: 2px; }
+.fv-custom-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--content-secondary); }
+.fv-custom-tag i { display: flex; width: 13px; height: 13px; }
+.fv-custom-x { flex: none; }
+
+/* Success step */
+.step-modal.is-success { width: min(468px, 94vw); }
+.step-modal.is-success .step-body { min-height: 0; }
+.step-success { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--spacing-tight); padding: var(--spacing-tight) 0 0; }
+.step-success-ico { width: 56px; height: 56px; border-radius: var(--radius-full); }
+.step-success-ico i { width: 28px; height: 28px; }
+.step-success .step-sub { max-width: 42ch; margin: 0 auto; text-wrap: balance; }
+.step-success-acts { display: flex; flex-wrap: wrap; gap: var(--spacing-base-tight); justify-content: center; margin-top: var(--spacing-loose); }
+
+/* Closing with unsaved input asks first, in a small popover at the X */
+.step-close-confirm { position: absolute; top: 58px; right: 20px; z-index: 30; width: 268px; padding: var(--spacing-base); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); box-shadow: var(--sh-popovers); }
+.step-close-confirm::before { content: ''; position: absolute; top: -7px; right: 20px; width: 12px; height: 12px; background: var(--bg-base); border-left: 1px solid var(--border-base); border-top: 1px solid var(--border-base); transform: rotate(45deg); }
+.scc-text { margin: 0 0 var(--spacing-base-tight); font-size: 13px; line-height: 1.5; color: var(--content-base); }
+.scc-actions { display: flex; justify-content: flex-end; gap: var(--spacing-tight); }
+
+/* "Not relevant" — a short reasons picker, so a thumbs-down still tells HR something */
+.nr-modal { width: min(520px, 94vw); }
+.nr-list { display: flex; flex-direction: column; gap: var(--spacing-tight); }
+.nr-other { width: 100%; margin-top: var(--spacing-tight); }
+
+/* ═══════════ Focus View: an answered card ═══════════ */
+.fa-done { display: flex; flex-direction: column; padding: var(--spacing-base-tight) var(--spacing-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); background: var(--bg-base); }
+.fa-done-row { display: flex; align-items: center; gap: var(--spacing-base-tight); }
+.fa-done-ico { flex: none; width: 32px; height: 32px; border-radius: var(--radius-base); display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); color: var(--content-secondary); }
+.fa-done-ico i { display: flex; width: 18px; height: 18px; }
+.fa-done-ico.is-improve { background: var(--bg-brand-subtle); color: var(--content-brand); }
+.fa-done-ico.is-monitor { background: var(--bg-info-subtle); color: var(--content-info); }
+.fa-done-ico.is-support { background: var(--bg-negative-subtle); color: var(--content-negative); }
+.fa-done-ico.is-promote { background: var(--bg-positive-subtle); color: var(--content-positive); }
+.fa-done-body { flex: 1; min-width: 0; }
+.fa-done-title { font-size: 14px; font-weight: 600; color: var(--content-base); }
+.fa-done-note { font-size: 12px; line-height: 1.5; color: var(--content-secondary); }
+.fa-done-details { display: flex; flex-direction: column; gap: var(--spacing-base-tight); margin-top: var(--spacing-base-tight); padding-top: var(--spacing-base-tight); border-top: 1px solid var(--border-base); }
+.fa-done-line { margin: 0; font-size: 14px; color: var(--content-base); }
+.fa-done-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--spacing-tight); }
+.fa-done-item { display: flex; align-items: center; gap: var(--spacing-base-tight); font-size: 14px; color: var(--content-base); }
+.fa-done-editrow { display: flex; margin-top: var(--spacing-tight); }
+.fa-done-editlink { flex: none; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; text-decoration: none; font-size: 13px; cursor: pointer; }
+.fa-done-editlink i { display: flex; width: 13px; height: 13px; }
+
+/* A support request, shown as the message that was sent */
+.fa-ask { display: flex; align-items: flex-start; gap: var(--spacing-base-tight); }
+.fa-ask > .av { flex: none; }
+.fa-ask-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spacing-tight); }
+.fa-ask-bubble { position: relative; align-self: flex-start; max-width: 100%; padding: var(--spacing-base-tight) var(--spacing-base); background: var(--bg-secondary); border-radius: var(--radius-md); font-size: 14px; line-height: 1.5; color: var(--content-base); }
+.fa-ask-to { display: flex; align-items: center; gap: var(--spacing-tight); font-size: 12px; color: var(--content-secondary); }
+
+@media (max-width: 1199px) { .fv-card-cta { width: auto; } }
+/* Narrow screens: three labelled steps do not fit next to the close button, so the bar keeps the
+   dots and drops the labels. */
+@media (max-width: 600px) {
+  .stp-bar { padding: 0 var(--spacing-extra-loose) var(--spacing-tight) 0; }
+  .stp-step { width: auto; }
+  .stp-label { display: none; }
+  .step-modal { padding: var(--spacing-base); }
+  .step-footer .btn { flex: 1; justify-content: center; }
+}
+
+/* ═══════════ Actions page: responses, not just pins ═══════════
+   The page leads with what has been decided — a count per response, then the table.
+   Ported from the Action Center stepper prototype. */
+.actions-page { display: flex; flex-direction: column; gap: var(--spacing-loose); }
+.actions-head { display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; gap: var(--spacing-base); }
+.actions-head-txt { display: flex; flex-direction: column; gap: var(--spacing-tight); min-width: 0; max-width: 68ch; }
+.actions-head-cta { display: flex; gap: var(--spacing-base-tight); flex: none; }
+.actions-head-cta i { display: flex; width: 16px; height: 16px; }
+@media (max-width: 720px) { .actions-head { flex-direction: column; } .actions-head-cta { width: 100%; } }
+
+.actions-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-base); }
+.actions-summary[hidden] { display: none; }
+.act-sum { display: flex; align-items: center; gap: var(--spacing-base-tight); padding: var(--spacing-base); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); box-shadow: var(--sh-card); }
+.act-sum-ico { flex: none; width: 40px; height: 40px; border-radius: var(--radius-base); display: inline-flex; align-items: center; justify-content: center; background: var(--bg-secondary); color: var(--content-secondary); }
+.act-sum-ico i { display: flex; width: 20px; height: 20px; }
+.act-sum.is-improve .act-sum-ico { background: var(--bg-brand-subtle); color: var(--content-brand); }
+.act-sum.is-monitor .act-sum-ico { background: var(--bg-info-subtle); color: var(--content-info); }
+.act-sum.is-support .act-sum-ico { background: var(--bg-negative-subtle); color: var(--content-negative); }
+.act-sum.is-promote .act-sum-ico { background: var(--bg-positive-subtle); color: var(--content-positive); }
+.act-sum-txt { display: flex; flex-direction: column; }
+.act-sum-n { font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--content-base); }
+.act-sum-l { font-size: 12px; color: var(--content-secondary); }
+@media (max-width: 900px) { .actions-summary { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) { .ap-thead { display: none; } .ap-row { grid-template-columns: 1fr auto; row-gap: var(--spacing-tight); } .ap-score { display: none; } }
+
+/* The theme a pinned question belongs to, under its name in the table */
+.ap-name-theme { display: block; font-size: 12px; font-weight: 400; color: var(--content-secondary); }
+/* "Add action" reads as a link in the row, not a competing button */
+.ap-addaction { display: inline-flex; align-items: center; gap: var(--spacing-tight); background: none; border: 0; padding: 0; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--content-brand); cursor: pointer; }
+.ap-addaction i { display: flex; width: 16px; height: 16px; }
+.ap-addaction:hover { text-decoration: underline; }
+.ap-toolbar[hidden], .ap-table[hidden] { display: none; }
+
+/* Empty state — the four responses explained with the same cards the dialog uses */
+.actions-empty { display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: var(--spacing-loose); padding: var(--spacing-extra-loose); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); }
+.ae-hero { display: flex; align-items: center; gap: var(--spacing-extra-loose); width: 100%; }
+.ae-hero-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spacing-tight); }
+.ae-title { margin: 0; font-size: 22px; font-weight: 700; color: var(--content-base); }
+.ae-desc { margin: 0; font-size: 15px; line-height: 1.5; color: var(--content-secondary); }
+.ae-illo { flex: none; }
+.actions-illo { display: block; height: 140px; width: auto; }
+.ae-options { width: 100%; }
+.step-opt.is-static { cursor: default; }
+.step-opt.is-static:hover { border-color: var(--border-base); }
+.ae-cta-row { display: flex; justify-content: center; }
+.ae-cta { gap: 6px; }
+.ae-cta i { display: flex; width: 16px; height: 16px; }
+@media (max-width: 900px) { .ae-hero { flex-direction: column-reverse; align-items: flex-start; gap: var(--spacing-base); } }

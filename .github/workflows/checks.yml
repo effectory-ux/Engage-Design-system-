@@ -34,6 +34,12 @@ jobs:
       - name: docs pages and stylesheets resolve
         run: ./tools/check-docs-assets.py
 
+      # A native <input type="date"> (and friends) renders the browser's own widget:
+      # wrong typography, wrong colours, no tokens, different per OS. Nothing errors,
+      # so it only ever surfaces when someone spots it in a screenshot.
+      - name: no native controls the DS already covers
+        run: ./tools/check-native-controls.py
+
       # skill-manifest.json is what the org skill fetches to find screens and the
       # reference. It is generated from the registry, so a stale commit would point
       # the whole org at the wrong set.

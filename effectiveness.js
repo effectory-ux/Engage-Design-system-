@@ -776,76 +776,612 @@ const FOCUS_TYPES = {
   'I am able to maintain a good balance between working and relaxing': ['Self directed', 'Team level action', 'Process / structural action']
 };
 
-/* ---------- Focus View (second tab) ---------- */
-function focusView(d) {
-  const npsValue = d.npsPromoters - d.npsDetractors;
-  /* Theme labels per question — questions match the overview's Highest/Lowest cards */
-  const THEME = {
-    /* focus items (lowest scores) */
-    'I know what results are expected of me at work': 'Work performance',
-    'Doing my work gives me energy': 'Wellbeing and workload',
-    'I am provided with good work resources': 'Work enablement',
-    'My skills and abilities fit in well with my job': 'Work performance',
-    'I enjoy doing my work / tasks': 'Work enjoyment',
-    'Important information is readily accessible for me': 'Work enablement',
-    'I am able to maintain a good balance between working and relaxing': 'Wellbeing and workload',
-    /* wins items (highest scores) */
-    'I feel comfortable within the team': 'Engagement',
-    'Our team trusts one another': 'Collaboration',
-    'During a team meeting, everyone has a fair chance to speak up': 'Collaboration',
-    'There is a relaxed atmosphere within our team': 'Wellbeing and workload',
-    'I enjoy my work': 'Work enjoyment'
-  };
-  const fxMarker = (m) => `<div class="fx-marker ${m.variant} ${m.chip}" style="left:${m.x}%;top:${100 - m.y}%"><div class="fx-dot"></div><div class="fx-chip"><i data-icon="${m.icon}"></i>${m.label}</div></div>`;
-  const trend = (val) => val ? `<div class="fv-trend-row"><span class="fv-trend">${val} <i data-icon="arrow-up"></i></span><span class="fv-trend-note">vs previous survey</span></div>` : '';
-  const verdictClass = 'is-' + d.efpLeadEm.toLowerCase().replace(/\s+/g, '-');
-  const approach = (i, q) => (FOCUS_TYPES[q] || APPROACHES)
-    .map(a => `<button class="rb-btn-bordered" data-appr="${a}"><span class="rb-wrap"><input type="radio" class="rb" name="appr-${i}"></span>${a}</button>`).join('');
+/* ---------- Focus View: responding to a focus area ---------- */
+/* A focus card is a decision, not a form. The card stays collapsed until the manager picks how
+   they will respond — Improve, Monitor, Need support or Promote — in a short dialog, and plans it
+   there. The response is written to actState(q).goal, so the pin, the side panels and the Action
+   Planner all follow from the same choice; the store below only holds what the dialog needs on top
+   of that (the picked recommendations, the drafts, and whether the response was confirmed). */
+const RESP_DESC = {
+  improve: 'Something the team can influence, so commit to a concrete next step now.',
+  monitor: 'Not urgent yet, so keep it on your radar and revisit at the next survey.',
+  support: "Outside the team's control, so flag it for the right person to pick up.",
+  promote: 'A real strength worth celebrating, so plan a way to share the win with your team or more widely.'
+};
+/* How much a recommendation asks of the manager — drives the effort chip on each option. */
+const EFFORT = { 'Self directed': 'low', '1 on 1 action': 'low', 'Team level action': 'medium', 'Process / structural action': 'high' };
+const EFFORT_LABEL = { low: 'Low effort', medium: 'Medium effort', high: 'High effort' };
 
-  const focusCard = (s, i) => `
-    <div class="fv-card" data-q="${s.q}">
+const FOCUS_RESP = {};
+const focusResp = (q) => FOCUS_RESP[q] || (FOCUS_RESP[q] = {
+  done: false, picked: [], custom: [], creating: false,
+  draft: { title: '', desc: '', due: '', assignee: '' },
+  monitorTitle: '', monitorNote: '', supportTitle: '', supportText: '', supportPerson: ''
+});
+const focusDecided = (q) => !!(focusResp(q).done && actState(q).goal);
+
+/* Theme labels per question — questions match the overview's Highest/Lowest cards */
+const FV_THEME = {
+  /* focus items (lowest scores) */
+  'I know what results are expected of me at work': 'Work performance',
+  'Doing my work gives me energy': 'Wellbeing and workload',
+  'I am provided with good work resources': 'Work enablement',
+  'My skills and abilities fit in well with my job': 'Work performance',
+  'I enjoy doing my work / tasks': 'Work enjoyment',
+  'Important information is readily accessible for me': 'Work enablement',
+  'I am able to maintain a good balance between working and relaxing': 'Wellbeing and workload',
+  /* wins items (highest scores) */
+  'I feel comfortable within the team': 'Engagement',
+  'Our team trusts one another': 'Collaboration',
+  'During a team meeting, everyone has a fair chance to speak up': 'Collaboration',
+  'There is a relaxed atmosphere within our team': 'Wellbeing and workload',
+  'I enjoy my work': 'Work enjoyment'
+};
+
+/* Why this question is a focus area — a short signal on the card, worked out from the question's
+   own benchmark and its previous score, so the tag states something true rather than decorative.
+   One tag per card, the most telling reason first. */
+const SMART_TAGS = {
+  bench: { icon: 'benchmark-down', label: 'Furthest below benchmark', tone: 'info' },
+  drop:  { icon: 'Trend-down', label: 'Biggest drop', tone: 'warning' },
+  rise:  { icon: 'Trend-up', label: 'Improving, still behind', tone: 'accent' },
+  below: { icon: 'arrow-down', label: 'Below benchmark', tone: 'neutral' }
+};
+const fvScoreRow = (q) => {
+  for (const grp of SCORES_GROUPS) { const r = grp.rows.find(x => x.q === q); if (r) return r; }
+  return null;
+};
+function fvSmartTags(d, rows) {
+  const g = groupKey(d), p = periodKey(d);
+  const info = rows.map(s => {
+    const r = fvScoreRow(s.q);
+    const prev = (r && p === 'after') ? r.v[g].before : null;
+    const change = prev == null ? 0 : s.s - prev;
+    return { q: s.q, gap: r ? r.bench - s.s : 0, change };
+  });
+  const tags = {};
+  /* Widest benchmark gap, then the sharpest decline, then the clearest recovery that has not
+     caught up yet. Each reason is claimed by one card only; a card that fits none of them, but
+     still sits under its benchmark, takes the plain tag. */
+  const claim = (tag, candidates, rank) => {
+    const winner = candidates.filter(x => !tags[x.q]).sort((a, b) => rank(b) - rank(a))[0];
+    if (winner) tags[winner.q] = tag;
+  };
+  claim('bench', info.filter(x => x.gap > 0), x => x.gap);
+  claim('drop', info.filter(x => x.change < 0), x => -x.change);
+  claim('rise', info.filter(x => x.change > 0 && x.gap > 0), x => x.change);
+  info.forEach(x => { if (!tags[x.q] && x.gap > 0) tags[x.q] = 'below'; });
+  return tags;
+}
+const smartTagHTML = (key) => {
+  const t = SMART_TAGS[key];
+  return t ? `<div class="fv-smarttag-row"><span class="fv-smarttag is-${t.tone}"><i data-icon="${t.icon}"></i> ${t.label}</span></div>` : '';
+};
+
+/* The cards currently on screen, so a confirmed response can re-render them in place. */
+let FV_CARDS = [];
+let FV_WINS = [];
+/* A question's score row, wherever it sits — a focus area or a win. */
+const fvRowFor = (q) => FV_CARDS.find(c => c.q === q) || FV_WINS.find(c => c.q === q) || null;
+const fvIsWin = (q) => FV_WINS.some(c => c.q === q);
+
+/* Is this worth our attention? Two icon buttons in the card's top row — the label lives in the
+   tooltip, so the control stays out of the way of the question and the score. */
+function relevanceThumbsHTML(q) {
+  const T2 = (s) => window.tr ? tr(s) : s;
+  const r = focusResp(q).relevance;
+  const thumb = (dir, icon, label) => `<span class="tt-demo">
+      <button type="button" class="fv-thumb${r === dir ? ' is-on-' + dir : ''}" data-fv-rel="${dir}" aria-label="${T2(label)}" aria-pressed="${r === dir}"><i data-icon="${icon}"></i></button>
+      <div class="tooltip is-above">${T2(label)}</div>
+    </span>`;
+  return `<span class="fv-relevance">
+    ${thumb('up', 'up-vote', 'Relevant for my team')}
+    ${thumb('down', 'down-vote', 'Not relevant right now')}
+  </span>`;
+}
+
+function focusCard(s) {
+  const decided = focusDecided(s.q);
+  const cta = decided
+    ? '<button class="btn btn-secondary fv-choose-btn" data-fv-edit><i data-icon="edit"></i> Edit</button>'
+    : '<button class="btn btn-secondary fv-choose-btn" data-fv-choose>Choose</button>';
+  return `
+    <div class="fv-card${decided ? ' is-active' : ''}" data-q="${esc(s.q)}">
       <div class="fv-card-head">
         <div class="fv-card-top">
           <div class="fv-card-q">
             <p class="fv-card-question">${s.q}</p>
-            <span class="fv-card-theme">${THEME[s.q] || ''}</span>
+            <span class="fv-card-theme">${FV_THEME[s.q] || ''}</span>
           </div>
+          ${decided ? '' : relevanceThumbsHTML(s.q)}
           <span class="fv-score is-focus">${s.s}%</span>
+          <span class="fv-card-cta">${cta}</span>
         </div>
-        <div class="fv-relevance">
-          <a class="fv-rel-btn"><i data-icon="up-vote"></i> This is relevant</a>
-          <a class="fv-rel-btn"><i data-icon="down-vote"></i> This focus area is not relevant right now</a>
-        </div>
+        ${decided ? '' : smartTagHTML(s.tag)}
       </div>
-      <div class="fv-divider"></div>
-      <div class="fv-approach">
-        <div class="fv-approach-lbl"><i data-icon="lightbulb"></i> Pick an approach to see the recommended action:</div>
-        <div class="fv-approach-chips">${approach(i, s.q)}</div>
-        <div class="fv-reco" hidden>
-          <div class="fv-reco-content">
-            <div class="fv-reco-head">
-              <div class="fv-reco-title-wrap">
-                <span class="fv-reco-eyebrow"></span>
-                <p class="fv-reco-title"></p>
-              </div>
-            </div>
-            <p class="fv-reco-body"></p>
-          </div>
-          <button class="btn btn-primary fv-reco-add"><i data-icon="target"></i> Add to action planner</button>
-        </div>
-        <button class="btn btn-link fv-create"><i data-icon="plus"></i> Create new action</button>
-      </div>
+      ${decided ? fvReflectHTML(s.q) : ''}
     </div>`;
+}
 
-  const winCard = (s) => `
-    <div class="fv-win-card">
-      <div class="fv-card-q">
-        <p class="fv-card-question">${s.q}</p>
-        <span class="fv-card-theme">${THEME[s.q] || ''}</span>
-      </div>
-      <span class="fv-score is-win">${s.s}%</span>
+function winCard(s) {
+  const decided = focusDecided(s.q);
+  const goal = actState(s.q).goal;
+  const cta = decided
+    ? `<button class="btn btn-secondary fv-choose-btn is-chosen" data-fv-edit><i data-icon="check"></i> ${(GOAL_CHIPS[goal] || {}).label || 'Responded'}</button>`
+    : '<button class="btn btn-secondary fv-choose-btn" data-fv-choose>Choose</button>';
+  return `
+  <div class="fv-win-card${decided ? ' is-done' : ''}" data-q="${esc(s.q)}">
+    <div class="fv-card-q">
+      <p class="fv-card-question">${s.q}</p>
+      <span class="fv-card-theme">${FV_THEME[s.q] || ''}</span>
+    </div>
+    <span class="fv-score is-win">${s.s}%</span>
+    <span class="fv-card-cta">${cta}</span>
+  </div>`;
+}
+
+/* What a decided card shows instead of the CTA: the response, what it produced, and that HR sees it. */
+function fvReflectHTML(q) {
+  const st = focusResp(q), goal = actState(q).goal, g = GOAL_CHIPS[goal] || {};
+  const actionList = () => `<ul class="fa-done-list">${actState(q).actions
+    .map(a => `<li class="fa-done-item"><span class="fa-done-item-text">${esc(a.text || 'Untitled action')}</span></li>`).join('')}</ul>`;
+  let title, details;
+  if (goal === 'improve') { title = "You're improving this focus area"; details = actionList(); }
+  else if (goal === 'promote') { title = "You're celebrating this strength"; details = actionList(); }
+  else if (goal === 'monitor') {
+    title = 'This focus area is being monitored';
+    details = `<p class="fa-done-line">${st.monitorNote.trim() ? '&ldquo;' + esc(st.monitorNote.trim()) + '&rdquo;' : 'Monitoring this in your own way'}</p>`;
+  } else {
+    title = 'This focus area is flagged for support';
+    const who = st.supportPerson.trim() || 'the right person';
+    details = `<div class="fa-ask">${avatarHTML('Jente Insing', 32)}<div class="fa-ask-body">
+      <div class="fa-ask-bubble">${esc(st.supportText.trim() || 'Support requested for this focus area')}</div>
+      <div class="fa-ask-to">Sent to ${esc(who)}</div></div></div>`;
+  }
+  return `<div class="fv-approach"><div class="fa-done">
+    <div class="fa-done-row">
+      <span class="fa-done-ico is-${goal}"><i data-icon="${g.icon}"></i></span>
+      <div class="fa-done-body"><div class="fa-done-title">${title}</div><div class="fa-done-note">Visible to HR</div></div>
+    </div>
+    <div class="fa-done-details">${details}</div>
+    <div class="fa-done-editrow"><a class="link-inline fa-done-editlink" data-fv-edit><i data-icon="edit"></i> Edit details</a></div>
+  </div></div>`;
+}
+
+function renderFocusCards() {
+  const focus = document.querySelector('#view-focus .fv-cards');
+  if (focus) { focus.innerHTML = FV_CARDS.map(focusCard).join(''); if (window.Icons) window.Icons.render(focus); }
+  const wins = document.querySelector('#view-focus .fv-win-cards');
+  if (wins) { wins.innerHTML = FV_WINS.map(winCard).join(''); if (window.Icons) window.Icons.render(wins); }
+}
+
+/* ---------- "Not relevant" dialog ---------- */
+/* Thumbs-down is a message to HR, not a dismissal: it asks why, so the score can be read in
+   context. Thumbs-up toggles on the spot; only the down thumb opens this. */
+const OTHER_REASON = 'Other';
+const DISMISS_REASONS = [
+  'Already being addressed',
+  'Not a priority for my team right now',
+  "I don't have the influence to change this",
+  "This doesn't accurately reflect my team",
+  OTHER_REASON
+];
+let FV_NR_Q = null;
+
+function fvNrEl() {
+  let el = document.getElementById('fv-nr-dialog');
+  if (el) return el;
+  el = document.createElement('div');
+  el.className = 'overlay step-overlay';
+  el.id = 'fv-nr-dialog';
+  el.hidden = true;
+  document.body.appendChild(el);
+  el.addEventListener('click', (e) => { if (e.target === el) fvNrClose(); });
+  el.addEventListener('input', (e) => {
+    const note = e.target.closest('[data-fv-nrnote]');
+    if (note) focusResp(FV_NR_Q).nrNote = note.value;
+  });
+  el.addEventListener('change', (e) => {
+    const box = e.target.closest('[data-fv-nrreason]');
+    if (!box) return;
+    const st = focusResp(FV_NR_Q), r = box.dataset.fvNrreason;
+    st.nrReasons = st.nrReasons || [];
+    const at = st.nrReasons.indexOf(r);
+    if (at > -1) st.nrReasons.splice(at, 1); else st.nrReasons.push(r);
+    renderFvNr();
+  });
+  el.addEventListener('click', (e) => {
+    if (e.target.closest('[data-fv-nrclose]')) { fvNrClose(); return; }
+    if (e.target.closest('[data-fv-nrsubmit]')) {
+      const st = focusResp(FV_NR_Q);
+      if (!(st.nrReasons || []).length) return;
+      st.relevance = 'down';
+      fvNrClose();
+      renderFocusCards();
+    }
+  });
+  return el;
+}
+
+function fvNrOpen(q) {
+  FV_NR_Q = q;
+  const st = focusResp(q);
+  st.nrReasons = st.nrReasons || [];
+  fvNrEl().hidden = false;
+  renderFvNr();
+}
+function fvNrClose() { const el = document.getElementById('fv-nr-dialog'); if (el) el.hidden = true; }
+
+function renderFvNr() {
+  const q = FV_NR_Q; if (!q) return;
+  const st = focusResp(q), chosen = st.nrReasons || [];
+  const list = DISMISS_REASONS.map(r => {
+    const on = chosen.indexOf(r) > -1;
+    return `<label class="cb-label-wrap nr-opt"><span class="cb-wrap"><input type="checkbox" class="cb" data-fv-nrreason="${esc(r)}"${on ? ' checked' : ''}></span>${r}</label>`
+      + (on && r === OTHER_REASON ? `<textarea class="ta nr-other" rows="2" data-fv-nrnote placeholder="Tell us what makes this not relevant">${esc(st.nrNote || '')}</textarea>` : '');
+  }).join('');
+  const ok = chosen.length > 0;
+  fvNrEl().innerHTML = `<div class="step-modal nr-modal" role="dialog" aria-modal="true">
+    <button class="step-close ib ib-36 ib-tertiary" aria-label="Close" data-fv-nrclose><i data-icon="cross"></i></button>
+    <div class="step-hero"><div class="step-hero-row">
+      <span class="step-hero-ico is-support"><i data-icon="down-vote"></i></span>
+      <h2 class="step-h2">Not relevant for your team?</h2></div>
+      <p class="step-sub">Tell us why, so HR can read &ldquo;${q}&rdquo; in the right context.</p></div>
+    <div class="step-body nr-list">${list}</div>
+    <div class="step-footer">
+      <button class="btn btn-secondary" data-fv-nrclose>Cancel</button>
+      <button class="btn btn-primary${ok ? '' : ' is-disabled'}" data-fv-nrsubmit${ok ? '' : ' disabled'}>Mark not relevant</button></div>
+  </div>`;
+  if (window.Icons) window.Icons.render(fvNrEl());
+}
+
+/* ---------- Respond dialog: Choose how to respond → Plan it ---------- */
+/* Step 1 is always complete — the manager arrived here by picking a focus area on the card. */
+const FV_STEPS = ['Choose your focus area', 'Choose how to respond', 'Plan it'];
+const FV_STEP = { q: null, stage: 'respond', busy: false, confirmOpen: false, goalOnOpen: '' };
+
+function fvStepEl() {
+  let el = document.getElementById('fv-step-dialog');
+  if (el) return el;
+  el = document.createElement('div');
+  el.className = 'overlay step-overlay';
+  el.id = 'fv-step-dialog';
+  el.hidden = true;
+  document.body.appendChild(el);
+  el.addEventListener('click', (e) => { if (e.target === el) fvStepClose(); });
+  el.addEventListener('input', fvStepInput);
+  el.addEventListener('change', fvStepInput);
+  el.addEventListener('click', fvStepClick);
+  return el;
+}
+
+function openFvStep(q, stage) {
+  FV_STEP.q = q;
+  FV_STEP.confirmOpen = false;
+  /* The subject may already carry a goal set on the Scores page or in the Action Planner.
+     Abandoning the dialog must leave that alone, so remember it and put it back. */
+  FV_STEP.goalOnOpen = actState(q).goal || '';
+  FV_STEP.stage = stage || (actState(q).goal && focusDecided(q) ? 'plan' : 'respond');
+  const el = fvStepEl();
+  el.hidden = false;
+  document.body.classList.add('step-open');
+  renderFvStep();
+}
+
+/* Closing mid-flow asks first, so input typed into the plan step is never dropped silently. */
+function fvStepDirty() {
+  const q = FV_STEP.q; if (!q || FV_STEP.stage !== 'plan') return false;
+  const st = focusResp(q);
+  if (focusDecided(q)) return false;
+  const goal = actState(q).goal;
+  if (goal === 'monitor') return !!(st.monitorTitle.trim() || st.monitorNote.trim());
+  if (goal === 'support') return !!(st.supportTitle.trim() || st.supportText.trim() || st.supportPerson.trim());
+  return !!(st.picked.length || st.custom.length || st.draft.title.trim() || st.draft.desc.trim());
+}
+function fvStepClose() {
+  if (FV_STEP.confirmOpen) return;                    /* the popover owns the decision */
+  if (fvStepDirty()) { FV_STEP.confirmOpen = true; renderFvStep(); return; }
+  fvStepForceClose();
+}
+function fvStepForceClose() {
+  const q = FV_STEP.q;
+  /* an unconfirmed response leaves nothing behind — including the goal it tried out */
+  if (q && !focusDecided(q)) { actState(q).goal = FV_STEP.goalOnOpen; focusResp(q).creating = false; }
+  FV_STEP.confirmOpen = false;
+  const el = document.getElementById('fv-step-dialog');
+  if (el) el.hidden = true;
+  document.body.classList.remove('step-open');
+  renderFocusCards();
+}
+
+function fvStepPick(goal) {
+  const q = FV_STEP.q, st = focusResp(q);
+  if (actState(q).goal !== goal) { st.picked = []; st.custom = []; }
+  actState(q).goal = goal;
+  /* Promote has no recommendations to choose from, so it opens straight into the action form */
+  st.creating = goal === 'promote';
+  FV_STEP.stage = 'plan';
+  FV_STEP.busy = true; renderFvStep();
+  setTimeout(() => { FV_STEP.busy = false; renderFvStep(); }, 450);
+}
+
+function fvApproachesFor(q) { return FOCUS_TYPES[q] || APPROACHES; }
+
+function fvStepCanConfirm() {
+  const q = FV_STEP.q, st = focusResp(q), goal = actState(q).goal;
+  if (goal === 'monitor') return !!(st.monitorTitle.trim() && st.monitorNote.trim());
+  if (goal === 'support') return !!(st.supportTitle.trim() && st.supportText.trim());
+  if (st.creating) return !!(st.draft.title.trim() && st.draft.desc.trim());
+  return !!(st.picked.length || st.custom.length);
+}
+
+function fvNewActionHTML(st) {
+  return `<div class="fv-newaction">
+    <label class="fv-na-lbl">Action title <span class="fa-req">*</span></label>
+    <input class="tf" data-fv-draft="title" placeholder="What needs to be done?" value="${esc(st.draft.title)}">
+    <label class="fv-na-lbl">Description <span class="fa-req">*</span></label>
+    <textarea class="ta" rows="3" data-fv-draft="desc" placeholder="Add a description">${esc(st.draft.desc)}</textarea>
+    <div class="fv-na-opts">
+      <div class="fv-na-field"><label class="fv-na-lbl">Due date <span class="fv-na-opt">optional</span></label>
+        <div class="fv-na-dp-wrap">
+          <button class="sel-btn${st.draft.due ? ' is-filled' : ''}" type="button" data-fv-dp><i data-icon="Clock"></i><span class="sel-btn-value">${st.draft.due ? fmtActDate(st.draft.due) : 'Pick due date'}</span></button>
+          ${st.draft.due ? `<button class="ib ib-24 ib-tertiary" type="button" data-fv-dp-clear aria-label="Remove due date"><i data-icon="cross"></i></button>` : ''}
+          <div class="fv-na-dp" hidden></div>
+        </div></div>
+      <div class="fv-na-field"><label class="fv-na-lbl">Assignee <span class="fv-na-opt">optional</span></label>
+        <input class="tf" data-fv-draft="assignee" placeholder="Who will own this?" value="${esc(st.draft.assignee)}"></div>
+    </div>
+  </div>`;
+}
+
+function fvCustomListHTML(st) {
+  if (!st.custom.length) return '';
+  return `<div class="fv-custom-list">${st.custom.map((a, i) => {
+    const meta = (a.due ? `<span class="fv-custom-tag"><i data-icon="clock"></i> ${esc(a.due)}</span>` : '')
+      + (a.assignee ? `<span class="fv-custom-tag"><i data-icon="user"></i> ${esc(a.assignee)}</span>` : '');
+    return `<div class="fv-custom-item"><div class="fv-custom-main">
+      <span class="fv-custom-title">${esc(a.text)}</span>
+      ${a.desc ? `<span class="fv-custom-desc">${esc(a.desc)}</span>` : ''}
+      ${meta ? `<span class="fv-custom-meta">${meta}</span>` : ''}
+    </div><button class="ib ib-24 ib-tertiary fv-custom-x" aria-label="Remove action" data-fv-rmcustom="${i}"><i data-icon="cross"></i></button></div>`;
+  }).join('')}</div>`;
+}
+
+function fvStepPlanHTML(q) {
+  const st = focusResp(q), goal = actState(q).goal;
+  if (goal === 'monitor') {
+    return `<div class="fv-newaction">
+      <label class="fv-na-lbl">Action title <span class="fa-req">*</span></label>
+      <input class="tf" data-fv-field="monitorTitle" placeholder="What needs to happen?" value="${esc(st.monitorTitle)}">
+      <label class="fv-na-lbl">Description <span class="fa-req">*</span></label>
+      <textarea class="ta" rows="3" data-fv-field="monitorNote" placeholder="Describe how you'll keep an eye on this focus area — for example, revisit at the next survey, watch the score, or check back on a set date">${esc(st.monitorNote)}</textarea>
     </div>`;
+  }
+  if (goal === 'support') {
+    return `<div class="fv-newaction">
+      <label class="fv-na-lbl">Action title <span class="fa-req">*</span></label>
+      <input class="tf" data-fv-field="supportTitle" placeholder="What needs to happen?" value="${esc(st.supportTitle)}">
+      <label class="fv-na-lbl">Description <span class="fa-req">*</span></label>
+      <textarea class="ta" rows="3" data-fv-field="supportText" placeholder="Describe the support you're looking for">${esc(st.supportText)}</textarea>
+      <label class="fv-na-lbl">Who can help <span class="fv-na-opt">optional</span></label>
+      <input class="tf" data-fv-field="supportPerson" placeholder="Who could help with this?" value="${esc(st.supportPerson)}">
+    </div>`;
+  }
+  if (goal === 'promote') return fvCustomListHTML(st) + fvNewActionHTML(st);
+  /* Improve: the question's own recommended actions, multi-select */
+  if (st.creating) return fvNewActionHTML(st);
+  const byItem = RECO[q] || {};
+  const cards = fvApproachesFor(q).map((a) => {
+    const r = byItem[a]; if (!r) return '';
+    const eff = EFFORT[a] || 'medium', on = st.picked.indexOf(a) > -1;
+    return `<label class="fv-pick${on ? ' is-selected' : ''}">
+      <span class="cb-wrap"><input type="checkbox" class="cb" data-fv-appr="${esc(a)}"${on ? ' checked' : ''}></span>
+      <div class="fv-pick-body">
+        <div class="fv-pick-head">
+          <div class="fv-pick-title-wrap"><span class="fv-reco-eyebrow">${a}</span><p class="fv-reco-title">${esc(r.title)}</p></div>
+          <span class="fv-reco-effort is-${eff}">${EFFORT_LABEL[eff]}</span>
+        </div>
+        <p class="fv-reco-body">${esc(r.body)}</p>
+      </div></label>`;
+  }).join('');
+  return `<h3 class="step-plan-h">Choose the recommended actions you want to take</h3>
+    <div class="fv-picks">${cards}</div>${fvCustomListHTML(st)}
+    <a class="btn btn-link fv-create" data-fv-newaction><i data-icon="plus"></i> Create new action</a>`;
+}
 
+function fvStepBarHTML(active) {
+  return `<div class="stp-bar">${FV_STEPS.map((label, i) => {
+    const done = i < active, on = i === active;
+    return `<div class="stp-step${done ? ' is-done' : (on ? ' is-active' : ' is-upcoming')}">
+      <span class="stp-dot">${done ? '<i data-icon="check"></i>' : (i + 1)}</span>
+      <span class="stp-label">${label}</span></div>`
+      + (i < FV_STEPS.length - 1 ? `<span class="stp-line${done ? ' is-done' : ''}"></span>` : '');
+  }).join('')}</div>`;
+}
+
+function fvContextCardHTML(q) {
+  const row = fvRowFor(q);
+  return `<div class="fv-card step-context-card"><div class="fv-card-head"><div class="fv-card-top">
+    <div class="fv-card-q"><p class="fv-card-question">${q}</p><span class="fv-card-theme">${FV_THEME[q] || ''}</span></div>
+    ${row ? `<span class="fv-score is-${fvIsWin(q) ? 'win' : 'focus'}">${row.s}%</span>` : ''}
+  </div></div></div>`;
+}
+
+function renderFvStep() {
+  const q = FV_STEP.q; if (!q) return;
+  const el = fvStepEl();
+  const goal = actState(q).goal;
+  const active = FV_STEP.stage === 'respond' ? 1 : 2;
+  let body = '', footer = '';
+  if (FV_STEP.busy) {
+    body = '<div class="step-loading"><span class="step-spinner"></span></div>';
+  } else if (FV_STEP.stage === 'success') {
+    const word = { improve: 'being acted on', monitor: 'being monitored', support: 'flagged for support', promote: 'set up to celebrate' }[goal] || 'handled';
+    body = `<div class="step-success">
+      <span class="step-hero-ico is-success step-success-ico"><i data-icon="check"></i></span>
+      <h2 class="step-h2">You're all set</h2>
+      <p class="step-sub">&ldquo;${q}&rdquo; is now <strong>${word}</strong>. Your team can see it and it's visible to HR.</p>
+      <div class="step-success-acts">
+        <button class="btn btn-secondary" data-fv-goactions>Go to Actions</button>
+        <button class="btn btn-primary" data-fv-done>Back to Focus View</button>
+      </div></div>`;
+  } else if (FV_STEP.stage === 'respond') {
+    body = `<div class="step-hero"><div class="step-hero-row">
+        <span class="step-hero-ico"><i data-icon="list-unordered"></i></span>
+        <h2 class="step-h2">Choose how to respond</h2></div>
+        <p class="step-sub">Pick the response that fits this area — you can change it later.</p></div>
+      ${fvContextCardHTML(q)}
+      <div class="step-options">${GOAL_ORDER.map(key => {
+        const g = GOAL_CHIPS[key];
+        return `<button class="step-opt is-${key}${goal === key ? ' is-selected' : ''}" data-fv-resp="${key}">
+          <span class="step-opt-ico"><i data-icon="${g.icon}"></i></span>
+          <span class="step-opt-title">${g.label}</span>
+          <span class="step-opt-desc">${RESP_DESC[key]}</span></button>`;
+      }).join('')}</div>`;
+  } else {
+    const g = GOAL_CHIPS[goal] || {};
+    body = `<div class="step-hero"><div class="step-hero-row">
+        <span class="step-hero-ico is-${goal}"><i data-icon="${g.icon}"></i></span>
+        <h2 class="step-h2">${g.label}</h2></div></div>
+      <div class="step-plan">${fvStepPlanHTML(q)}</div>`;
+    const ok = fvStepCanConfirm();
+    footer = `<div class="step-footer">
+      <button class="btn btn-secondary" data-fv-back>Back</button>
+      <button class="btn btn-primary${ok ? '' : ' is-disabled'}" data-fv-confirm${ok ? '' : ' disabled'}>Add action</button></div>`;
+  }
+  const confirmPop = FV_STEP.confirmOpen ? `<div class="step-close-confirm">
+    <p class="scc-text">Close without saving? You'll lose the changes you've made to this response.</p>
+    <div class="scc-actions"><button class="btn btn-secondary" data-fv-keep>Keep editing</button>
+      <button class="btn btn-primary" data-fv-discard>Discard</button></div></div>` : '';
+  el.innerHTML = `<div class="step-modal${FV_STEP.stage === 'success' ? ' is-success' : ''}" role="dialog" aria-modal="true">
+    <button class="step-close ib ib-36 ib-tertiary" aria-label="Close" data-fv-x><i data-icon="cross"></i></button>
+    ${FV_STEP.stage === 'success' ? '' : fvStepBarHTML(active)}
+    <div class="step-body">${body}</div>${footer}${confirmPop}</div>`;
+  if (window.Icons) window.Icons.render(el);
+}
+
+/* Confirming turns the response into this subject's goal and its actions, so the pin, the side
+   panels and the Action Planner all show the same decision. */
+function fvStepConfirm() {
+  if (!fvStepCanConfirm()) return;
+  const q = FV_STEP.q, st = focusResp(q), goal = actState(q).goal;
+  if (st.creating) { fvAddCustom(q); if (!fvStepCanConfirm()) return; }
+  FV_STEP.busy = true; renderFvStep();
+  setTimeout(() => {
+    const s = actState(q);
+    let items = [];
+    if (goal === 'improve' || goal === 'promote') {
+      items = st.picked.map(a => ({ text: (RECO[q] && RECO[q][a] ? RECO[q][a].title : a), done: false, deadline: '', assignee: '' }))
+        .concat(st.custom.map(c => ({ text: c.text, done: false, deadline: c.due || '', assignee: c.assignee || '' })));
+    } else if (goal === 'monitor') {
+      items = [{ text: st.monitorTitle.trim(), done: false, deadline: '', assignee: '' }];
+      s.desc = st.monitorNote.trim();
+    } else {
+      items = [{ text: st.supportTitle.trim(), done: false, deadline: '', assignee: st.supportPerson.trim() }];
+      s.desc = st.supportText.trim();
+    }
+    items.forEach(it => { if (it.text && !s.actions.some(a => a.text === it.text)) s.actions.push(it); });
+    const row = fvRowFor(q);
+    const scoreText = row ? row.s + '%' : '–';
+    if (!AP_PINNED.some(r => r.key === q)) AP_PINNED.push({ key: q, name: q, scoreText });
+    AP_REMOVED.delete(q); apTouch(q);
+    syncPinsForKey(q);
+    st.done = true; st.creating = false;
+    FV_STEP.busy = false; FV_STEP.stage = 'success';
+    renderFvStep(); renderFocusCards();
+  }, 500);
+}
+
+function fvAddCustom(q) {
+  const st = focusResp(q), d = st.draft;
+  if (!(d.title.trim() && d.desc.trim())) return;
+  st.custom.push({ text: d.title.trim(), desc: d.desc.trim(), due: d.due, assignee: d.assignee.trim() });
+  st.draft = { title: '', desc: '', due: '', assignee: '' };
+  st.creating = false;
+}
+
+function fvStepInput(e) {
+  const q = FV_STEP.q; if (!q) return;
+  const st = focusResp(q);
+  const field = e.target.closest('[data-fv-field]');
+  if (field) { st[field.dataset.fvField] = field.value; fvSyncConfirm(); return; }
+  const draft = e.target.closest('[data-fv-draft]');
+  if (draft) { st.draft[draft.dataset.fvDraft] = draft.value; fvSyncConfirm(); return; }
+  const appr = e.target.closest('[data-fv-appr]');
+  if (appr) {
+    const a = appr.dataset.fvAppr, at = st.picked.indexOf(a);
+    if (at > -1) st.picked.splice(at, 1); else st.picked.push(a);
+    renderFvStep();
+  }
+}
+/* Only the button state changes while typing — re-rendering would drop the caret. */
+function fvSyncConfirm() {
+  const btn = document.querySelector('#fv-step-dialog [data-fv-confirm]');
+  if (!btn) return;
+  const ok = fvStepCanConfirm();
+  btn.disabled = !ok;
+  btn.classList.toggle('is-disabled', !ok);
+}
+
+function fvStepClick(e) {
+  const q = FV_STEP.q;
+  const hit = (sel) => e.target.closest(sel);
+  /* Due date — the design system's own picker, never a native date input */
+  const dpBtn = hit('[data-fv-dp]');
+  if (dpBtn) {
+    e.stopPropagation();
+    const pop = dpBtn.closest('.fv-na-dp-wrap').querySelector('.fv-na-dp');
+    const willOpen = pop.hidden;
+    if (willOpen) {
+      const iso = focusResp(q).draft.due;
+      const base = iso ? new Date(iso + 'T00:00:00') : new Date();
+      pop.innerHTML = dpMonthHTML(base.getFullYear(), base.getMonth(), iso);
+      if (window.Icons) window.Icons.render(pop);
+    }
+    pop.hidden = !willOpen;
+    return;
+  }
+  const dpNav = hit('.dp-nav-btn');
+  if (dpNav) {
+    e.stopPropagation();
+    let y = +dpNav.dataset.y, m = +dpNav.dataset.m;
+    m += dpNav.classList.contains('dp-prev') ? -1 : 1;
+    if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; }
+    const pop = dpNav.closest('.fv-na-dp');
+    pop.innerHTML = dpMonthHTML(y, m, focusResp(q).draft.due);
+    if (window.Icons) window.Icons.render(pop);
+    return;
+  }
+  const dpDay = hit('.dp-day[data-iso]');
+  if (dpDay) { e.stopPropagation(); focusResp(q).draft.due = dpDay.dataset.iso; renderFvStep(); return; }
+  if (hit('[data-fv-dp-clear]')) { e.stopPropagation(); focusResp(q).draft.due = ''; renderFvStep(); return; }
+  if (!hit('.fv-na-dp-wrap')) document.querySelectorAll('#fv-step-dialog .fv-na-dp').forEach(p => { p.hidden = true; });
+  if (hit('[data-fv-x]')) { fvStepClose(); return; }
+  if (hit('[data-fv-keep]')) { FV_STEP.confirmOpen = false; renderFvStep(); return; }
+  if (hit('[data-fv-discard]')) { FV_STEP.confirmOpen = false; fvStepForceClose(); return; }
+  const resp = hit('[data-fv-resp]');
+  if (resp) { fvStepPick(resp.dataset.fvResp); return; }
+  if (hit('[data-fv-back]')) { FV_STEP.stage = 'respond'; renderFvStep(); return; }
+  if (hit('[data-fv-confirm]')) { fvStepConfirm(); return; }
+  if (hit('[data-fv-newaction]')) { e.preventDefault(); focusResp(q).creating = true; renderFvStep(); return; }
+  const rm = hit('[data-fv-rmcustom]');
+  if (rm) { focusResp(q).custom.splice(+rm.dataset.fvRmcustom, 1); renderFvStep(); return; }
+  if (hit('[data-fv-done]')) { fvStepForceClose(); return; }
+  if (hit('[data-fv-goactions]')) {
+    fvStepForceClose();
+    document.querySelector('.tabs .tab[data-view="actions"]')?.click();
+  }
+}
+
+/* ---------- Focus View (second tab) ---------- */
+function focusView(d) {
+  const npsValue = d.npsPromoters - d.npsDetractors;
+  const fvTags = fvSmartTags(d, d.lowScores.slice(0, 3));
+  FV_CARDS = d.lowScores.slice(0, 3).map(s => ({ ...s, tag: fvTags[s.q] || '' }));
+  FV_WINS = d.highScores.slice(0, 3);
+  const fxMarker = (m) => `<div class="fx-marker ${m.variant} ${m.chip}" style="left:${m.x}%;top:${100 - m.y}%"><div class="fx-dot"></div><div class="fx-chip"><i data-icon="${m.icon}"></i>${m.label}</div></div>`;
+  const trend = (val) => val ? `<div class="fv-trend-row"><span class="fv-trend">${val} <i data-icon="arrow-up"></i></span><span class="fv-trend-note">vs previous survey</span></div>` : '';
+  const verdictClass = 'is-' + d.efpLeadEm.toLowerCase().replace(/\s+/g, '-');
   return `
   <div class="fv-stats">
     <div class="fv-stat-pill">
@@ -917,7 +1453,7 @@ function focusView(d) {
     </div>
     <div class="fv-block-main">
       <a class="fv-why" data-dialog="fa-dialog"><i data-icon="info"></i> Why these focus areas?</a>
-      <div class="fv-cards">${d.lowScores.slice(0, 3).map(focusCard).join('')}</div>
+      <div class="fv-cards">${FV_CARDS.map(focusCard).join('')}</div>
     </div>
   </div>
 
@@ -929,7 +1465,7 @@ function focusView(d) {
     </div>
     <div class="fv-block-main">
       <a class="fv-why" data-dialog="wins-dialog"><i data-icon="info"></i> Why these successes?</a>
-      <div class="fv-win-cards">${d.highScores.slice(0, 3).map(winCard).join('')}</div>
+      <div class="fv-win-cards">${FV_WINS.map(winCard).join('')}</div>
     </div>
   </div>
 
@@ -1086,7 +1622,7 @@ let AP_CUSTOM = [];
 let AP_REMOVED = new Set();
 let AP_PINNED = [];                 /* questions/themes pinned via the Scores page: { key, name, score } */
 let AP_SORT = null;                 /* { col: 'score'|'goal'|'progress', dir: 1|-1 } */
-const AP_GOAL_ORDER = { promote: 3, improve: 2, contemplate: 1, '': 0 };
+const AP_GOAL_ORDER = { promote: 4, improve: 3, support: 2, monitor: 1, '': 0 };
 let AP_CUSTOM_SEQ = 0;
 
 /* The subjects shown in the planner: a couple of themes/questions plus any custom pins. */
@@ -1131,12 +1667,13 @@ function apRowHTML(r) {
   const scoreTxt = r.scoreText != null ? r.scoreText : (r.score == null ? '–' : r.score + '%');
   const progress = total > 0
     ? `<div class="ap-prog"><div class="ap-bar"><div class="ap-bar-fill" style="width:${Math.round(done / total * 100)}%"></div></div><span class="ap-bar-count">${done}/${total}</span></div>`
-    : `<button class="btn btn-secondary ap-add" type="button">${T2('Add actions')}</button>`;
+    : `<button class="ap-addaction ap-add" type="button"><i data-icon="plus"></i> ${T2('Add action')}</button>`;
   const isCustom = r.key.startsWith('custom:');
   const hasName = r.name && r.name.trim();
   const display = isCustom ? (hasName ? esc(r.name) : `<span class="ap-name-empty">${T2('Untitled pin')}</span>`) : T2(r.name);
+  const theme = isCustom ? 'Custom action' : (FV_THEME[r.key] || '');
   return `<div class="ap-row" data-key="${esc(r.key)}" data-name="${esc((hasName ? r.name : (isCustom ? 'pin' : r.name)).toLowerCase())}" role="button" tabindex="0">
-    <span class="ap-name">${display}</span>
+    <span class="ap-name">${display}${theme ? `<span class="ap-name-theme">${T2(theme)}</span>` : ''}</span>
     <span class="ap-score">${scoreTxt}</span>
     <span class="ap-goal">${st.goal ? goalChipHTML(st.goal) : '<span class="ap-goal-none">–</span>'}</span>
     <span class="ap-prog-cell">${progress}</span>
@@ -1152,19 +1689,59 @@ function apRowHTML(r) {
   </div>`;
 }
 
+/* The four responses, counted across the planner — the page opens on what has been decided. */
+const RESP_SUMMARY = [
+  ['improve', 'To improve'],
+  ['monitor', 'Monitoring'],
+  ['support', 'Flagged for support'],
+  ['promote', 'To promote']
+];
+function actionsSummaryHTML(rows) {
+  const T2 = (s) => window.tr ? tr(s) : s;
+  const counts = {};
+  rows.forEach(r => { const g = actState(r.key).goal; if (g) counts[g] = (counts[g] || 0) + 1; });
+  return RESP_SUMMARY.map(([key, label]) => {
+    const g = GOAL_CHIPS[key];
+    return `<div class="act-sum is-${key}"><span class="act-sum-ico"><i data-icon="${g.icon}"></i></span>
+      <div class="act-sum-txt"><span class="act-sum-n">${counts[key] || 0}</span><span class="act-sum-l">${T2(label)}</span></div></div>`;
+  }).join('');
+}
+
+/* Nothing decided yet: explain what a response is, using the same four cards as the dialog. */
+function actionsEmptyHTML() {
+  const T2 = (s) => window.tr ? tr(s) : s;
+  return `<div class="actions-empty">
+    <div class="ae-hero">
+      <div class="ae-hero-txt">
+        <h2 class="ae-title">${T2('Turn your results into action')}</h2>
+        <p class="ae-desc">${T2("Respond to a focus area to decide how you'll act on it, and it shows up here, shared with your team and visible to HR. Not sure where to start? Create a custom pin from your own goal.")}</p>
+      </div>
+      <div class="ae-illo"><img class="actions-illo" src="${ASSET_BASE}assets/illustrations/actions-empty.svg" alt="" /></div>
+    </div>
+    <div class="step-options ae-options">${GOAL_ORDER.map(key => {
+      const g = GOAL_CHIPS[key];
+      return `<div class="step-opt is-${key} is-static">
+        <span class="step-opt-ico"><i data-icon="${g.icon}"></i></span>
+        <span class="step-opt-title">${T2(g.label)}</span>
+        <span class="step-opt-desc">${RESP_DESC[key]}</span></div>`;
+    }).join('')}</div>
+    <div class="ae-cta-row"><button class="btn btn-primary ae-cta ap-custom" type="button"><i data-icon="plus"></i> ${T2('Custom pin')}</button></div>
+  </div>`;
+}
+
 function actionsView(d) {
   const T2 = (s) => window.tr ? tr(s) : s;
   seedActionPlanner();
   const rows = actionPlannerRows(d);
   return `
-  <div class="ap-wrap">
-    <div class="ap-headrow">
-      <div class="rd-intro"><h2 class="text-l3">${T2('Action Planner')}</h2><span class="rd-bar"></span><span class="rd-sub">${T2('Pinboard & actions')}</span></div>
-      <a class="ap-tutorial" href="https://support.effectory.com/hc/en-us/articles/16130091054749-results-dashboard-action-planner" target="_blank" rel="noopener noreferrer">${T2('Watch tutorial')} <i data-icon="external-link"></i></a>
-    </div>
-    <div class="ap-toolbar">
-      <div class="search-wrap ap-search"><span class="search-icon"><i data-icon="search"></i></span><input type="search" class="srch ap-srch" placeholder="${T2('Search')}"></div>
-      <div class="ap-toolbar-right">
+  <div class="ap-wrap actions-page">
+    <div class="actions-head">
+      <div class="actions-head-txt">
+        <span class="fv-eyebrow is-focus">${T2('Your responses')}</span>
+        <h2 class="fv-section-title">${T2("Everything you've decided to act on")}</h2>
+        <p class="fv-section-desc">${T2("Actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview. All of this is visible to HR.")}</p>
+      </div>
+      <div class="actions-head-cta">
         <div class="ap-export-wrap">
           <button class="btn btn-secondary ap-export" type="button"><i data-icon="download"></i> ${T2('Export')} <i data-icon="chevron-down"></i></button>
           <div class="menu ap-export-menu" hidden>
@@ -1175,12 +1752,13 @@ function actionsView(d) {
         <button class="btn btn-primary ap-custom" type="button"><i data-icon="plus"></i> ${T2('Custom pin')}</button>
       </div>
     </div>
+    <div class="actions-summary" id="actions-summary">${actionsSummaryHTML(rows)}</div>
     <div class="ap-table">
       <div class="ap-thead">
-        <span class="ap-th ap-th-name">${T2('Topic')}</span>
-        <button class="ap-th ap-sort" data-col="score" type="button">${T2('Score')} <i data-icon="chevron-down"></i></button>
-        <button class="ap-th ap-sort" data-col="goal" type="button">${T2('Goal')} <i data-icon="chevron-down"></i></button>
-        <button class="ap-th ap-sort" data-col="progress" type="button">${T2('Action progress')} <i data-icon="chevron-down"></i></button>
+        <span class="ap-th ap-th-name">${T2('Focus area')}</span>
+        <span class="ap-th">${T2('Score')}</span>
+        <span class="ap-th">${T2('Response')}</span>
+        <span class="ap-th">${T2('Actions')}</span>
         <span></span>
       </div>
       <div class="ap-tbody">${rows.map(apRowHTML).join('')}</div>
@@ -1281,9 +1859,7 @@ function actionsPanelInner() {
       <div class="act-goal-wrap">
         <button class="act-goal-trigger" type="button"><span class="act-goal-current">Select a goal</span> <i data-icon="chevron-down"></i></button>
         <div class="menu act-goal-menu" hidden>
-          <div class="menu-item act-goal-opt" role="option" tabindex="0" data-goal="improve"><span class="goal-chip is-improve"><i data-icon="barchart-2"></i> Improve</span></div>
-          <div class="menu-item act-goal-opt" role="option" tabindex="0" data-goal="promote"><span class="goal-chip is-promote"><i data-icon="win"></i> Promote</span></div>
-          <div class="menu-item act-goal-opt" role="option" tabindex="0" data-goal="contemplate"><span class="goal-chip is-contemplate"><i data-icon="message"></i> Contemplate</span></div>
+          ${goalOptionsHTML('act-goal-opt', 'option')}
           <div class="menu-divider act-goal-remove-sep"></div>
           <div class="menu-item act-goal-remove" role="button" tabindex="0"><i data-icon="trash" class="menu-item-icon"></i><span class="menu-item-title">Remove goal &amp; actions</span></div>
         </div>
@@ -1307,23 +1883,35 @@ function actionsPanelInner() {
 const ACT_STORE = {};
 const actState = (key) => ACT_STORE[key] || (ACT_STORE[key] = { goal: '', desc: '', actions: [] });
 const GOAL_CHIPS = {
-  improve: { cls: 'is-improve', icon: 'barchart-2', label: 'Improve' },
-  promote: { cls: 'is-promote', icon: 'win', label: 'Promote' },
-  contemplate: { cls: 'is-contemplate', icon: 'message', label: 'Contemplate' }
+  improve: { cls: 'is-improve', icon: 'target', label: 'Improve' },
+  monitor: { cls: 'is-monitor', icon: 'eye', label: 'Monitor' },
+  support: { cls: 'is-support', icon: 'flag', label: 'Need support' },
+  promote: { cls: 'is-promote', icon: 'benchmark-up', label: 'Promote' }
 };
+/* The four goals in the order they are offered everywhere: the panel's dropdown and the pin popovers. */
+const GOAL_ORDER = ['improve', 'monitor', 'support', 'promote'];
 const goalChipHTML = (key) => {
   const T2 = (s) => window.tr ? tr(s) : s;
   const g = GOAL_CHIPS[key];
   return g ? `<span class="goal-chip ${g.cls}"><i data-icon="${g.icon}"></i> ${T2(g.label)}</span>` : T2('Select a goal');
 };
+/* The goal options, rendered once for every menu that offers them, so the four stay in step.
+   role="option" marks a single-select menu (the panel's dropdown): those carry a check on the
+   selected goal. The pin popovers set a goal rather than showing one, so they get no check. */
+function goalOptionsHTML(optClass, role) {
+  const T2 = (s) => window.tr ? tr(s) : s;
+  return GOAL_ORDER.map(key => {
+    const g = GOAL_CHIPS[key];
+    const check = role === 'option' ? '<i data-icon="check" class="menu-item-check"></i>' : '';
+    return `<div class="menu-item ${optClass}" role="${role}" tabindex="0" data-goal="${key}"><span class="goal-chip ${g.cls}"><i data-icon="${g.icon}"></i> ${T2(g.label)}</span>${check}</div>`;
+  }).join('');
+}
 /* Pin → "select a goal" popover, shared by Scores rows, Theme cards and Overview cards. */
 function pinPopHTML(name, scoreText) {
   return `<div class="menu sc-pin-pop" hidden>
     <div class="sc-pin-head"><span class="sc-pin-q">${name}</span> <span class="sc-pin-score">(${scoreText})</span></div>
     <div class="menu-group-lbl">Select a goal</div>
-    <div class="menu-item sc-pin-goal" role="button" tabindex="0" data-goal="promote"><span class="goal-chip is-promote"><i data-icon="win"></i> Promote</span></div>
-    <div class="menu-item sc-pin-goal" role="button" tabindex="0" data-goal="improve"><span class="goal-chip is-improve"><i data-icon="barchart-2"></i> Improve</span></div>
-    <div class="menu-item sc-pin-goal" role="button" tabindex="0" data-goal="contemplate"><span class="goal-chip is-contemplate"><i data-icon="message"></i> Contemplate</span></div>
+    ${goalOptionsHTML('sc-pin-goal', 'button')}
   </div>`;
 }
 /* A pin icon button + its goal popover. key/name/score travel on the wrapper for the generic wiring. */
@@ -1350,9 +1938,7 @@ function pinListControl(items, btnClass) {
         <button class="sc-pin-back" type="button"><i data-icon="chevron-left"></i> ${T2('Back')}</button>
         <div class="sc-pin-head"><span class="sc-pin-q"></span> <span class="sc-pin-score"></span></div>
         <div class="menu-group-lbl">Select a goal</div>
-        <div class="menu-item sc-pin-goal" role="button" tabindex="0" data-goal="promote"><span class="goal-chip is-promote"><i data-icon="win"></i> Promote</span></div>
-        <div class="menu-item sc-pin-goal" role="button" tabindex="0" data-goal="improve"><span class="goal-chip is-improve"><i data-icon="barchart-2"></i> Improve</span></div>
-        <div class="menu-item sc-pin-goal" role="button" tabindex="0" data-goal="contemplate"><span class="goal-chip is-contemplate"><i data-icon="message"></i> Contemplate</span></div>
+        ${goalOptionsHTML('sc-pin-goal', 'button')}
       </div>
     </div>
   </div>`;
@@ -1423,14 +2009,15 @@ function setPinTip(wrap) {
   const T2 = (s) => window.tr ? tr(s) : s;
   const pin = wrap.querySelector('.sc-pin'); if (!pin) return;
   const goal = actState(wrap.dataset.pinKey).goal;
-  const txt = goal ? `Pin: ${T2(GOAL_CHIPS[goal].label)}` : T2('Pin: no status');
-  pin.classList.toggle('is-pinned', !!goal);
-  ['promote', 'improve', 'contemplate'].forEach(g => pin.classList.toggle('is-goal-' + g, goal === g));
+  const chip = GOAL_CHIPS[goal];
+  const txt = chip ? `Pin: ${T2(chip.label)}` : T2('Pin: no status');
+  pin.classList.toggle('is-pinned', !!chip);
+  GOAL_ORDER.forEach(g => pin.classList.toggle('is-goal-' + g, goal === g));
   pin.setAttribute('aria-label', txt);
   const tip = wrap.querySelector('.tooltip'); if (tip) tip.textContent = txt;
   /* filled pin when pinned, outline when not */
   const ico = pin.querySelector('[data-icon]');
-  if (ico) { const want = goal ? 'pin-filled' : 'pin'; if (ico.dataset.icon !== want) { ico.dataset.icon = want; delete ico.dataset.iconLoaded; ico.innerHTML = ''; if (window.Icons) window.Icons.renderOne(ico); } }
+  if (ico) { const want = chip ? 'pin-filled' : 'pin'; if (ico.dataset.icon !== want) { ico.dataset.icon = want; delete ico.dataset.iconLoaded; ico.innerHTML = ''; if (window.Icons) window.Icons.renderOne(ico); } }
 }
 /* Re-sync any single-pin controls bound to `key` after the goal changed elsewhere (e.g. a side panel). */
 function syncPinsForKey(key) {
@@ -1466,7 +2053,7 @@ function wirePins() {
       wrap.querySelectorAll('.sc-pinlist-item').forEach(it => {
         const st = actState(it.dataset.pinKey), pinned = !!st.goal; if (pinned) n++;
         it.classList.toggle('is-pinned', pinned);
-        const pinIco = it.querySelector('.sc-pinlist-pin'); if (pinIco) ['promote', 'improve', 'contemplate'].forEach(g => pinIco.classList.toggle('is-goal-' + g, st.goal === g));
+        const pinIco = it.querySelector('.sc-pinlist-pin'); if (pinIco) GOAL_ORDER.forEach(g => pinIco.classList.toggle('is-goal-' + g, st.goal === g));
         const meta = it.querySelector('.sc-pinlist-meta'); if (meta) meta.textContent = pinned ? `${st.actions.length} ${T2('action(s)')}` : '';
       });
       const cnt = wrap.querySelector('.sc-pin-count'); if (cnt) { cnt.textContent = n; cnt.hidden = n === 0; }
@@ -1589,7 +2176,7 @@ function wireActions(overlay) {
   const list = overlay.querySelector('.act-list');
   if (!trigger || !addBtn || !list) return;
   overlay.dataset.actWired = '1';
-  /* custom goal dropdown (Improve / Promote / Contemplate chips) */
+  /* custom goal dropdown (Improve / Monitor / Need support / Promote chips) */
   trigger.addEventListener('click', (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; });
   menu.addEventListener('click', (e) => e.stopPropagation());
   document.addEventListener('click', () => { menu.hidden = true; });
@@ -3396,12 +3983,14 @@ function renderOverview(variant, initialView) {
       titleEl.contentEditable = isCustom ? 'true' : 'false';
       titleEl.classList.toggle('is-editable', isCustom);
       titleEl.setAttribute('data-placeholder', T2('What do you want to tackle?'));
-      eyebrowEl.textContent = realName ? T2('Edit pin') : T2('Create pin');
+      eyebrowEl.textContent = realName ? T2('Edit pin') : T2('Add action');
       eyebrowEl.hidden = !isCustom;
       appOverlay.classList.toggle('is-custom', isCustom);   /* only a real custom pin hides the Score row */
       loadActions(appOverlay, key, score);
       appOverlay.hidden = false;
       if (window.Icons) window.Icons.render(appOverlay);
+      /* a brand-new custom pin opens with the caret already in its title */
+      if (isCustom && !realName) requestAnimationFrame(() => titleEl.focus());
     };
     /* editing a custom pin's title updates its planner row */
     titleEl.addEventListener('input', () => {
@@ -3416,6 +4005,24 @@ function renderOverview(variant, initialView) {
       const tbody = view.querySelector('.ap-tbody');
       if (!tbody) return;
       let rows = actionPlannerRows(d);
+      /* the counts, the table and the empty state all follow the same row set */
+      const sum = view.querySelector('#actions-summary');
+      if (sum) { sum.innerHTML = actionsSummaryHTML(rows); if (window.Icons) window.Icons.render(sum); }
+      const empty = view.querySelector('.actions-empty');
+      const table = view.querySelector('.ap-table');
+      const toolbar = view.querySelector('.ap-toolbar');
+      if (!rows.length) {
+        if (table) table.hidden = true;
+        if (toolbar) toolbar.hidden = true;
+        if (sum) sum.hidden = true;
+        if (!empty) table?.insertAdjacentHTML('afterend', actionsEmptyHTML());
+        if (window.Icons) window.Icons.render(view);
+        return;
+      }
+      if (empty) empty.remove();
+      if (table) table.hidden = false;
+      if (toolbar) toolbar.hidden = false;
+      if (sum) sum.hidden = false;
       if (AP_SORT) {
         const val = (r) => {
           const st = actState(r.key);
@@ -3484,7 +4091,7 @@ function renderOverview(variant, initialView) {
       if (sort) { const col = sort.dataset.col; AP_SORT = (AP_SORT && AP_SORT.col === col) ? { col, dir: -AP_SORT.dir } : { col, dir: -1 }; view.querySelectorAll('.ap-sort').forEach(s => s.classList.toggle('is-active', s === sort)); window.renderAPBody(); return; }
       if (e.target.closest('.ap-custom')) {
         const key = 'custom:' + (++AP_CUSTOM_SEQ);
-        ACT_STORE[key] = { goal: 'contemplate', desc: '', actions: [] };   /* a new custom pin starts on Contemplate */
+        ACT_STORE[key] = { goal: 'monitor', desc: '', actions: [] };   /* a new custom pin starts on Monitor */
         AP_CUSTOM.push({ key, name: '', score: null, custom: true });       /* empty title → placeholder in the panel */
         AP_REMOVED.delete(key);
         window.renderAPBody();
@@ -3564,59 +4171,25 @@ function renderOverview(variant, initialView) {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !ov.hidden) close(); });
   });
 
-  /* Focus View: picking an approach reveals a recommended-action card */
-  document.querySelectorAll('#view-focus .fv-card').forEach(card => {
-    const reco = card.querySelector('.fv-reco');
-    if (!reco) return;
-    card.querySelectorAll('.rb-btn-bordered').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        e.preventDefault();
-        const input = chip.querySelector('input.rb');
-        if (input) input.checked = true;
-        card.querySelectorAll('.rb-btn-bordered').forEach(c => c.classList.toggle('is-checked', c === chip));
-        card.classList.add('is-active');
-        const T2 = (s) => window.tr ? tr(s) : s;
-        const byItem = RECO[card.dataset.q];
-        const r = byItem && byItem[chip.dataset.appr];
-        if (!r) { reco.hidden = true; return; }
-        reco.querySelector('.fv-reco-eyebrow').textContent = T2(chip.dataset.appr);
-        reco.querySelector('.fv-reco-title').textContent = T2(r.title);
-        reco.querySelector('.fv-reco-body').textContent = T2(r.body);
-        reco.hidden = false;
-      });
-    });
-
-    /* "Add to action planner" / "Create new action" → set this focus item's goal to
-       Improve, register it in the Action Planner, then open its Actions panel. */
-    const q = card.dataset.q;
-    const scoreText = (card.querySelector('.fv-score')?.textContent || '–').trim();
-    const pinFocus = () => {
-      actState(q).goal = 'improve';
-      if (!AP_PINNED.some(r => r.key === q)) AP_PINNED.push({ key: q, name: q, scoreText });
-      AP_REMOVED.delete(q); apTouch(q);
-    };
-    card.querySelector('.fv-reco-add')?.addEventListener('click', (e) => {
+  /* Focus View: Choose / Edit on a focus card opens the respond dialog. Delegated, because a
+     confirmed response re-renders the cards. */
+  document.getElementById('view-focus')?.addEventListener('click', (e) => {
+    const rel = e.target.closest('[data-fv-rel]');
+    if (rel) {
       e.preventDefault();
-      const title = (card.querySelector('.fv-reco-title')?.textContent || '').trim();
-      pinFocus();
-      /* open the panel first, then let the recommended action appear so it reads as
-         "being added" rather than already sitting there */
-      const overlay = window.apOpenActions ? window.apOpenActions(q, q, scoreText, false) : null;
-      if (overlay && title && !actState(q).actions.some(a => a.text === title)) {
-        setTimeout(() => {
-          actState(q).actions.push({ text: title, done: false, deadline: '', assignee: '' }); apTouch(q);
-          renderActList(overlay);
-          const rows = overlay.querySelectorAll('.act-list .act-item');
-          const fresh = rows[rows.length - 1];
-          if (fresh) requestAnimationFrame(() => fresh.classList.add('is-new'));
-        }, 450);
-      }
-    });
-    card.querySelector('.fv-create')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      pinFocus();
-      if (window.apOpenActions) window.apOpenActions(q, q, scoreText, true);
-    });
+      const q = rel.closest('.fv-card')?.dataset.q;
+      if (!q) return;
+      const st = focusResp(q), dir = rel.dataset.fvRel;
+      if (dir === 'down' && st.relevance !== 'down') { fvNrOpen(q); return; }   /* ask why first */
+      st.relevance = st.relevance === dir ? null : dir;   /* clicking the active thumb clears it */
+      renderFocusCards();
+      return;
+    }
+    const btn = e.target.closest('[data-fv-choose], [data-fv-edit]');
+    if (!btn) return;
+    e.preventDefault();
+    const card = btn.closest('.fv-card, .fv-win-card');
+    if (card) openFvStep(card.dataset.q, btn.hasAttribute('data-fv-edit') ? 'plan' : 'respond');
   });
 
   /* Reports view: language picker → generate → download / notify */

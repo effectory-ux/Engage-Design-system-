@@ -690,6 +690,11 @@ Compacte groep van 2–3 opties waarvan er altijd precies één geselecteerd is 
 > ⚠️ Figma/dev gap: de styleguide kent ook `multiple` (meerdere segmenten tegelijk aan); Figma dekt alleen single select met 2–3 buttons.
 
 ### Date Picker
+> ⚠️ **Nooit een native `<input type="date">`** (en net zo min `time`, `month`, `week`, `range`,
+> `file`, `<progress>` of `<meter>`). Die tonen de widget van de browser: eigen typografie, eigen
+> kleuren, geen tokens, en per besturingssysteem anders — precies wat hieronder wél goed staat.
+> Er komt geen foutmelding van, dus het valt alleen op in een screenshot. `tools/check-native-controls.py`
+> faalt erop en draait mee in CI.
 ```html
 <!-- Trigger knop -->
 <button class="dp-trigger">
