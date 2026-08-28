@@ -2146,6 +2146,9 @@ span.inline-notif-icon.is-subtle i[data-icon] { width: 24px; height: 24px; displ
 
 /* ── Dialog ── */
 .dialog { position: relative; display: flex; flex-direction: column; gap: 24px; width: 440px; max-width: 100%; padding: 32px; background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-xl); box-shadow: var(--sh-dialogs); font-family: 'Poppins', sans-serif; overflow: hidden; }
+/* The docs and the production panelClass both name an XS; the base width already is it, so this
+   makes the documented name real rather than working by accident. */
+.dialog-xs { width: 440px; }
 .dialog-s { width: 600px; }
 .dialog-m { width: 800px; }
 .dialog-l { width: 1080px; }
