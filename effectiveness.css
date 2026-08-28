@@ -1535,7 +1535,7 @@
     .ap-export-menu[hidden], .ap-kebab-menu[hidden] { display: none; }
 
     /* Actions table — a card, with an uppercase header band */
-    .ap-table { border: 1px solid var(--border-base); border-radius: var(--radius-md); background: var(--bg-base); box-shadow: var(--sh-card); }
+    .ap-table { border: 1px solid var(--border-base); border-radius: var(--radius-md); background: var(--bg-base); }
     .ap-thead, .ap-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px 168px 190px 44px; align-items: center; gap: var(--spacing-base); padding: var(--spacing-base) var(--spacing-loose); }
     .ap-thead { background: var(--bg-secondary); border-radius: var(--radius-md) var(--radius-md) 0 0; }
     .ap-th { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--content-subtle); justify-self: start; }
@@ -1547,6 +1547,9 @@
 
     .ap-row { border-top: 1px solid var(--border-base); cursor: pointer; transition: background var(--motion-fast) var(--ease-out); }
     .ap-row:hover { background: var(--bg-secondary); }
+    /* .ib-tertiary hovers to --bg-base-hover, which is the same value as --bg-secondary — the
+       row's own hover — so the kebab had no visible state inside a row. One step further. */
+    .ap-row .ap-kebab:hover { background: var(--bg-tertiary); color: var(--content-base); }
     /* name over its theme, so the row reads as the focus area it came from */
     .ap-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--content-base); }
     .ap-score { font-size: 14px; font-weight: 600; color: var(--content-secondary); }
@@ -1721,7 +1724,7 @@
 .step-opt.is-monitor .step-opt-ico { background: var(--bg-info-subtle); color: var(--content-info); }
 .step-opt.is-support .step-opt-ico { background: var(--bg-negative-subtle); color: var(--content-negative); }
 .step-opt.is-promote .step-opt-ico { background: var(--bg-positive-subtle); color: var(--content-positive); }
-.step-opt-title { font-size: 15px; font-weight: 600; color: var(--content-base); }
+.step-opt-title { font-size: 14px; font-weight: 600; color: var(--content-base); }
 .step-opt-desc { font-size: 12px; line-height: 1.5; color: var(--content-secondary); }
 @media (max-width: 760px) { .step-options { grid-template-columns: 1fr; } }
 
@@ -1845,7 +1848,7 @@
 .act-sum.is-support .act-sum-ico { background: var(--bg-negative-subtle); color: var(--content-negative); }
 .act-sum.is-promote .act-sum-ico { background: var(--bg-positive-subtle); color: var(--content-positive); }
 .act-sum-txt { display: flex; flex-direction: column; }
-.act-sum-n { font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--content-base); }
+.act-sum-n { font-size: 22px; font-weight: 600; line-height: 1.1; color: var(--content-base); }
 .act-sum-l { font-size: 12px; color: var(--content-secondary); }
 @media (max-width: 900px) { .actions-summary { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 760px) { .ap-thead { display: none; } .ap-row { grid-template-columns: 1fr auto; row-gap: var(--spacing-tight); } .ap-score { display: none; } }
@@ -1856,16 +1859,16 @@
 .ap-addaction { display: inline-flex; align-items: center; gap: var(--spacing-tight); background: none; border: 0; padding: 0; font-family: inherit; font-size: 14px; font-weight: 600; color: var(--content-brand); cursor: pointer; }
 .ap-addaction i { display: flex; width: 16px; height: 16px; }
 .ap-addaction:hover { text-decoration: underline; }
-.ap-toolbar[hidden], .ap-table[hidden] { display: none; }
+.ap-toolbar[hidden], .ap-table[hidden], .actions-head[hidden] { display: none; }
 
 /* Empty state — the four responses explained with the same cards the dialog uses */
-.actions-empty { display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: var(--spacing-loose); padding: var(--spacing-extra-loose); background: var(--bg-base); border: 1px solid var(--border-base); border-radius: var(--radius-md); }
+.actions-empty { display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: var(--spacing-loose); width: 100%; max-width: 960px; margin: var(--spacing-super-loose) auto; padding: var(--spacing-extra-loose); background: var(--bg-base); border-radius: var(--radius-md); }
 .ae-hero { display: flex; align-items: center; gap: var(--spacing-extra-loose); width: 100%; }
 .ae-hero-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--spacing-tight); }
-.ae-title { margin: 0; font-size: 22px; font-weight: 700; color: var(--content-base); }
-.ae-desc { margin: 0; font-size: 15px; line-height: 1.5; color: var(--content-secondary); }
+.ae-title { margin: 0; font-size: 22px; font-weight: 600; color: var(--content-base); }
+.ae-desc { margin: 0; font-size: 14px; line-height: 1.6; color: var(--content-secondary); }
 .ae-illo { flex: none; }
-.actions-illo { display: block; height: 140px; width: auto; }
+.actions-illo { display: block; height: 96px; width: auto; }
 .ae-options { width: 100%; }
 .step-opt.is-static { cursor: default; }
 .step-opt.is-static:hover { border-color: var(--border-base); }

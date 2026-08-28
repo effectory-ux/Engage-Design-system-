@@ -128,6 +128,10 @@ Gebruik altijd deze tokens voor animaties; verzin geen eigen duraties/easings.
 - `prefers-reduced-motion` zet de animaties uit (in én uit; al ingebouwd) — vang die af met een fallback die meteen sluit.
 
 ### Typografie-utility-classes
+> ⚠️ **Alleen maten van de schaal: 12 / 14 / 16 / 20 / 26 / 32 / 42.** **15px mag nooit.** Naast 14px
+> zie je het verschil niet in een diff, wel op het scherm. `tools/check-font-scale.py` faalt erop en
+> draait mee in CI. Nieuwe maat echt nodig? Zet hem eerst als text-class in `foundation.css`.
+
 ```
 .text-l1   42px / 600 / -.03em    heading niveau 1
 .text-l2   32px / 600 / -.02em    heading niveau 2

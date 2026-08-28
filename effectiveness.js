@@ -1725,7 +1725,7 @@ function actionsEmptyHTML() {
         <span class="step-opt-title">${T2(g.label)}</span>
         <span class="step-opt-desc">${RESP_DESC[key]}</span></div>`;
     }).join('')}</div>
-    <div class="ae-cta-row"><button class="btn btn-primary ae-cta ap-custom" type="button"><i data-icon="plus"></i> ${T2('Custom pin')}</button></div>
+    <div class="ae-cta-row"><button class="btn btn-primary ae-cta ap-custom" type="button"><i data-icon="plus"></i> ${T2('Create custom action')}</button></div>
   </div>`;
 }
 
@@ -1737,7 +1737,6 @@ function actionsView(d) {
   <div class="ap-wrap actions-page">
     <div class="actions-head">
       <div class="actions-head-txt">
-        <span class="fv-eyebrow is-focus">${T2('Your responses')}</span>
         <h2 class="fv-section-title">${T2("Everything you've decided to act on")}</h2>
         <p class="fv-section-desc">${T2("Actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview. All of this is visible to HR.")}</p>
       </div>
@@ -4011,7 +4010,11 @@ function renderOverview(variant, initialView) {
       const empty = view.querySelector('.actions-empty');
       const table = view.querySelector('.ap-table');
       const toolbar = view.querySelector('.ap-toolbar');
+      const head = view.querySelector('.actions-head');
       if (!rows.length) {
+        /* the empty state carries its own title and CTA, so the page header would only
+           repeat it — and there is nothing yet to export or sort */
+        if (head) head.hidden = true;
         if (table) table.hidden = true;
         if (toolbar) toolbar.hidden = true;
         if (sum) sum.hidden = true;
@@ -4020,6 +4023,7 @@ function renderOverview(variant, initialView) {
         return;
       }
       if (empty) empty.remove();
+      if (head) head.hidden = false;
       if (table) table.hidden = false;
       if (toolbar) toolbar.hidden = false;
       if (sum) sum.hidden = false;

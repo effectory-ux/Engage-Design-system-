@@ -213,7 +213,7 @@ h6 { font-size: 12px; font-weight: 600; color: var(--content-subtle); letter-spa
   font-size: 13.5px; line-height: 1.55; color: var(--content-base);
   margin-top: 16px;
 }
-.gap-callout-icon { flex-shrink: 0; margin-top: 1px; font-size: 15px; }
+.gap-callout-icon { flex-shrink: 0; margin-top: 1px; font-size: 14px; }
 .gap-callout strong { font-weight: 600; display: block; margin-bottom: 2px; }
 
 .anatomy-items { display: flex; flex-direction: column; gap: 12px; margin-top: var(--spacing-tight); }

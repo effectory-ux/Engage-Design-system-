@@ -4,8 +4,8 @@
   "raw": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main",
   "reference": {
     "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/design-system-reference.md",
-    "sha": "e4def890ac3c",
-    "bytes": 83840
+    "sha": "ca21ab30d4af",
+    "bytes": 84142
   },
   "designSystem": {
     "tokens.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/tokens.css",
