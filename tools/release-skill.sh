@@ -18,8 +18,8 @@ ASSET="effectory-design-system.zip"
 ZIP="$ROOT/dist/$ASSET"
 
 # 1. Rebuild the bundle from source
-"$ROOT/sync-skill.sh"
-"$ROOT/build-skill.sh"
+"$ROOT/tools/sync-skill.sh"
+"$ROOT/tools/build-skill.sh"
 
 VER=$(tr -d '[:space:]' < "$ROOT/VERSION")
 BUILT=$(date +"%Y-%m-%d %H:%M")

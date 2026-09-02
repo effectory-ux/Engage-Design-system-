@@ -1,8 +1,59 @@
 {
-  "count": 1048,
+  "count": 1055,
   "entries": [
     {
-      "hash": "48b3209",
+      "hash": "d68965f",
+      "author": "Jente Insing",
+      "date": "2026-08-28",
+      "subject": "Empty Actions page stands on its own; font sizes hold the scale",
+      "pages": []
+    },
+    {
+      "hash": "642fb96",
+      "author": "Jente Insing",
+      "date": "2026-08-28",
+      "subject": "Define dialog-xs",
+      "pages": []
+    },
+    {
+      "hash": "8e698f0",
+      "author": "Jente Insing",
+      "date": "2026-08-28",
+      "subject": "Carry the empty-state illustration into the skill bundle",
+      "pages": []
+    },
+    {
+      "hash": "4cee385",
+      "author": "Jente Insing",
+      "date": "2026-08-28",
+      "subject": "Focus View responds; the Actions page shows the responses",
+      "pages": []
+    },
+    {
+      "hash": "b782bd0",
+      "author": "Jente Insing",
+      "date": "2026-08-28",
+      "subject": "Announcement: colour variants as classes, with every button state",
+      "pages": [
+        "announcement-docs.html"
+      ]
+    },
+    {
+      "hash": "ad0e804",
+      "author": "Jente Insing",
+      "date": "2026-08-26",
+      "subject": "Carry the new semantic subtle-hover tokens into the skill bundle",
+      "pages": []
+    },
+    {
+      "hash": "0e9b2f9",
+      "author": "Jente Insing",
+      "date": "2026-08-26",
+      "subject": "Add subtle-hover to the four semantic background families",
+      "pages": []
+    },
+    {
+      "hash": "a1a3704",
       "author": "Jamal van Rooijen",
       "date": "2026-08-19",
       "subject": "Let the org skill update itself from the repo (v1.17.0)",

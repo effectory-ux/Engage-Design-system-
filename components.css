@@ -280,8 +280,8 @@ input.tf.is-readonly.is-hover { border-color: var(--border-base); }
 
 /* Helper text */
 .tf-help {
-  font-size: 14px;
-  color: var(--content-subtle);
+  font-size: 12px;
+  color: var(--content-secondary);
   line-height: 1.5;
 }
 
