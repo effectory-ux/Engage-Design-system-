@@ -21,8 +21,9 @@ set -euo pipefail
 # Derived files. skill-source/ (the org bundle) and skill-manifest.json are
 # generated from the skill and design-system sources. When one of those sources
 # is staged, regenerate the derived files and stage them too, so the commit is
-# complete on its own. CI does the same on every pull request, so forgetting is
-# harmless; this just saves the round trip.
+# complete on its own. CI refuses a pull request whose derived files are stale
+# and prints the fix, so a clone without hooks cannot break main — this just
+# saves the round trip.
 if git diff --cached --name-only --diff-filter=ACMRD \
    | grep -qE '^(VERSION|tokens\.css|foundation\.css|components\.css|icons\.js|tools/(serve\.py|ds-skill\.sh)|assets/|skill-source/SKILL\.md|\.claude/skills/effectory-design-system/)'; then
   if bash tools/regenerate.sh --quiet; then

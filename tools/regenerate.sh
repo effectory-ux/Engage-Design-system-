@@ -7,8 +7,9 @@
 #
 # Who runs it, so that nobody has to remember:
 #   · .githooks/pre-commit, when a skill or design-system source is staged
-#   · CI (.github/workflows/checks.yml) on every pull request, committing the
-#     result to the branch as github-actions[bot]
+#   · CI (.github/workflows/checks.yml) on every pull request — it refuses the
+#     pull request when the committed copies differ from what it regenerates
+#     (or commits the fix itself when the REGEN_TOKEN secret is set)
 #   · the release workflow, right before it zips the bundle
 #
 # assets.tar.gz is only replaced when its *content* changed: tar/gzip output is
