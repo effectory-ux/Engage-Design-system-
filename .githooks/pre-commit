@@ -17,6 +17,22 @@
 
 set -euo pipefail
 
+# ---------------------------------------------------------------------------
+# Derived files. skill-source/ (the org bundle) and skill-manifest.json are
+# generated from the skill and design-system sources. When one of those sources
+# is staged, regenerate the derived files and stage them too, so the commit is
+# complete on its own. CI refuses a pull request whose derived files are stale
+# and prints the fix, so a clone without hooks cannot break main — this just
+# saves the round trip.
+if git diff --cached --name-only --diff-filter=ACMRD \
+   | grep -qE '^(VERSION|tokens\.css|foundation\.css|components\.css|icons\.js|tools/(serve\.py|ds-skill\.sh)|assets/|skill-source/SKILL\.md|\.claude/skills/effectory-design-system/)'; then
+  if bash tools/regenerate.sh --quiet; then
+    git add -A skill-manifest.json skill-source
+  else
+    echo "⚠ pre-commit: tools/regenerate.sh failed — committing anyway; CI regenerates on the pull request." >&2
+  fi
+fi
+
 # Only check staged additions in *-docs.html and index.html
 FILES=$(git diff --cached --name-only --diff-filter=AM | grep -E '^([a-z0-9-]+-docs\.html|index\.html)$' || true)
 

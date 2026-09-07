@@ -1,0 +1,69 @@
+name: release skill
+
+# Rebuilds the org-skill bundle and refreshes the rolling "skill-latest" release
+# on every push to main that touches the skill. The download URL never changes:
+#   https://github.com/effectory-ux/Engage-Design-system-/releases/download/skill-latest/effectory-design-system.zip
+#
+# The zip only has to be re-uploaded in Claude.ai when SKILL.md or ds-skill.sh
+# changed — everything else the deployed skill fetches from the repo itself, and
+# `ds-skill.sh sync` tells the user when the bundle is behind.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - VERSION
+      - tokens.css
+      - foundation.css
+      - components.css
+      - icons.js
+      - assets/**
+      - skill-source/**
+      - .claude/skills/effectory-design-system/**
+      - tools/**
+      - .github/workflows/release-skill.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-skill
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: build the bundle
+        run: |
+          ./tools/regenerate.sh
+          ./tools/build-skill.sh
+
+      - name: refresh the rolling skill-latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER=$(tr -d '[:space:]' < VERSION)
+          TITLE="Effectory Design System — skill v$VER"
+          NOTES="Version **$VER** · built $(date -u +'%Y-%m-%d %H:%M UTC') from ${GITHUB_SHA::7}
+
+          **Install or update:** download \`effectory-design-system.zip\` and upload it in
+          Claude.ai → Organization settings → Skills → + Add. (Requires 'Code execution and
+          file creation' enabled in Organization → Capabilities.)
+
+          Only needed when the skill's instructions changed; \`ds-skill.sh sync\` says so.
+          The version number is also inside the bundle (VERSION file + SKILL.md)."
+          if gh release view skill-latest >/dev/null 2>&1; then
+            gh release edit skill-latest --title "$TITLE" --notes "$NOTES"
+          else
+            gh release create skill-latest --target main --title "$TITLE" --notes "$NOTES"
+          fi
+          gh release upload skill-latest dist/effectory-design-system.zip --clobber
+          echo "✓ v$VER published to the skill-latest release"

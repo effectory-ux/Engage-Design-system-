@@ -71,7 +71,7 @@ cp "$ROOT/tools/serve.py" "$BUNDLE/serve.py"
 echo "→ Bundling icons + illustrations + flags into assets.tar.gz (org-skills have a file-count limit)"
 rm -f "$BUNDLE/assets.tar.gz" "$BUNDLE/icons.tar.gz"
 rm -rf "$BUNDLE/assets"
-( cd "$ROOT/assets" && tar --exclude='.DS_Store' -czf "$BUNDLE/assets.tar.gz" icons illustrations flags )
+( cd "$ROOT/assets" && COPYFILE_DISABLE=1 tar --exclude='.DS_Store' --exclude='._*' -czf "$BUNDLE/assets.tar.gz" icons illustrations flags )
 
 echo ""
 echo "✓ skill-source/ in sync."
