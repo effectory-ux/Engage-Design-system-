@@ -5,7 +5,7 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.17.2
+**Version:** 1.18.0
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
@@ -38,14 +38,12 @@ bijgewerkt.
 
 2. Zet de design-system bestanden in de werkdirectory:
    ```bash
-   cp design-system-files/tokens.css design-system-files/foundation.css \
-      design-system-files/components.css design-system-files/icons.js \
-      design-system-files/serve.py .
-   mkdir -p assets && tar -xzf design-system-files/assets.tar.gz -C assets/
+   ./ds-skill.sh apply
    ```
-   Sla dit over als `tokens.css`, `assets/icons/` en `assets/illustrations/` er al staan. Wil je de
-   **actuele** CSS uit de repo in plaats van de meegeleverde, gebruik dan `ds-update.sh` — zie het
-   blok hieronder.
+   Dit kopieert de **actuele** `tokens.css`, `foundation.css`, `components.css`, `icons.js` en
+   `serve.py` uit `.ds-cache/` (zojuist opgehaald door `sync`), pakt iconen, illustraties en vlaggen
+   uit de bundel uit als `assets/` nog ontbreekt, en legt in `ds-pin.json` vast welke versie het
+   project draait. Staat het project op `manual`, dan raakt `apply` niets aan — zie het blok hieronder.
 
 3. Heb je een referentiescherm nodig, haal dat **op het moment zelf** op — niet alle vijftien vooraf:
    ```bash
@@ -60,6 +58,10 @@ op wachten. Door ze op te halen is een nieuw scherm toevoegen een **commit in de
 zip alleen opnieuw geüpload te worden als de **regels in deze SKILL.md** zelf wijzigen. Elke
 geslaagde fetch schrijft naar `.ds-cache/`, dus valt GitHub weg dan werk je door met de laatste goede
 versie — een netwerkprobleem maakt het hoogstens iets ouder, nooit stuk.
+
+Meldt `sync` dat **de skill-bundel verouderd is** (de instructies of `ds-skill.sh` zijn in de repo
+veranderd), zeg dat dan één keer tegen de gebruiker: de admin moet de skill in Claude.ai bijwerken.
+Werk daarna gewoon door met de instructies die je hebt; alle inhoud is wél actueel.
 
 ### Design system updates — `auto` of `manual`
 
@@ -76,7 +78,7 @@ bepaalt de gebruiker. De keuze staat in `ds-pin.json` in de projectmap:
 ```
 
 - **`"update": "auto"`** *(standaard)* — haal bij de start van een bouwsessie de nieuwste versie op
-  (`tools/ds-update.sh`) en meld in één zin wat er veranderd is. Zo werk je altijd met het actuele system.
+  (`./ds-skill.sh apply`) en meld in één zin wat er veranderd is. Zo werk je altijd met het actuele system.
 - **`"update": "manual"`** — verander niets. Meld alleen dat er een update klaarstaat en op welke
   ref het project nu staat; de gebruiker beslist. Gebruik dit zodra een prototype af is, gedeeld is
   of in de galerij staat: dan hoort het niet meer te bewegen.
@@ -89,7 +91,10 @@ Regels:
    `"update": "manual"`. Vraagt hij om los te laten ("weer meelopen", "attach"), zet `"auto"`.
 4. De gebruiker kan het ook in de prompt zeggen ("bouw dit maar pin het design system") — dat wint
    van wat er in het bestand staat, en je legt het daarna vast.
-5. `tools/ds-update.sh --check` zegt alleen of het project achterloopt, zonder iets te wijzigen.
+5. `./ds-skill.sh apply --check` zegt alleen of het project achterloopt, zonder iets te wijzigen.
+   `./ds-skill.sh apply --force` werkt een `manual`-project bij, alleen als de gebruiker daarom vraagt.
+6. `ref` is de inhouds-generatie uit het manifest van de repo; `./ds-skill.sh apply --ref <commit>`
+   pint het project in plaats daarvan op een exacte commit.
 
 > Op termijn komt deze schakelaar in de prototype-toolbar; tot die tijd is `ds-pin.json` plus de
 > prompt de plek waar het geregeld wordt.
@@ -541,7 +546,7 @@ dezelfde kaart.
 
 1. **Vraag naam + track** — één `AskUserQuestion`, naam eerst. Dit is je eerste bericht, vóór elke andere vraag (regel 12 en 13)
 2. **Lees de reference** — laad `design-system-reference.md` volledig
-3. **Zorg dat design-system bestanden in CWD staan** — kopieer ze indien nodig (zie Setup)
+3. **Zorg dat design-system bestanden in CWD staan** — `./ds-skill.sh apply` (zie Setup)
 4. **Begrijp de vraag** — welk scherm, welke componenten, welke flow?
 5. **Controleer beschikbaarheid** — staan alle benodigde componenten en tokens in de reference?
    - Niet beschikbaar → stop en meld het aan de gebruiker

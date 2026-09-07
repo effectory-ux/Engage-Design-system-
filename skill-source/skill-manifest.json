@@ -1,17 +1,42 @@
 {
-  "version": "1.17.0",
+  "version": "1.18.0",
   "repo": "effectory-ux/Engage-Design-system-",
   "raw": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main",
   "reference": {
     "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/.claude/skills/effectory-design-system/design-system-reference.md",
-    "sha": "ca21ab30d4af",
-    "bytes": 84142
+    "sha": "e3b1398fa969",
+    "bytes": 85576
   },
   "designSystem": {
-    "tokens.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/tokens.css",
-    "foundation.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/foundation.css",
-    "components.css": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/components.css",
-    "icons.js": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/icons.js"
+    "tokens.css": {
+      "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/tokens.css",
+      "sha": "fba4b3211708",
+      "bytes": 26651
+    },
+    "foundation.css": {
+      "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/foundation.css",
+      "sha": "d011596d6d4c",
+      "bytes": 4249
+    },
+    "components.css": {
+      "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/components.css",
+      "sha": "0b0a3459d8ff",
+      "bytes": 127151
+    },
+    "icons.js": {
+      "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/icons.js",
+      "sha": "a17ea6f88283",
+      "bytes": 2742
+    },
+    "serve.py": {
+      "url": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main/tools/serve.py",
+      "sha": "62beb8220b43",
+      "bytes": 833
+    }
+  },
+  "bundle": {
+    "skillMd": "93c1405fa1e7",
+    "dsSkill": "d701faf9a393"
   },
   "screens": [
     {
@@ -271,5 +296,6 @@
         "bytes": 2302
       }
     }
-  ]
+  ],
+  "generation": "2b377fc2f39b"
 }

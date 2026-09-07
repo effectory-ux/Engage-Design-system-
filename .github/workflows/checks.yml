@@ -1,17 +1,43 @@
 name: checks
 
-# The skill's two hand-maintained seams are checked on the way in, not only when
-# whoever releases happens to run sync-skill.sh on their laptop.
+# Two things happen here.
+#
+# The checks catch hand-maintained seams that rot silently: the reference doc
+# vs components.css, the two skill copies, docs asset paths, native controls,
+# the type scale.
+#
+# The regeneration keeps the *derived* files current — skill-source/ (the org
+# bundle) and skill-manifest.json (what the deployed skill fetches) — so nobody
+# has to remember tools/regenerate.sh:
+#   · on a pull request it regenerates and, when something changed, commits the
+#     result to the branch as github-actions[bot], then starts a fresh run for
+#     that commit (a push made with GITHUB_TOKEN triggers no workflow by itself);
+#   · on main it only verifies, because main is protected and every change
+#     arrives through a pull request that already carries the regeneration.
+
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   skill:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # a pull request checks out its own branch, not the merge ref, so the
+          # regeneration can be committed back to it
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
 
       - uses: actions/setup-python@v5
         with:
@@ -45,8 +71,38 @@ jobs:
       - name: font sizes are on the type scale
         run: ./tools/check-font-scale.py
 
-      # skill-manifest.json is what the org skill fetches to find screens and the
-      # reference. It is generated from the registry, so a stale commit would point
-      # the whole org at the wrong set.
-      - name: skill-manifest.json is current
-        run: ./tools/build-manifest.py --check
+      # skill-source/ and skill-manifest.json are generated from the sources above.
+      # Regenerate them here; the next two steps decide what to do with the result.
+      - name: regenerate derived files (skill-source/, skill-manifest.json)
+        run: ./tools/regenerate.sh
+
+      - name: commit the regeneration to the pull request
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [ -z "$(git status --porcelain -- skill-manifest.json skill-source)" ]; then
+            echo "✓ derived files were already current"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A skill-manifest.json skill-source
+          git commit -q -m "Regenerate skill-source and skill-manifest.json" \
+                        -m "Automated by .github/workflows/checks.yml via tools/regenerate.sh."
+          git push origin "HEAD:$BRANCH"
+          # a push made with GITHUB_TOKEN triggers no workflow run, so start the one
+          # for the new head ourselves; that run is what branch protection waits for
+          gh workflow run checks.yml --ref "$BRANCH"
+          echo "::notice title=derived files regenerated::Committed to $BRANCH as github-actions[bot]; a new checks run was started for that commit."
+
+      - name: derived files are current
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          if [ -n "$(git status --porcelain -- skill-manifest.json skill-source)" ]; then
+            git status --short -- skill-manifest.json skill-source
+            echo "::error::skill-source/ or skill-manifest.json is stale. Open a pull request — CI regenerates them there — or run tools/regenerate.sh and commit."
+            exit 1
+          fi
+          echo "✓ derived files current"
