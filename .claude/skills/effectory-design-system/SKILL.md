@@ -233,6 +233,11 @@ Roep `ux-copy` aan zodra je tekst gaat schrijven of wijzigen — niet alleen op 
 ```
 Gebruik alleen iconnamen uit de lijst in `design-system-reference.md` sectie 5.
 
+Landvlaggen zijn geen iconen: die gaan via `<i class="flag" data-flag="NL"></i>`, omdat
+ze hun eigen kleuren houden in plaats van `currentColor` te volgen. Codes en formaten in
+`design-system-reference.md` sectie 6. Een vlag staat altijd naast de taal in woorden,
+nooit in plaats daarvan, en nooit voor de nationaliteit van een persoon.
+
 ### 6. tokens.css komt uit het design system
 Nooit `tokens.css` handmatig bewerken — ook niet even, ook niet "alleen in dit prototype". Alleen lezen
 en gebruiken.

@@ -47,6 +47,17 @@ for n in $USED; do
 done
 echo "  assets/icons/ ($(echo "$USED" | grep -c . ) referenced icons)"
 
+# same for flags — data-flag accepts nl / nl-NL / NL, the file is the last two letters upper-cased
+FLAGS=$(grep -rho 'data-flag="[^"]*"' . --include=*.html 2>/dev/null | sed 's/.*="//;s/"//' \
+  | awk '{print toupper(substr($0, length($0)-1))}' | sort -u)
+if [ -n "$FLAGS" ]; then
+  mkdir -p assets/flags
+  for n in $FLAGS; do
+    curl -fsSL "$RAW/$REF/assets/flags/$n.svg" -o "assets/flags/$n.svg" 2>/dev/null || true
+  done
+  echo "  assets/flags/ ($(echo "$FLAGS" | grep -c . ) referenced flags)"
+fi
+
 python3 - "$REF" <<'PY'
 import json, sys, datetime
 json.dump({"designSystem": "effectory-ux/Engage-Design-system-",

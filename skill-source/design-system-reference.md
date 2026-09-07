@@ -1323,3 +1323,34 @@ Iconen worden geïnjecteerd door `icons.js` (moet onderaan `<body>` staan).
 
 **Niet als `data-icon` te gebruiken** (bestandsnamen met spaties of hoofdletters zijn illustraties, geen UI-iconen):
 `Barchart-1` `ESG scan` `ESG scan-1` `ESG scan-2` `Strategic fitness scan` `Tree` `Trend-down` `Trend-up` `Type` `magic wand`
+
+---
+
+## 6. Vlaggen
+
+Patroon: `<i class="flag" data-flag="NL"></i>`
+Vlaggen zitten in `assets/flags/{CODE}.svg` onder hun ISO 3166-1 alpha-2-code en worden
+door dezelfde `icons.js` geïnjecteerd als de iconen.
+
+Gebruik `data-flag`, niet `data-icon`: een vlag houdt zijn eigen kleuren en volgt dus
+géén `currentColor`. De code mag lowercase (`nl`) of een locale (`pt-BR`) zijn — de
+loader pakt de laatste twee letters.
+
+`.flag` geeft een 4:3-kader van 20px breed, plus een haarlijn zodat wit-op-wit vlaggen
+(JP, PL, ID) niet weglopen in het vlak. Formaat zet je met de breedte:
+`.flag-sm` (16px) en `.flag-lg` (24px).
+
+```html
+<i class="flag" data-flag="NL"></i>
+<i class="flag flag-sm" data-flag="DE"></i>
+<i class="flag flag-lg" data-flag="BR"></i>
+```
+
+**Beschikbare vlaggen** (55, één per taal waarin Engage uitvraagt):
+
+`AT` `BE` `BG` `BR` `CH` `CN` `CZ` `DE` `DK` `EE` `EG` `ES` `ET` `FI` `FR` `GB` `GR` `HK` `HR` `HU` `ID` `IN` `IS` `IT` `JP` `KE` `KH` `KR` `LT` `LV` `MA` `MM` `MX` `MY` `NL` `NO` `PK` `PL` `PT` `RO` `RS` `RU` `SA` `SE` `SI` `SK` `SY` `TH` `TN` `TR` `TW` `UA` `US` `VN` `ZA`
+
+Een vlag is geen taal: zet de taal in woorden en laat de vlag ernaast staan als
+herkenning, nooit in plaats van de tekst. Portugees is niet alleen Brazilië, Engels
+niet alleen het Verenigd Koninkrijk, en wie zijn land niet ziet staan heeft niets om
+op te zoeken. Nooit een vlag gebruiken voor de nationaliteit van een persoon.

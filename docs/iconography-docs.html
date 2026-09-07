@@ -73,6 +73,33 @@
       text-align: center; word-break: break-all; line-height: 1.4;
     }
 
+    /* Flag — mirror of the .flag block in components.css */
+    .flag {
+      display: inline-block; flex-shrink: 0; vertical-align: middle;
+      width: 20px; aspect-ratio: 4 / 3; overflow: hidden;
+      box-shadow: inset 0 0 0 1px var(--border-base);
+    }
+    .flag-sm { width: 16px; }
+    .flag-lg { width: 24px; }
+    .flag > svg { display: block; }
+
+    /* Flag grid — same cell as the icon grid, but a flag keeps its own colours
+       (the .icon-cell rules rewrite every fill to currentColor) and is 4:3, not
+       square, so it gets its own cell class. */
+    .flag-grid { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
+    .flag-cell {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 16px 8px;
+      border: 1px solid var(--border-base-hover); border-radius: var(--radius-md);
+      background: var(--bg-base); cursor: pointer;
+      transition: border-color .12s ease, background .12s ease;
+    }
+    .flag-cell:hover { border-color: var(--border-base); background: var(--bg-secondary); }
+    .flag-cell .flag { width: 32px; }
+    .flag-cell-country { font-size: 11px; color: var(--content-subtle); text-align: center; line-height: 1.4; }
+    .flag-cell.copied { border-color: var(--border-brand); background: var(--bg-secondary); }
+    .flag-cell.copied .icon-cell-name::after { content: ' · copied'; color: var(--content-brand); }
+
     .note {
       background: var(--bg-secondary);
       border: 1px solid var(--border-base);
@@ -218,6 +245,28 @@
     </div>
   </section>
 
+  <!-- FLAGS -->
+  <section class="section" id="flags">
+    <h2 class="text-l3">Flags</h2>
+    <p style="font-size:14px; color:var(--content-secondary); line-height:1.6; margin-bottom:16px;">The 55 country flags Engage ships, one per survey language and market. They live in <span class="g-code">assets/flags/{CODE}.svg</span> under their ISO 3166-1 alpha-2 code and are injected by <span class="g-code">icons.js</span>, the same loader as the icon library. Use <span class="g-code">data-flag</span> rather than <span class="g-code">data-icon</span>: a flag keeps its own colours instead of following <span class="g-code">currentColor</span>. The <span class="g-code">.flag</span> class gives it a 4:3 box, so resize by setting the width alone.</p>
+    <div class="icon-toolbar">
+      <input class="icon-search" id="flag-search" type="search" placeholder="Search flags — code or country…" oninput="filterFlags(this.value)" aria-label="Search flags" />
+    </div>
+    <div id="flag-grid" class="icon-grid flag-grid" aria-busy="true"></div>
+    <div class="icon-count" id="flag-count"></div>
+    <div class="note" id="flag-no-results" style="display:none;">No flags match your search. Only the 55 languages Engage surveys in are included.</div>
+    <div class="dev-code-wrap" style="margin-top:16px;">
+      <button class="dev-copy-btn">Copy</button>
+      <pre><code><span class="cm">&lt;!-- default, 20px wide --&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">class</span>=<span class="cv">"flag"</span> <span class="ca">data-flag</span>=<span class="cv">"NL"</span><span class="ct">&gt;&lt;/i&gt;</span>
+
+<span class="cm">&lt;!-- 16px and 24px --&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">class</span>=<span class="cv">"flag flag-sm"</span> <span class="ca">data-flag</span>=<span class="cv">"DE"</span><span class="ct">&gt;&lt;/i&gt;</span>
+<span class="ct">&lt;i</span> <span class="ca">class</span>=<span class="cv">"flag flag-lg"</span> <span class="ca">data-flag</span>=<span class="cv">"BR"</span><span class="ct">&gt;&lt;/i&gt;</span></code></pre>
+    </div>
+    <div class="note" style="margin-top:16px;"><strong>A flag is not a language.</strong> Label the language in words and let the flag sit beside it as recognition, never instead of it: Portuguese is not only Brazil, English is not only the United Kingdom, and a reader whose country is missing has nothing to look for. Never use a flag to stand for a person's nationality.</div>
+  </section>
+
   <!-- USAGE -->
   <section class="section" id="usage">
     <h2 class="text-l3">Usage</h2>
@@ -341,6 +390,7 @@
     <a class="toc-link" href="#sizes">Sizes</a>
     <a class="toc-link" href="#library">Library</a>
     <a class="toc-link" href="#file-types">File type icons</a>
+    <a class="toc-link" href="#flags">Flags</a>
     <a class="toc-link" href="#usage">Usage</a>
     <a class="toc-link" href="#guidance">Guidance</a>
   </nav>
@@ -393,7 +443,7 @@
 
     const results = await Promise.all(sorted.map(async name => {
       try {
-        const r = await fetch(`assets/icons/${encodeURIComponent(name)}.svg`);
+        const r = await fetch(`../assets/icons/${encodeURIComponent(name)}.svg`);
         if (!r.ok) return { name, svg: null };
         return { name, svg: normalizeSvg(await r.text()) };
       } catch { return { name, svg: null }; }
@@ -433,7 +483,64 @@
       q ? `${visible} of ${ICONS.length} icons` : `${ICONS.length} icons`;
   }
 
+  /* ISO 3166-1 alpha-2 → English country name. The name is only there so the
+     search box finds "netherlands" as well as "NL"; the code is what you copy. */
+  const FLAGS = {
+    AT: "Austria", BE: "Belgium", BG: "Bulgaria", BR: "Brazil", CH: "Switzerland",
+    CN: "China", CZ: "Czechia", DE: "Germany", DK: "Denmark", EE: "Estonia",
+    EG: "Egypt", ES: "Spain", ET: "Ethiopia", FI: "Finland", FR: "France",
+    GB: "United Kingdom", GR: "Greece", HK: "Hong Kong", HR: "Croatia", HU: "Hungary",
+    ID: "Indonesia", IN: "India", IS: "Iceland", IT: "Italy", JP: "Japan",
+    KE: "Kenya", KH: "Cambodia", KR: "South Korea", LT: "Lithuania", LV: "Latvia",
+    MA: "Morocco", MM: "Myanmar", MX: "Mexico", MY: "Malaysia", NL: "Netherlands",
+    NO: "Norway", PK: "Pakistan", PL: "Poland", PT: "Portugal", RO: "Romania",
+    RS: "Serbia", RU: "Russia", SA: "Saudi Arabia", SE: "Sweden", SI: "Slovenia",
+    SK: "Slovakia", SY: "Syria", TH: "Thailand", TN: "Tunisia", TR: "T\u00fcrkiye",
+    TW: "Taiwan", UA: "Ukraine", US: "United States", VN: "Vietnam", ZA: "South Africa"
+  };
+
+  function loadFlags() {
+    const grid = document.getElementById('flag-grid');
+    const frag = document.createDocumentFragment();
+    for (const code of Object.keys(FLAGS).sort()) {
+      const cell = document.createElement('div');
+      cell.className = 'flag-cell';
+      cell.dataset.search = `${code} ${FLAGS[code]}`.toLowerCase();
+      cell.title = `Click to copy \u00b7 ${code}`;
+      cell.innerHTML =
+        `<i class="flag" data-flag="${code}"></i>` +
+        `<span class="icon-cell-name">${code}</span>` +
+        `<span class="flag-cell-country">${FLAGS[code]}</span>`;
+      cell.addEventListener('click', () => {
+        navigator.clipboard?.writeText(code);
+        cell.classList.add('copied');
+        setTimeout(() => cell.classList.remove('copied'), 1200);
+      });
+      frag.appendChild(cell);
+    }
+    grid.removeAttribute('aria-busy');
+    grid.appendChild(frag);
+    document.getElementById('flag-count').textContent = `${Object.keys(FLAGS).length} flags`;
+    /* icons.js only sweeps the document once, on load — these cells arrive after. */
+    window.Icons?.render(grid);
+  }
+
+  function filterFlags(q) {
+    q = (q || '').trim().toLowerCase();
+    const cells = document.querySelectorAll('#flag-grid .flag-cell');
+    let visible = 0;
+    cells.forEach(cell => {
+      const match = !q || cell.dataset.search.includes(q);
+      cell.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    document.getElementById('flag-no-results').style.display = visible ? 'none' : '';
+    const total = Object.keys(FLAGS).length;
+    document.getElementById('flag-count').textContent = q ? `${visible} of ${total} flags` : `${total} flags`;
+  }
+
   loadIcons();
+  loadFlags();
 </script>
 </body>
 </html>

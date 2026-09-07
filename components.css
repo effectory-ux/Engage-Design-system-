@@ -724,13 +724,18 @@ textarea.ta.is-disabled::placeholder { color: var(--content-disabled); }
   height:36px; border:1px solid var(--border-action); border-radius:6px;
   background:var(--bg-base); padding:0 12px; box-shadow:var(--sh-action);
   display:flex; align-items:center; justify-content:space-between; gap:8px;
-  font-size:14px; cursor:pointer; width:100%;
+  font-family:inherit; font-size:14px; cursor:pointer; width:100%;
 }
+/* A <button class="slt"> would otherwise fall back to the browser's button font */
+button.slt { font: inherit; font-size:14px; }
 .slt-left { display:flex; align-items:center; gap:8px; min-width:0; }
 .slt-ph   { color:var(--content-subtle); white-space:nowrap; }
 .slt-val  { color:var(--content-base); white-space:nowrap; }
 .slt svg  { width:16px; height:16px; flex-shrink:0; color:var(--content-secondary); }
 .slt:focus-visible svg, .slt.is-focus svg { color:var(--content-base); }
+/* icons.js renders each icon into an <i data-icon>, which needs the same box as a bare svg */
+.slt i[data-icon] { width:16px; height:16px; flex-shrink:0; display:flex; color:var(--content-secondary); }
+.slt:focus-visible i[data-icon], .slt.is-focus i[data-icon] { color:var(--content-base); }
 .slt:hover, .slt.is-hover  { border-color:var(--border-action-hover); }
 .slt:active, .slt.is-pressed { border-color:var(--border-action-pressed, var(--border-action-hover)); }
 .slt:focus-visible, .slt.is-focus,
@@ -801,7 +806,7 @@ button.sel-btn { font: inherit; font-size:14px; }
   border-color:transparent; background:transparent; box-shadow:none;
   padding:0; height:auto; gap:6px;
 }
-.sel-btn-inline:hover, .sel-btn-inline.is-hover { background:transparent; border-color:transparent; color:var(--content-secondary); }
+.sel-btn-inline:hover, .sel-btn-inline.is-hover { background:transparent; border-color:transparent; color:var(--content-action-hover); }
 .sel-btn-inline:active, .sel-btn-inline.is-pressed { background:transparent; border-color:transparent; }
 .sel-btn-name  { font-weight:600; color:var(--content-base); }
 .sel-btn-value { font-weight:500; color:var(--content-secondary); }
@@ -810,6 +815,17 @@ button.sel-btn { font: inherit; font-size:14px; }
 .sel-btn.is-filled > svg, .sel-btn.is-filled > i { color:var(--content-base); }
 .sel-btn svg   { width:16px; height:16px; flex-shrink:0; color:var(--content-secondary); }
 .sel-btn:focus-visible svg, .sel-btn.is-focus svg { color:var(--content-base); }
+/* The inline variant has no background or border to change, and once it is filled its
+   text already sits at the darkest colour, so neither can carry the hover. The value is
+   underlined instead, the same affordance as .link-inline. These rules come after the
+   filled ones above, which pin the same colours. */
+.sel-btn-inline:hover .sel-btn-name,  .sel-btn-inline.is-hover .sel-btn-name,
+.sel-btn-inline:hover .sel-btn-value, .sel-btn-inline.is-hover .sel-btn-value,
+.sel-btn-inline:hover > svg,          .sel-btn-inline.is-hover > svg,
+.sel-btn-inline:hover > i,            .sel-btn-inline.is-hover > i { color:var(--content-action-hover); }
+.sel-btn-inline:hover .sel-btn-value, .sel-btn-inline.is-hover .sel-btn-value {
+  text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px;
+}
 
 /* Dropdown menu (open state for select) */
 .menu-stack { display:flex; flex-direction:column; gap:6px; width:100%; }
@@ -2524,3 +2540,17 @@ span.inline-notif-icon.is-subtle i[data-icon] { width: 24px; height: 24px; displ
    <a>; make the title the link instead if the row also navigates. */
 .list-item-actions { flex-shrink: 0; display: flex; align-items: center; gap: var(--spacing-tight); }
 .list-empty { padding: var(--spacing-super-loose) var(--spacing-loose); text-align: center; color: var(--content-secondary); font-size: 14px; }
+
+/* ── Flag — a country flag from assets/flags, injected by icons.js ── */
+/* <i class="flag" data-flag="NL"></i>. Unlike a library icon a flag keeps its own
+   colours, so it never follows currentColor. The box is 4:3, the ratio the artwork
+   is drawn at, so it fills exactly — resize by setting the width only. The inset
+   hairline stops the white-heavy flags (JP, PL, ID) bleeding into a white surface. */
+.flag {
+  display: inline-block; flex-shrink: 0; vertical-align: middle;
+  width: 20px; aspect-ratio: 4 / 3; overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--border-base);
+}
+.flag-sm { width: 16px; }
+.flag-lg { width: 24px; }
+.flag > svg { display: block; }

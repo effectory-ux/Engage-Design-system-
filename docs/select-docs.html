@@ -15,13 +15,16 @@
       height:36px; border:1px solid var(--border-action); border-radius:6px;
       background:var(--bg-base); padding:0 12px; box-shadow:var(--sh-action);
       display:flex; align-items:center; justify-content:space-between; gap:8px;
-      font-size:14px; cursor:pointer; width:100%;
+      font-family:inherit; font-size:14px; cursor:pointer; width:100%;
     }
+    button.slt { font: inherit; font-size:14px; }
     .slt-left { display:flex; align-items:center; gap:8px; min-width:0; }
     .slt-ph   { color:var(--content-subtle); white-space:nowrap; }
     .slt-val  { color:var(--content-base); white-space:nowrap; }
     .slt svg  { width:16px; height:16px; flex-shrink:0; color:var(--content-secondary); }
     .slt:focus-visible svg, .slt.is-focus svg { color:var(--content-base); }
+    .slt i[data-icon] { width:16px; height:16px; flex-shrink:0; display:flex; color:var(--content-secondary); }
+    .slt:focus-visible i[data-icon], .slt.is-focus i[data-icon] { color:var(--content-base); }
     .slt:hover, .slt.is-hover  { border-color:var(--border-action-hover); }
     .slt:active, .slt.is-pressed { border-color:var(--border-action-pressed, var(--border-action-hover)); }
     .slt:focus-visible, .slt.is-focus,
@@ -90,7 +93,7 @@
       border-color:transparent; background:transparent; box-shadow:none;
       padding:0; height:auto; gap:6px;
     }
-    .sel-btn-inline:hover, .sel-btn-inline.is-hover { background:transparent; border-color:transparent; color:var(--content-secondary); }
+    .sel-btn-inline:hover, .sel-btn-inline.is-hover { background:transparent; border-color:transparent; color:var(--content-action-hover); }
     .sel-btn-inline:active, .sel-btn-inline.is-pressed { background:transparent; border-color:transparent; }
     .sel-btn-name  { font-weight:600; color:var(--content-base); }
     .sel-btn-value { font-weight:500; color:var(--content-secondary); }
@@ -98,6 +101,13 @@
     .sel-btn.is-filled > svg, .sel-btn.is-filled > i { color:var(--content-base); }
     .sel-btn svg   { width:16px; height:16px; flex-shrink:0; color:var(--content-secondary); }
     .sel-btn:focus-visible svg, .sel-btn.is-focus svg { color:var(--content-base); }
+    .sel-btn-inline:hover .sel-btn-name,  .sel-btn-inline.is-hover .sel-btn-name,
+    .sel-btn-inline:hover .sel-btn-value, .sel-btn-inline.is-hover .sel-btn-value,
+    .sel-btn-inline:hover > svg,          .sel-btn-inline.is-hover > svg,
+    .sel-btn-inline:hover > i,            .sel-btn-inline.is-hover > i { color:var(--content-action-hover); }
+    .sel-btn-inline:hover .sel-btn-value, .sel-btn-inline.is-hover .sel-btn-value {
+      text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px;
+    }
 
     /* ── State display helpers ── */
     /* .states-row, .state-col, .state-lbl now defined globally in styles.css */
@@ -397,7 +407,13 @@
       <div class="state-lbl">Selected</div>
       <div class="sel-btn sel-btn-inline is-filled" style="pointer-events:none;"><i data-icon="Clock"></i><span class="sel-btn-value">Jun 30, 2026</span></div>
     </div>
+    <div class="state-col">
+      <div class="state-lbl">Selected, hover</div>
+      <div class="sel-btn sel-btn-inline is-filled is-hover" style="pointer-events:none;"><i data-icon="Clock"></i><span class="sel-btn-value">Jun 30, 2026</span></div>
+    </div>
   </div>
+
+  <p class="section-lead" style="margin-top:24px;">The inline trigger has no border or background to change on hover, and once it is selected its value already sits at the darkest text colour. The value is <strong>underlined</strong> on hover instead, the same affordance as <code>.link-inline</code>, so the control still answers to the pointer.</p>
 </section>
 
 <!-- USAGE -->
