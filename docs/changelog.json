@@ -1,6 +1,25 @@
 {
-  "count": 1055,
+  "count": 1057,
   "entries": [
+    {
+      "hash": "dc20ee1",
+      "author": "Jente Insing",
+      "date": "2026-09-07",
+      "subject": "Country flags are their own asset, next to the icons (v1.17.2)",
+      "pages": [
+        "iconography-docs.html",
+        "select-docs.html"
+      ]
+    },
+    {
+      "hash": "02cd525",
+      "author": "Jente Insing",
+      "date": "2026-09-02",
+      "subject": "Helper text is readable, and the release script can find its build steps (v1.17.1)",
+      "pages": [
+        "text-field-docs.html"
+      ]
+    },
     {
       "hash": "d68965f",
       "author": "Jente Insing",
