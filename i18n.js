@@ -60,6 +60,17 @@
     "Action Planner": { nl: "Actieplanner", de: "Maßnahmenplaner" },
     "Pinboard & actions": { nl: "Pinboard & acties", de: "Pinnwand & Maßnahmen" },
     "Watch tutorial": { nl: "Bekijk uitleg", de: "Tutorial ansehen" },
+    /* Planner page header, the four summary tiles and the table */
+    "Everything you've decided to act on": { nl: "Alles wat je gaat aanpakken", de: "Alles, was Sie angehen möchten" },
+    "Actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview. All of this is visible to HR.": { nl: "Acties die je uitvoert, gebieden die je in de gaten houdt en onderwerpen waarvoor je hulp hebt aangevraagd, verzameld uit je aandachtsgebieden en de vragen die je in het overzicht hebt vastgepind. Dit is allemaal zichtbaar voor HR.", de: "Maßnahmen, die Sie ergreifen, Bereiche, die Sie beobachten, und Themen, für die Sie Unterstützung angefordert haben, gesammelt aus Ihren Schwerpunkten und den Fragen, die Sie in der Übersicht angepinnt haben. All das ist für HR sichtbar." },
+    "To improve": { nl: "Te verbeteren", de: "Zu verbessern" },
+    "Monitoring": { nl: "Monitoren", de: "Beobachten" },
+    "Flagged for support": { nl: "Hulp nodig", de: "Unterstützung nötig" },
+    "To promote": { nl: "Uit te dragen", de: "Zu fördern" },
+    "Focus area": { nl: "Aandachtsgebied", de: "Schwerpunkt" },
+    "Response": { nl: "Reactie", de: "Reaktion" },
+    "Activity": { nl: "Activiteit", de: "Aktivität" },
+    "Action": { nl: "Actie", de: "Maßnahme" },
     "Export": { nl: "Exporteren", de: "Exportieren" },
     "Export as PDF": { nl: "Exporteren als PDF", de: "Als PDF exportieren" },
     "Export as Excel": { nl: "Exporteren als Excel", de: "Als Excel exportieren" },
@@ -203,6 +214,15 @@
     "2 selected": { nl: "2 geselecteerd", de: "2 ausgewählt" },
     "Reset": { nl: "Reset", de: "Zurücksetzen" },
     "Effectory Index": { nl: "Effectory Index", de: "Effectory Index" },
+    "Legend": { nl: "Legenda", de: "Legende" },
+    /* Screen-reader labels (aria-label) */
+    "Open eNPS details": { nl: "eNPS-details openen", de: "eNPS-Details öffnen" },
+    "Search questions": { nl: "Vragen zoeken", de: "Fragen suchen" },
+    "Statistical significance — learn how it works": { nl: "Statistische significantie: zo werkt het", de: "Statistische Signifikanz: so funktioniert es" },
+    "Spiderweb of theme scores, current versus previous survey": { nl: "Spinnenweb van themascores, huidig onderzoek versus vorig onderzoek", de: "Netzdiagramm der Themenwerte, aktuelle im Vergleich zur vorherigen Befragung" },
+    "Theme score over time": { nl: "Themascore in de tijd", de: "Themenwert im Zeitverlauf" },
+    "Dismiss": { nl: "Sluiten", de: "Schließen" },
+    "Lower": { nl: "Lager", de: "Niedriger" },
     /* Comparisons popover + segments */
     "Quick comparisons": { nl: "Snelle vergelijkingen", de: "Schnelle Vergleiche" },
     "All comparisons": { nl: "Alle vergelijkingen", de: "Alle Vergleiche" },
@@ -287,6 +307,7 @@
     "Choose a language": { nl: "Kies een taal", de: "Sprache wählen" },
     "Download “{report}” in the language you select below": { nl: "Download “{report}” in de taal die je hieronder kiest", de: "Laden Sie „{report}“ in der unten gewählten Sprache herunter" },
     "Generating report": { nl: "Rapport genereren", de: "Bericht wird generiert" },
+    "File is being generated.": { nl: "Het bestand wordt aangemaakt.", de: "Die Datei wird erstellt." },
     "We are working hard to generate your file, please wait, your file will be downloaded once finished.": { nl: "We werken hard aan je bestand. Even geduld — je bestand wordt gedownload zodra het klaar is.", de: "Wir arbeiten an Ihrer Datei. Bitte warten Sie — die Datei wird heruntergeladen, sobald sie fertig ist." },
     "Your report is ready": { nl: "Je rapport is klaar", de: "Ihr Bericht ist fertig" },
     "Your download will start automatically.": { nl: "Je download start automatisch.", de: "Ihr Download startet automatisch." },
@@ -470,6 +491,14 @@
     "Why these successes?": { nl: "Waarom deze successen?", de: "Warum diese Erfolge?" },
     "This is relevant": { nl: "Dit is relevant", de: "Das ist relevant" },
     "This focus area is not relevant right now": { nl: "Dit aandachtsgebied is nu niet relevant", de: "Dieser Schwerpunkt ist derzeit nicht relevant" },
+    "Relevant for my team": { nl: "Relevant voor mijn team", de: "Relevant für mein Team" },
+    "Not relevant right now": { nl: "Nu niet relevant", de: "Derzeit nicht relevant" },
+    "Choose": { nl: "Kiezen", de: "Auswählen" },
+    /* Smart tags: why a question is a focus area */
+    "Furthest below benchmark": { nl: "Grootste achterstand op de benchmark", de: "Am weitesten unter der Benchmark" },
+    "Biggest drop": { nl: "Grootste daling", de: "Stärkster Rückgang" },
+    "Improving, still behind": { nl: "Verbetert, maar nog achter", de: "Verbessert sich, liegt aber zurück" },
+    "Below benchmark": { nl: "Onder de benchmark", de: "Unter der Benchmark" },
     "Pick an approach to see the recommended action:": { nl: "Kies een aanpak om de aanbevolen actie te zien:", de: "Wählen Sie einen Ansatz, um die empfohlene Maßnahme zu sehen:" },
     /* Focus view — survey items, sections, recommendation types */
     "I know what results are expected of me at work": { nl: "Ik weet welke resultaten er van mij op het werk worden verwacht", de: "Ich weiß, welche Ergebnisse bei der Arbeit von mir erwartet werden" },
@@ -706,9 +735,13 @@
       const e = T[key];
       if (e && e[window.LANG]) n.nodeValue = raw.replace(key, e[window.LANG]);
     });
-    root.querySelectorAll('[aria-label]').forEach(el => {
-      const e = T[el.getAttribute('aria-label')];
-      if (e && e[window.LANG]) el.setAttribute('aria-label', e[window.LANG]);
+    /* Attributes carry UI text too: the label a screen reader reads, the hint in an
+       empty field, the native tooltip. Same lookup, same fallback to English. */
+    ['aria-label', 'placeholder', 'title'].forEach(attr => {
+      root.querySelectorAll('[' + attr + ']').forEach(el => {
+        const e = T[el.getAttribute(attr)];
+        if (e && e[window.LANG]) el.setAttribute(attr, e[window.LANG]);
+      });
     });
   };
 })();

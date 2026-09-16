@@ -1,5 +1,5 @@
 {
-  "version": "1.18.0",
+  "version": "1.18.1",
   "repo": "effectory-ux/Engage-Design-system-",
   "raw": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main",
   "reference": {
@@ -297,5 +297,5 @@
       }
     }
   ],
-  "generation": "2b377fc2f39b"
+  "generation": "871b21c2fa3b"
 }
