@@ -541,6 +541,63 @@ dezelfde kaart.
 
 ---
 
+### 16. Publiceren: eigen repo, eigen Cloudflare Worker
+Elk nieuw prototype krijgt een **eigen repo** in `effectory-ux` en een **eigen Cloudflare Worker**. Nooit in
+de docs-repo. De URL wordt `https://<repo-naam>.effectory-ux.workers.dev`, en elke push naar `main`
+publiceert zichzelf opnieuw — daar hoeft niemand iets voor aan te klikken.
+
+Waarom niet meer GitHub Pages: Pages kan een prototype niet afschermen, op geen enkel plan. Op Cloudflare
+kan dat straks wel (zie onderaan), en de repo mag privé zijn terwijl het prototype open staat.
+
+**Voorwaarde, eenmalig per machine.** Er moet een `~/.cf-env` zijn met `CLOUDFLARE_API_TOKEN` en
+`CLOUDFLARE_ACCOUNT_ID`. Lees hem met `set -a; . ~/.cf-env; set +a` en druk de waarden **nooit** af.
+Ontbreekt het bestand, vraag er dan om en maak zelf geen token aan — het gedeelde token staat in de
+wachtwoordmanager.
+
+**Stappen.** In deze volgorde; de koppeling verwijst naar de Worker, dus die moet eerst bestaan.
+
+1. **Repo aanmaken** — `gh repo create effectory-ux/<naam> --private --source=. --push`
+2. **Bestanden** — het prototype als `index.html` in de root, met `tokens.css`, `foundation.css`,
+   `components.css`, `icons.js` en `assets/` ernaast. Plus:
+   ```jsonc
+   // wrangler.jsonc
+   { "name": "<naam>", "compatibility_date": "<vandaag>",
+     "assets": { "directory": "./", "html_handling": "auto-trailing-slash",
+                 "not_found_handling": "none" } }
+   ```
+   En een `.assetsignore` met minimaal `.git/`, `.github/`, `*.md`, `*.sh`, `node_modules/` en
+   **`.wrangler/`**.
+3. **Eerste deploy** — `npx wrangler@4 deploy`. Hierdoor ontstaat de Worker.
+4. **Worker-tag ophalen** — uit `GET /accounts/{id}/workers/services/{naam}`, veld
+   `result.default_environment.script.tag`.
+5. **Repo koppelen** — `PUT /accounts/{id}/builds/repos/connections` met `provider_type: github`, het
+   org-id en het repo-id (`gh api /repos/effectory-ux/<naam> --jq .id`). Levert een
+   `repo_connection_uuid`.
+6. **Trigger aanmaken** — `POST /accounts/{id}/builds/triggers` met de Worker-tag als
+   `external_script_id`, die connection-uuid, `deploy_command: "npx wrangler deploy"`, leeg
+   `build_command`, `root_directory: "/"` en `branch_includes: ["main"]`. Het benodigde
+   `build_token_uuid` haal je op uit `GET /accounts/{id}/builds/tokens` — hardcode het niet.
+7. **Link teruggeven** — meld `https://<naam>.effectory-ux.workers.dev` als de deelbare URL.
+
+**Valkuilen.** Alle vier zijn een keer misgegaan; ze kosten samen een middag.
+
+| Symptoom | Oorzaak |
+|---|---|
+| `Missing entry-point` | wrangler 3 draait; een Worker zonder `main` vereist wrangler 4+ |
+| `code 7003, could not route` | verkeerd account-id. Dat is 32 hex-tekens; een token is langer |
+| Upload faalt op 25 MiB | `node_modules/` staat niet in `.assetsignore` |
+| `no-op-worker.js` staat publiek | `.wrangler/` staat niet in `.assetsignore` |
+
+Een geslaagde build rapporteert `status: stopped` met `build_outcome: success`. `stopped` betekent dat de
+container klaar is, niet dat het misging.
+
+**Nog niet beschikbaar: afschermen.** Cloudflare Access, waarmee een prototype na een test alleen nog voor
+`@effectory.com` te openen is, staat nog niet aan. Zolang dat zo is, is een prototype op Cloudflare net zo
+open als op Pages: iedereen met de URL komt erin. Zeg dat er eerlijk bij en gebruik regel 15 voor de vraag
+of het een kaart krijgt. Zodra Access er is, hoort hier de vraag bij of het prototype na de test dicht moet.
+
+---
+
 
 ## Workflow
 
@@ -560,6 +617,7 @@ dezelfde kaart.
     > Start de server met `python3 serve.py` en open daarna:
     > `http://localhost:<poort>/<bestandsnaam>.html`
 11. **Vraag de zichtbaarheid** — `AskUserQuestion`: public (kaart op de projects-pagina) of hidden (alleen via de URL). Zie regel 15
+12. **Publiceer** — eigen repo + eigen Cloudflare Worker, en meld de deelbare URL. Zie regel 16
 
 ---
 
