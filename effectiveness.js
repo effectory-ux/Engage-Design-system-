@@ -941,7 +941,7 @@ function fvReflectHTML(q) {
   return `<div class="fv-approach"><div class="fa-done">
     <div class="fa-done-row">
       <span class="fa-done-ico is-${goal}"><i data-icon="${g.icon}"></i></span>
-      <div class="fa-done-body"><div class="fa-done-title">${title}</div><div class="fa-done-note">Visible to HR</div></div>
+      <div class="fa-done-body"><div class="fa-done-title">${title}</div><div class="fa-done-note">Saved to Actions</div></div>
     </div>
     <div class="fa-done-details">${details}</div>
     <div class="fa-done-editrow"><a class="link-inline fa-done-editlink" data-fv-edit><i data-icon="edit"></i> Edit details</a></div>
@@ -1220,7 +1220,7 @@ function renderFvStep() {
     body = `<div class="step-success">
       <span class="step-hero-ico is-success step-success-ico"><i data-icon="check"></i></span>
       <h2 class="step-h2">You're all set</h2>
-      <p class="step-sub">&ldquo;${q}&rdquo; is now <strong>${word}</strong>. Your team can see it and it's visible to HR.</p>
+      <p class="step-sub">&ldquo;${q}&rdquo; is now <strong>${word}</strong>. You'll find it on the Actions page.</p>
       <div class="step-success-acts">
         <button class="btn btn-secondary" data-fv-goactions>Go to Actions</button>
         <button class="btn btn-primary" data-fv-done>Back to Focus View</button>
@@ -1692,7 +1692,7 @@ function apRowHTML(r) {
 /* The four responses, counted across the planner — the page opens on what has been decided. */
 const RESP_SUMMARY = [
   ['improve', 'To improve'],
-  ['monitor', 'Monitoring'],
+  ['monitor', 'To monitor'],
   ['support', 'Flagged for support'],
   ['promote', 'To promote']
 ];
@@ -1714,7 +1714,7 @@ function actionsEmptyHTML() {
     <div class="ae-hero">
       <div class="ae-hero-txt">
         <h2 class="ae-title">${T2('Turn your results into action')}</h2>
-        <p class="ae-desc">${T2("Respond to a focus area to decide how you'll act on it, and it shows up here, shared with your team and visible to HR. Not sure where to start? Create a custom pin from your own goal.")}</p>
+        <p class="ae-desc">${T2("Respond to a focus area to decide how you'll act on it, and it shows up here. Not sure where to start? Create a custom pin from your own goal.")}</p>
       </div>
       <div class="ae-illo"><img class="actions-illo" src="${ASSET_BASE}assets/illustrations/actions-empty.svg" alt="" /></div>
     </div>
@@ -1725,7 +1725,7 @@ function actionsEmptyHTML() {
         <span class="step-opt-title">${T2(g.label)}</span>
         <span class="step-opt-desc">${RESP_DESC[key]}</span></div>`;
     }).join('')}</div>
-    <div class="ae-cta-row"><button class="btn btn-primary ae-cta ap-custom" type="button"><i data-icon="plus"></i> ${T2('Create custom action')}</button></div>
+    <div class="ae-cta-row"><button class="btn btn-primary ae-cta ap-custom" type="button"><i data-icon="plus"></i> ${T2('Create pin')}</button></div>
   </div>`;
 }
 
@@ -1738,7 +1738,7 @@ function actionsView(d) {
     <div class="actions-head">
       <div class="actions-head-txt">
         <h2 class="fv-section-title">${T2("Everything you've decided to act on")}</h2>
-        <p class="fv-section-desc">${T2("Actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview. All of this is visible to HR.")}</p>
+        <p class="fv-section-desc">${T2("All actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview.")}</p>
       </div>
       <div class="actions-head-cta">
         <div class="ap-export-wrap">
@@ -1748,7 +1748,7 @@ function actionsView(d) {
             <div class="menu-item ap-export-opt"><span class="menu-item-title">${T2('Export as Excel')}</span></div>
           </div>
         </div>
-        <button class="btn btn-primary ap-custom" type="button"><i data-icon="plus"></i> ${T2('Custom pin')}</button>
+        <button class="btn btn-primary ap-custom" type="button"><i data-icon="plus"></i> ${T2('Add custom pin')}</button>
       </div>
     </div>
     <div class="actions-summary" id="actions-summary">${actionsSummaryHTML(rows)}</div>

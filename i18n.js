@@ -64,6 +64,7 @@
     "Export as PDF": { nl: "Exporteren als PDF", de: "Als PDF exportieren" },
     "Export as Excel": { nl: "Exporteren als Excel", de: "Als Excel exportieren" },
     "Custom pin": { nl: "Aangepaste pin", de: "Eigene Markierung" },
+  "Add custom pin": { nl: "Aangepaste pin toevoegen", de: "Eigene Markierung hinzufügen" },
     "Create custom action": { nl: "Eigen actie maken", de: "Eigene Maßnahme erstellen" },
     "Create pin": { nl: "Pin aanmaken", de: "Markierung erstellen" },
     "Pinned": { nl: "Vastgepind", de: "Angepinnt" },
