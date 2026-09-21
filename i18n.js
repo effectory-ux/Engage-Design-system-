@@ -491,6 +491,12 @@
     "Why these successes?": { nl: "Waarom deze successen?", de: "Warum diese Erfolge?" },
     "This is relevant": { nl: "Dit is relevant", de: "Das ist relevant" },
     "This focus area is not relevant right now": { nl: "Dit aandachtsgebied is nu niet relevant", de: "Dieser Schwerpunkt ist derzeit nicht relevant" },
+    /* The three-step dialog that turns a focus area into actions */
+    "Choose your focus area": { nl: "Kies je aandachtsgebied", de: "Schwerpunkt wählen" },
+    "Choose how to respond": { nl: "Kies hoe je reageert", de: "Reaktion wählen" },
+    "Plan it": { nl: "Inplannen", de: "Einplanen" },
+    "Pick the response that fits this area — you can change it later.": { nl: "Kies de reactie die bij dit gebied past. Je kunt het later nog aanpassen.", de: "Wählen Sie die Reaktion, die zu diesem Bereich passt. Sie können das später ändern." },
+    "Choose the recommended actions you want to take": { nl: "Kies de aanbevolen acties die je wilt oppakken", de: "Wählen Sie die empfohlenen Maßnahmen, die Sie ergreifen möchten" },
     "Relevant for my team": { nl: "Relevant voor mijn team", de: "Relevant für mein Team" },
     "Not relevant right now": { nl: "Nu niet relevant", de: "Derzeit nicht relevant" },
     "Choose": { nl: "Kiezen", de: "Auswählen" },
