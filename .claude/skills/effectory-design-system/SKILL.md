@@ -551,6 +551,42 @@ container klaar is, niet dat het misging.
 `@effectory.com` te openen is, staat nog niet aan. Zolang dat zo is, is een prototype op Cloudflare net zo
 open als op Pages: iedereen met de URL komt erin. Zeg dat er eerlijk bij en gebruik regel 15 voor de vraag
 of het een kaart krijgt. Zodra Access er is, hoort hier de vraag bij of het prototype na de test dicht moet.
+### 17. Zichtbare copy in één laag, met stabiele keys
+Schrijf zichtbare tekst **nooit los in de render-code**. Elke string krijgt een plek in één
+copy-laag bovenaan het script, en de render-code leest daaruit:
+
+```js
+const COPY = {
+  'coordinator.group-linking.step-link.step-title': 'Link the groups from both surveys',
+  'coordinator.group-linking.review-banner.pending-title-one':  '1 group needs your review',
+  'coordinator.group-linking.review-banner.pending-title-many': '{{suggestionCount}} groups need your review',
+};
+```
+
+Vier eisen aan die laag:
+
+1. **Een stabiele key per string**, opgebouwd als `{portal}.{pagina}.{feature}.{component + type}` —
+   `coordinator.group-linking.share-dialog.copy-link-button`. Nooit de Engelse tekst als key: dan is
+   elke copy-wijziging een nieuwe string en gooit het vertaalgeheugen het werk weg. (Het
+   results-dashboard doet dit met `i18n.js`, en precies daar zit die zwakte in: dat bestand is
+   gekeyd op de brontekst.)
+2. **Aantallen als benoemde variabele**, `{{groupCount}}`, en **één entry per meervoudsvorm**. Nooit
+   een getal in de brontekst, en nooit een zin die je uit losse fragmenten aan elkaar plakt:
+   `n + (n === 1 ? ' group needs' : ' groups need') + ' your review'` levert een vertaler
+   `' group needs'` op, en dat is in het Nederlands onvertaalbaar.
+3. **Attributen zijn ook copy.** Een `aria-label` op een icon-only knop en een `placeholder` in een
+   zoekveld krijgen hun eigen entry. Stel ze niet samen met data: een attribuut kan geen variabele
+   bevatten, dus `placeholder = 'Search groups in ' + surveyName` is niet te vertalen.
+4. **Eén deep link per scherm of staat** (`?loc-state=<key>`), die de staat opzet via dezelfde code
+   die een klik aanroept, plus `document.documentElement.dataset.locStateReady` als signaal dat de
+   staat er staat. Dat is wat een screenshot per staat voor de vertaler mogelijk maakt.
+
+**Waarom dit een regel is en geen suggestie:** met deze laag is de export naar Smartcat (skill
+`smartcat`) een dump van dat object. Zonder deze laag moet iemand achteraf elke string in een
+gerenderd scherm annoteren en via een browser-renderer uit de DOM trekken — voor group-linking was
+dat 186 strings over 5.700 regels, en dat kostte een dag. De copy-laag kost bij het bouwen vrijwel
+niets.
+
 
 ---
 

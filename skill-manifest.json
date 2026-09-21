@@ -1,5 +1,5 @@
 {
-  "version": "1.18.1",
+  "version": "1.19.0",
   "repo": "effectory-ux/Engage-Design-system-",
   "raw": "https://raw.githubusercontent.com/effectory-ux/Engage-Design-system-/main",
   "reference": {
@@ -35,7 +35,7 @@
     }
   },
   "bundle": {
-    "skillMd": "93c1405fa1e7",
+    "skillMd": "6b27e2b81856",
     "dsSkill": "d701faf9a393"
   },
   "screens": [
@@ -297,5 +297,5 @@
       }
     }
   ],
-  "generation": "871b21c2fa3b"
+  "generation": "060a5a0c08ff"
 }
