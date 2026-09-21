@@ -5,7 +5,7 @@ description: Bouw prototypes, mockups, designs, schermen, pagina's of losse comp
 
 # Skill: Effectory Design System
 
-**Version:** 1.18.1
+**Version:** 1.19.0
 
 Activeer deze skill wanneer iemand vraagt een **prototype**, **mockup**, **design**, **scherm**, **pagina** of **losse component-demo** te bouwen met onze design-system-componenten.
 
@@ -596,6 +596,42 @@ container klaar is, niet dat het misging.
 open als op Pages: iedereen met de URL komt erin. Zeg dat er eerlijk bij en gebruik regel 15 voor de vraag
 of het een kaart krijgt. Zodra Access er is, hoort hier de vraag bij of het prototype na de test dicht moet.
 
+### 17. Zichtbare copy in één laag, met stabiele keys
+Schrijf zichtbare tekst **nooit los in de render-code**. Elke string krijgt een plek in één
+copy-laag bovenaan het script, en de render-code leest daaruit:
+
+```js
+const COPY = {
+  'coordinator.group-linking.step-link.step-title': 'Link the groups from both surveys',
+  'coordinator.group-linking.review-banner.pending-title-one':  '1 group needs your review',
+  'coordinator.group-linking.review-banner.pending-title-many': '{{suggestionCount}} groups need your review',
+};
+```
+
+Vier eisen aan die laag:
+
+1. **Een stabiele key per string**, opgebouwd als `{portal}.{pagina}.{feature}.{component + type}` —
+   `coordinator.group-linking.share-dialog.copy-link-button`. Nooit de Engelse tekst als key: dan is
+   elke copy-wijziging een nieuwe string en gooit het vertaalgeheugen het werk weg. (Het
+   results-dashboard doet dit met `i18n.js`, en precies daar zit die zwakte in: dat bestand is
+   gekeyd op de brontekst.)
+2. **Aantallen als benoemde variabele**, `{{groupCount}}`, en **één entry per meervoudsvorm**. Nooit
+   een getal in de brontekst, en nooit een zin die je uit losse fragmenten aan elkaar plakt:
+   `n + (n === 1 ? ' group needs' : ' groups need') + ' your review'` levert een vertaler
+   `' group needs'` op, en dat is in het Nederlands onvertaalbaar.
+3. **Attributen zijn ook copy.** Een `aria-label` op een icon-only knop en een `placeholder` in een
+   zoekveld krijgen hun eigen entry. Stel ze niet samen met data: een attribuut kan geen variabele
+   bevatten, dus `placeholder = 'Search groups in ' + surveyName` is niet te vertalen.
+4. **Eén deep link per scherm of staat** (`?loc-state=<key>`), die de staat opzet via dezelfde code
+   die een klik aanroept, plus `document.documentElement.dataset.locStateReady` als signaal dat de
+   staat er staat. Dat is wat een screenshot per staat voor de vertaler mogelijk maakt.
+
+**Waarom dit een regel is en geen suggestie:** met deze laag is de export naar Smartcat (skill
+`smartcat`) een dump van dat object. Zonder deze laag moet iemand achteraf elke string in een
+gerenderd scherm annoteren en via een browser-renderer uit de DOM trekken — voor group-linking was
+dat 186 strings over 5.700 regels, en dat kostte een dag. De copy-laag kost bij het bouwen vrijwel
+niets.
+
 ---
 
 
@@ -610,7 +646,8 @@ of het een kaart krijgt. Zodra Access er is, hoort hier de vraag bij of het prot
 6. **Bepaal de pagina's** — benoem elk scherm dat het prototype nodig heeft en geef elk scherm zijn eigen bestand + URL (regel 14). Meer dan één scherm? Bouw dan nooit één bestand dat views omwisselt.
 7. **Bouw incrementeel** — begin met de HTML-structuur, voeg components toe, stel layout in met tokens
 8. **Geen eigen stijlen** — custom CSS alleen voor layout-specifieke zaken (positionering, grid, flex), altijd met tokens voor waarden
-9. **Review** — check de output op doc-classes en hardcoded waarden vóór oplevering
+9. **Review** — check de output op doc-classes en hardcoded waarden vóór oplevering, en of alle
+   zichtbare tekst uit de copy-laag komt (regel 17)
 10. **Lokale server vereist** — meld na het bouwen altijd de URL van **elke** pagina:
     > ⚠️ Open dit prototype via de lokale server, **niet** via dubbelklik (file://).
     > SVG-maskers (o.a. Toggle-vinkje) en icoonfuncties werken niet zonder HTTP.
