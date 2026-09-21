@@ -62,7 +62,7 @@
     "Watch tutorial": { nl: "Bekijk uitleg", de: "Tutorial ansehen" },
     /* Planner page header, the four summary tiles and the table */
     "Everything you've decided to act on": { nl: "Alles wat je gaat aanpakken", de: "Alles, was Sie angehen möchten" },
-    "Actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview. All of this is visible to HR.": { nl: "Acties die je uitvoert, gebieden die je in de gaten houdt en onderwerpen waarvoor je hulp hebt aangevraagd, verzameld uit je aandachtsgebieden en de vragen die je in het overzicht hebt vastgepind. Dit is allemaal zichtbaar voor HR.", de: "Maßnahmen, die Sie ergreifen, Bereiche, die Sie beobachten, und Themen, für die Sie Unterstützung angefordert haben, gesammelt aus Ihren Schwerpunkten und den Fragen, die Sie in der Übersicht angepinnt haben. All das ist für HR sichtbar." },
+    "All actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview.": { nl: "Alle acties die je uitvoert, gebieden die je in de gaten houdt en onderwerpen waarvoor je hulp hebt aangevraagd, verzameld uit je aandachtsgebieden en de vragen die je in het overzicht hebt vastgepind.", de: "Alle Maßnahmen, die Sie ergreifen, Bereiche, die Sie beobachten, und Themen, für die Sie Unterstützung angefordert haben, gesammelt aus Ihren Schwerpunkten und den Fragen, die Sie in der Übersicht angepinnt haben." },
     "To improve": { nl: "Te verbeteren", de: "Zu verbessern" },
     "Monitoring": { nl: "Monitoren", de: "Beobachten" },
     "Flagged for support": { nl: "Hulp nodig", de: "Unterstützung nötig" },
