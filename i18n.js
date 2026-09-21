@@ -64,7 +64,8 @@
     "Everything you've decided to act on": { nl: "Alles wat je gaat aanpakken", de: "Alles, was Sie angehen möchten" },
     "All actions you're taking, areas you're monitoring, and topics flagged for support, gathered from your focus areas and the questions you pinned in the Overview.": { nl: "Alle acties die je uitvoert, gebieden die je in de gaten houdt en onderwerpen waarvoor je hulp hebt aangevraagd, verzameld uit je aandachtsgebieden en de vragen die je in het overzicht hebt vastgepind.", de: "Alle Maßnahmen, die Sie ergreifen, Bereiche, die Sie beobachten, und Themen, für die Sie Unterstützung angefordert haben, gesammelt aus Ihren Schwerpunkten und den Fragen, die Sie in der Übersicht angepinnt haben." },
     "To improve": { nl: "Te verbeteren", de: "Zu verbessern" },
-    "Monitoring": { nl: "Monitoren", de: "Beobachten" },
+
+    "To monitor": { nl: "Monitoren", de: "Beobachten" },
     "Flagged for support": { nl: "Hulp nodig", de: "Unterstützung nötig" },
     "To promote": { nl: "Uit te dragen", de: "Zu fördern" },
     "Focus area": { nl: "Aandachtsgebied", de: "Schwerpunkt" },
@@ -77,6 +78,8 @@
     "Custom pin": { nl: "Aangepaste pin", de: "Eigene Markierung" },
   "Add custom pin": { nl: "Aangepaste pin toevoegen", de: "Eigene Markierung hinzufügen" },
     "Create custom action": { nl: "Eigen actie maken", de: "Eigene Maßnahme erstellen" },
+    "Turn your results into action": { nl: "Zet je resultaten om in actie", de: "Machen Sie aus Ihren Ergebnissen Maßnahmen" },
+    "Respond to a focus area to decide how you'll act on it, and it shows up here. Not sure where to start? Create a custom pin from your own goal.": { nl: "Reageer op een aandachtsgebied om te bepalen wat je ermee doet, dan verschijnt het hier. Weet je niet waar je moet beginnen? Maak een eigen pin vanuit je eigen doel.", de: "Reagieren Sie auf einen Schwerpunkt, um festzulegen, wie Sie damit umgehen, dann erscheint er hier. Sie wissen nicht, wo Sie anfangen sollen? Erstellen Sie eine eigene Markierung aus Ihrem eigenen Ziel." },
     "Create pin": { nl: "Pin aanmaken", de: "Markierung erstellen" },
     "Pinned": { nl: "Vastgepind", de: "Angepinnt" },
     "Pin: no status": { nl: "Pin: geen status", de: "Pin: kein Status" },
