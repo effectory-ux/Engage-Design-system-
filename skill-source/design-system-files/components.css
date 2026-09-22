@@ -2323,7 +2323,10 @@ span.inline-notif-icon.is-subtle i[data-icon] { width: 24px; height: 24px; displ
 @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
 
 /* ── Page Header — the title block at the top of a view ── */
-.ph { width: 100%; background: var(--bg-base); }
+/* No background of its own: the header shows the surface it sits on. Painting --bg-base (the
+   card colour) put a visible band on every page in dark mode, where the page body is
+   --bg-interface-body. In light mode the two are both white, which is why it went unseen. */
+.ph { width: 100%; }
 .ph-row { display: flex; align-items: center; gap: 24px; padding-bottom: 24px; }
 .ph-left { flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .ph-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--content-brand); padding: 4px 0; }
