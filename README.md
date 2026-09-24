@@ -1,5 +1,12 @@
 # effectory-design-documentation
 
+## Hosting
+
+GitHub Pages publiceert `main` vanaf de root (Settings → Pages → *Deploy from a
+branch*, `main`, `/ (root)`) op https://effectory-ux.github.io/Engage-Design-system-/.
+Prototypes laden hun CSS en JS daarvandaan, dus de repo moet public blijven en
+Pages aan: staat een van beide uit, dan verliezen alle prototypes hun styling.
+
 ## Contributor setup
 
 After cloning, enable the versioned git hooks once:
